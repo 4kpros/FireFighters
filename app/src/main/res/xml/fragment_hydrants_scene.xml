@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<MotionScene 
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:motion="http://schemas.android.com/apk/res-auto">
+
+    <Transition
+        motion:constraintSetEnd="@+id/end"
+        motion:constraintSetStart="@id/start"
+        motion:duration="1000">
+        <OnSwipe
+            motion:dragDirection="dragUp"
+            motion:dragScale="1"
+            motion:moveWhenScrollAtTop="true"
+            motion:onTouchUp="autoComplete"
+            motion:touchAnchorId="@id/recycler_hydrants"
+            motion:touchAnchorSide="top"/>
+        <KeyFrameSet>
+            <KeyAttribute
+                motion:motionTarget="@+id/button_search"
+                motion:framePosition="0"
+                android:alpha="1" />
+            <KeyAttribute
+                motion:motionTarget="@+id/button_search"
+                motion:framePosition="10"
+                android:alpha="0" />
+            <KeyAttribute
+                motion:motionTarget="@+id/text_input_layout_search_hydrants"
+                motion:framePosition="0"
+                android:alpha="0.5" />
+            <KeyAttribute
+                motion:motionTarget="@+id/text_input_layout_search_hydrants"
+                motion:framePosition="10"
+                android:alpha="0" />
+        </KeyFrameSet>
+    </Transition>
+
+    <ConstraintSet android:id="@+id/start"></ConstraintSet>
+
+    <ConstraintSet android:id="@+id/end">
+        <Constraint
+            android:id="@+id/text_input_layout_search_hydrants"
+            android:layout_width="0dp"
+            android:layout_height="0.01dp"
+            motion:layout_constraintTop_toBottomOf="@+id/text_hydrant_title"
+            motion:layout_constraintRight_toRightOf="parent"
+            motion:layout_constraintLeft_toLeftOf="parent"
+            android:visibility="invisible" />
+        <Constraint
+            android:id="@+id/linear_filter"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            motion:layout_constraintBottom_toBottomOf="@id/relative_hydrant_title"
+            android:layout_marginEnd="10dp"
+            motion:layout_constraintLeft_toLeftOf="@+id/text_input_layout_search_hydrants"
+            motion:layout_constraintRight_toLeftOf="@+id/relative_hydrant_title"
+            motion:layout_constraintTop_toTopOf="@id/relative_hydrant_title"
+            android:layout_marginRight="10dp" />
+        <Constraint
+            android:id="@+id/linear_order"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            motion:layout_constraintLeft_toRightOf="@+id/relative_hydrant_title"
+            motion:layout_constraintBottom_toBottomOf="@id/relative_hydrant_title"
+            motion:layout_constraintRight_toRightOf="@+id/text_input_layout_search_hydrants"
+            android:layout_marginStart="10dp"
+            motion:layout_constraintTop_toTopOf="@id/relative_hydrant_title"
+            android:layout_marginLeft="10dp" />
+        <Constraint
+            android:id="@+id/button_search"
+            android:layout_width="wrap_content"
+            android:layout_height="0.01dp"
+            motion:layout_constraintTop_toBottomOf="@+id/text_input_layout_search_hydrants"
+            motion:layout_constraintLeft_toLeftOf="parent"
+            motion:layout_constraintRight_toRightOf="parent"
+            android:visibility="invisible"/>
+    </ConstraintSet>
+</MotionScene>

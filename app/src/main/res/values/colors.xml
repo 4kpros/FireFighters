@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="purple_200">#F04545</color>
+    <color name="purple_500">#B71C1C</color>
+    <color name="purple_700">#7F0000</color>
+    <color name="teal_200">#FF03DAC5</color>
+    <color name="teal_700">#FF018786</color>
+
+    <color name="black">#000000</color>
+    <color name="white">#FFFFFF</color>
+
+    //Light colors
+    <color name="light">#F4F4F4</color>
+    <color name="light_200">#EDEDED</color>
+    <color name="light_300">#E3E3E3</color>
+    <color name="light_400">#CCCCCC</color>
+    <color name="light_500">#A6A6A6</color>
+    <color name="light_600">#787878</color>
+    //Dark colors
+    <color name="dark">#131619</color>
+    <color name="dark_100">#181D22</color>
+    <color name="dark_200">#23282C</color>
+    <color name="dark_300">#2C2C2C</color>
+    <color name="dark_400">#3A3A3A</color>
+    <color name="dark_500">#4C4C4C</color>
+    <color name="dark_600">#676767</color>
+
+    //Transparent colors
+    <color name="transparent">#00FFFFFF</color>
+    <color name="transparent_50">#0DFFFFFF</color>
+    <color name="transparent_100">#1AFFFFFF</color>
+    <color name="transparent_200">#33FFFFFF</color>
+    <color name="transparent_300">#4DFFFFFF</color>
+    <color name="transparent_400">#66FFFFFF</color>
+    <color name="transparent_500">#99FFFFFF</color>
+    <color name="transparent_600">#99FFFFFF</color>
+    <color name="transparent_700">#B3FFFFFF</color>
+    <color name="transparent_800">#CCFFFFFF</color>
+    <color name="transparent_900">#E6FFFFFF</color>
+
+    //Green colors
+    <color name="green_200">#72D52F</color>
+    <color name="green_300">#65BF28</color>
+    <color name="green_500">#438A11</color>
+    //Red colors
+    <color name="red_200">#FF2121</color>
+    <color name="red_500">#FF2121</color>
+    <color name="red_700">#FF2121</color>
+    //Blue colors
+    <color name="blue_200">#1691FF</color>
+    <color name="blue_500">#297ECA</color>
+    <color name="blue_700">#1C5385</color>
+    //Orange colors
+    <color name="orange_200">#FF8C00</color>
+</resources>

@@ -1,0 +1,114 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- Base application theme. -->
+    <style name="Theme.FireFighters" parent="Theme.MaterialComponents.DayNight.NoActionBar.Bridge">
+        <!-- Primary brand color. -->
+        <item name="colorPrimary">@color/purple_200</item>
+        <item name="colorPrimaryVariant">@color/purple_500</item>
+        <item name="colorOnPrimary">@color/black</item>
+        <!-- Secondary brand color. -->
+        <item name="colorSecondary">@color/teal_200</item>
+        <item name="colorSecondaryVariant">@color/teal_700</item>
+        <item name="colorOnSecondary">@color/black</item>
+        <!-- Status bar color. -->
+        <item name="android:statusBarColor" tools:targetApi="l">?attr/colorPrimaryVariant</item>
+        <!-- Customize your theme here. -->
+    </style>
+
+    <!-- Background color -->
+    <style name="CustomColor">
+        <item name="android:background">@color/dark</item>
+    </style>
+
+    <!-- Text color -->
+    <style name="CustomCleanTextColor">
+        <item name="android:textColor">@color/light_300</item>
+        <item name="android:tint">@color/light_300</item>
+    </style>
+    <!-- BottomTab bar -->
+    <style name="CustomTab">
+        <item name="android:background">@drawable/custom_tab_dark</item>
+    </style>
+    <!-- Extended floating action button -->
+    <style name="CustomExtendedFloatingAction" parent="@style/Widget.MaterialComponents.ExtendedFloatingActionButton">
+        <item name="android:backgroundTint" tools:targetApi="lollipop">@color/purple_200</item>
+    </style>
+
+    <!-- Background -->
+    <style name="CustomShape">
+        <item name="android:background">@drawable/shape_dark</item>
+    </style>
+    <style name="CustomShapeGradient">
+        <item name="android:background">@drawable/shape_gradient_dark</item>
+    </style>
+    <style name="CustomShapeTop">
+        <item name="android:background">@drawable/shape_top_dark</item>
+    </style>
+    <style name="CustomShapeTopGradient">
+        <item name="android:background">@drawable/shape_top_gradient_dark</item>
+    </style>
+    <style name="CustomShapeBottom">
+        <item name="android:background">@drawable/shape_bottom_dark</item>
+    </style>
+    <style name="CustomShapeBottomGradient">
+        <item name="android:background">@drawable/shape_bottom_gradient_dark</item>
+    </style>
+
+    <!-- Background rounded -->
+    <style name="CustomShapeRounded">
+        <item name="android:background">@drawable/rounded_shape_dark</item>
+    </style>
+    <style name="CustomShapeRoundedGradient">
+        <item name="android:background">@drawable/rounded_shape_gradient_dark</item>
+    </style>
+    <style name="CustomShapeRoundedTop">
+        <item name="android:background">@drawable/rounded_shape_top_dark</item>
+    </style>
+    <style name="CustomShapeRoundedTopGradient">
+        <item name="android:background">@drawable/rounded_shape_top_gradient_dark</item>
+    </style>
+    <style name="CustomShapeRoundedBottom">
+        <item name="android:background">@drawable/rounded_shape_bottom_dark</item>
+    </style>
+    <style name="CustomShapeRoundedBottomGradient">
+        <item name="android:background">@drawable/rounded_shape_bottom_gradient_dark</item>
+    </style>
+
+    <!-- Card Item -->
+    <style name="DefaultCardRipple">
+        <item name="android:background">@drawable/ripple_card_dark_gradient</item>
+    </style>
+
+    <!-- Ripple sos-->
+    <style name="CustomRippleSos">
+        <item name="android:background">@drawable/ripple_sos_button_dark</item>
+        <item name="android:clickable">true</item>
+        <item name="android:focusable">true</item>
+        <item name="android:textColor">@color/black</item>
+    </style>
+
+    <!-- Ripple -->
+    <style name="CustomRipple">
+        <item name="android:background">@drawable/ripple_dark_button</item>
+        <item name="android:clickable">true</item>
+        <item name="android:focusable">true</item>
+    </style>
+    <style name="CustomRippleGradient">
+        <item name="android:background">@drawable/ripple_dark_button_gradient</item>
+        <item name="android:clickable">true</item>
+        <item name="android:focusable">true</item>
+    </style>
+    <style name="CustomRoundedRipple">
+        <item name="android:background">@drawable/ripple_dark_button_rounded</item>
+        <item name="android:clickable">true</item>
+        <item name="android:focusable">true</item>
+    </style>
+
+<!-- Scrollbar -->
+<style name="ScrollView">
+    <item name="android:scrollbarAlwaysDrawVerticalTrack">true</item>
+    <item name="android:scrollbarStyle">outsideOverlay</item>
+    <item name="android:scrollbars">vertical</item>
+    <item name="android:fadeScrollbars">true</item>
+    <item name="android:scrollbarThumbVertical">@drawable/scroller_style</item>
+</style>
+</resources>

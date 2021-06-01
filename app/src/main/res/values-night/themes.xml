@@ -72,6 +72,45 @@
     <style name="CustomShapeRoundedBottomGradient">
         <item name="android:background">@drawable/rounded_shape_bottom_gradient_dark</item>
     </style>
+<!-- Background primary rounded -->
+    <style name="CustomShapePrimaryRounded">
+        <item name="android:background">@drawable/rounded_shape_primary</item>
+    </style>
+    <style name="CustomShapePrimaryRoundedGradient">
+        <item name="android:background">@drawable/rounded_shape_primary_gradient</item>
+    </style>
+    <style name="CustomShapePrimaryRoundedTop">
+        <item name="android:background">@drawable/rounded_shape_top_primary</item>
+    </style>
+    <style name="CustomShapePrimaryRoundedTopGradient">
+        <item name="android:background">@drawable/rounded_shape_top_primary_gradient</item>
+    </style>
+    <style name="CustomShapePrimaryRoundedBottom">
+        <item name="android:background">@drawable/rounded_shape_bottom_primary</item>
+    </style>
+    <style name="CustomShapePrimaryRoundedBottomGradient">
+        <item name="android:background">@drawable/rounded_shape_bottom_primary_gradient</item>
+    </style>
+
+    <!-- Background secondary rounded -->
+    <style name="CustomShapeSecondaryRounded">
+        <item name="android:background">@drawable/rounded_shape_secondary</item>
+    </style>
+    <style name="CustomShapeSecondaryRoundedGradient">
+        <item name="android:background">@drawable/rounded_shape_secondary_gradient</item>
+    </style>
+    <style name="CustomShapeSecondaryRoundedTop">
+        <item name="android:background">@drawable/rounded_shape_top_secondary</item>
+    </style>
+    <style name="CustomShapeSecondaryRoundedTopGradient">
+        <item name="android:background">@drawable/rounded_shape_top_secondary_gradient</item>
+    </style>
+    <style name="CustomShapeSecondaryRoundedBottom">
+        <item name="android:background">@drawable/rounded_shape_bottom_secondary</item>
+    </style>
+    <style name="CustomShapeSecondaryRoundedBottomGradient">
+        <item name="android:background">@drawable/rounded_shape_bottom_secondary_gradient</item>
+    </style>
 
     <!-- Card Item -->
     <style name="DefaultCardRipple">

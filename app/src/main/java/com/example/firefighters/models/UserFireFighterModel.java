@@ -1,23 +1,42 @@
 package com.example.firefighters.models;
 
-public class UserModel {
-    int userId;
+public class UserFireFighterModel {
+    int fireFighterId;
+    String cIN;
+    String matNo;
     String mail;
+    String grade;
     String userName;
     String firstName;
     String lastName;
     int phoneNumber;
     String picture;
 
-    public UserModel() {
+    public UserFireFighterModel() {
     }
 
-    public int getUserId() {
-        return userId;
+    public int getFireFighterId() {
+        return fireFighterId;
     }
 
-    public void setUserId(int userId) {
-        this.userId = userId;
+    public void setFireFighterId(int fireFighterId) {
+        this.fireFighterId = fireFighterId;
+    }
+
+    public String getcIN() {
+        return cIN;
+    }
+
+    public void setcIN(String cIN) {
+        this.cIN = cIN;
+    }
+
+    public String getMatNo() {
+        return matNo;
+    }
+
+    public void setMatNo(String matNo) {
+        this.matNo = matNo;
     }
 
     public String getMail() {
@@ -26,6 +45,14 @@ public class UserModel {
 
     public void setMail(String mail) {
         this.mail = mail;
+    }
+
+    public String getGrade() {
+        return grade;
+    }
+
+    public void setGrade(String grade) {
+        this.grade = grade;
     }
 
     public String getUserName() {

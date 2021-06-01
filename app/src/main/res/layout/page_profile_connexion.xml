@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:id="@+id/motion_layout_profile"
     app:layoutDescription="@xml/page_profile_connexion_scene">
     <ScrollView
         android:id="@+id/scroll_sign_in"
@@ -147,6 +148,15 @@
                 app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintRight_toRightOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/linear_remember_forgot" />
+            <com.google.android.material.progressindicator.CircularProgressIndicator
+                android:id="@+id/progress_circular"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintLeft_toLeftOf="@+id/button_sign_in"
+                app:layout_constraintRight_toRightOf="@+id/button_sign_in"
+                app:layout_constraintTop_toTopOf="@+id/button_sign_in"
+                app:layout_constraintBottom_toBottomOf="@+id/button_sign_in"
+                />
             <RelativeLayout
                 android:id="@+id/relative_go_to_sign_up"
                 android:layout_width="wrap_content"

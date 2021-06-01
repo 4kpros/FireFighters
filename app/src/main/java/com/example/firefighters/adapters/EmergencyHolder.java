@@ -1,14 +1,11 @@
 package com.example.firefighters.adapters;
 
-import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.example.firefighters.R;
-import com.example.firefighters.models.HydrantModel;
-import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.button.MaterialButton;
 
 import org.jetbrains.annotations.NotNull;
@@ -17,7 +14,7 @@ import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
-public class HydrantHolder extends RecyclerView.ViewHolder {
+public class EmergencyHolder extends RecyclerView.ViewHolder {
 
     CardView cardHydrant;
     TextView streetDistance;
@@ -34,13 +31,13 @@ public class HydrantHolder extends RecyclerView.ViewHolder {
 
     RelativeLayout cardClickButton;
 
-    public HydrantHolder(@NonNull @NotNull View itemView) {
+    public EmergencyHolder(@NonNull @NotNull View itemView) {
         super(itemView);
 
         initViews(itemView);
     }
 
-    public void checkInteractions(final long position, final HydrantAdapter.OnItemClickListener listener) {
+    public void bindListener(final int position, final EmergencyAdapter.OnItemClickListener listener) {
         //Street view button have be clicked ?
         streetViewButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -53,6 +50,13 @@ public class HydrantHolder extends RecyclerView.ViewHolder {
             @Override
             public void onClick(View v) {
                 listener.onItemMoreClick(position);
+            }
+        });
+        //On card clicked
+        cardClickButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                listener.onItemCardClick(position);
             }
         });
     }

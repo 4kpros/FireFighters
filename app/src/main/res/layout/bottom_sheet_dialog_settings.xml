@@ -4,7 +4,7 @@
     android:id="@+id/bottom_sheet_container"
     android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="wrap_content"
     android:layout_margin="10dp"
     style="@style/CustomShapeRoundedGradient"
     >
@@ -18,7 +18,7 @@
             android:layout_height="wrap_content"
             android:text="Settings"
             style="@style/CustomCleanTextColor"
-            android:textSize="20sp"
+            android:textSize="16sp"
             app:textAllCaps="true"
             android:textStyle="bold"
             android:maxLines="1"

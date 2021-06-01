@@ -1,6 +1,8 @@
 package com.example.firefighters.ui.profile;
 
+import androidx.annotation.Nullable;
 import androidx.cardview.widget.CardView;
+import androidx.constraintlayout.motion.widget.MotionLayout;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
@@ -16,22 +18,34 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.AnimationUtils;
 import android.widget.Toast;
 
 import com.example.firefighters.R;
+import com.example.firefighters.models.UserAdminModel;
+import com.example.firefighters.models.UserFireFighterModel;
+import com.example.firefighters.models.UserModel;
+import com.example.firefighters.viewmodels.EmergencyViewModel;
+import com.example.firefighters.viewmodels.FireTruckViewModel;
+import com.example.firefighters.viewmodels.UserViewModel;
+import com.example.firefighters.viewmodels.WaterSourceViewModel;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.button.MaterialButtonToggleGroup;
+import com.google.android.material.checkbox.MaterialCheckBox;
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.progressindicator.CircularProgressIndicator;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textview.MaterialTextView;
+import com.google.firebase.auth.FirebaseUser;
+
+import org.jetbrains.annotations.NotNull;
+
+import java.util.Objects;
 
 
 public class ProfileFragment extends Fragment {
 
     private Context context;
-    private ProfileViewModel profileViewModel;
 
     //Boolean
     private boolean isMyPointsPanel;
@@ -53,11 +67,15 @@ public class ProfileFragment extends Fragment {
     private MaterialButton goToSignUpButton;
     private MaterialButton workingOnButton;
     private MaterialButton myPointsButton;
+    private MaterialButton forgotPasswordButton;
+
+    private CircularProgressIndicator circularProgressIndicator;
 
     //Card views
     private CardView workingOnCard;
 
     //Toggle buttons
+    MaterialCheckBox checkBoxRemember;
     private MaterialButtonToggleGroup toggleButton;
     private MaterialButton emergencyPointButton;
     private MaterialButton waterPointButton;
@@ -65,6 +83,9 @@ public class ProfileFragment extends Fragment {
 
     //Recyclers views
     private RecyclerView recyclerViewExpandMyPoint;
+
+    MotionLayout pageProfileConnexion;
+    MotionLayout pageProfileHome;
 
     //Fab buttons
     ExtendedFloatingActionButton floatingButtonAdd;
@@ -75,17 +96,96 @@ public class ProfileFragment extends Fragment {
     MaterialTextView textAddWater;
     MaterialTextView textAddFireStation;
 
+    private UserViewModel userViewModel;
+    private EmergencyViewModel emergencyViewModel;
+    private WaterSourceViewModel waterSourceViewModel;
+    private FireTruckViewModel fireTruckViewModel;
+
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
-        profileViewModel = new ViewModelProvider(this).get(ProfileViewModel.class);
-        View root = inflater.inflate(R.layout.fragment_profile, container, false);
-
+        View view = inflater.inflate(R.layout.fragment_profile, container, false);
         context = getContext();
-        initViews(root);
+        initViews(view);
+        initViewModel();
         setViewStates();
-        checkInteractions(root);
+        ObserveLiveData();
+        return view;
+    }
 
-        return root;
+    private void ObserveLiveData() {
+        userViewModel.getCurrentAuthUser().observe(requireActivity(), new Observer<FirebaseUser>() {
+            @Override
+            public void onChanged(FirebaseUser firebaseUser) {
+                if (firebaseUser == null){
+                    goToSignInPage();
+                }else {
+                    //Update data
+                }
+            }
+        });
+        userViewModel.getUser().observe(requireActivity(), new Observer<UserModel>() {
+            @Override
+            public void onChanged(UserModel userModel) {
+                if (userModel == null){
+                    goToSignInPage();
+                }else {
+                    //Update data
+                }
+            }
+        });
+        userViewModel.getFireFighter().observe(requireActivity(), new Observer<UserFireFighterModel>() {
+            @Override
+            public void onChanged(UserFireFighterModel userFireFighterModel) {
+                if (userFireFighterModel == null){
+                    goToSignInPage();
+                }else {
+                    //Update data
+                }
+            }
+        });
+        userViewModel.getAdmin().observe(requireActivity(), new Observer<UserAdminModel>() {
+            @Override
+            public void onChanged(UserAdminModel userAdminModel) {
+                if (userAdminModel == null)
+                    goToSignInPage();
+                else {
+                    //Update data
+                }
+            }
+        });
+        userViewModel.getIsLoadingUser().observe(requireActivity(), new Observer<Boolean>() {
+            @Override
+            public void onChanged(Boolean aBoolean) {
+                if (!aBoolean){
+                    hideLoading();
+                    if(userViewModel.getCurrentAuthUser().getValue() != null){
+                        goToProfileHomePage();
+                    }
+                }
+            }
+        });
+    }
+
+    private void goToProfileHomePage() {
+        pageProfileHome.setVisibility(View.VISIBLE);
+        pageProfileConnexion.setVisibility(View.GONE);
+    }
+
+    private void goToSignInPage() {
+        pageProfileHome.setVisibility(View.GONE);
+        pageProfileConnexion.setVisibility(View.VISIBLE);
+    }
+
+    @Override
+    public void onViewCreated(@NonNull @NotNull View view, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+        checkInteractions(view);
+    }
+
+    private void initViewModel() {
+        userViewModel = new ViewModelProvider(requireActivity()).get(UserViewModel.class);
+        userViewModel.init();
     }
 
     private void checkInteractions(View root) {
@@ -186,13 +286,23 @@ public class ProfileFragment extends Fragment {
 
     private void tryToSignUp() {
         showLoading();
+        String userName = Objects.requireNonNull(userNameSignUp.getText()).toString();
+        String userMail = Objects.requireNonNull(mailSignUp.getText()).toString();
+        String userPassword = Objects.requireNonNull(passwordSignUp2.getText()).toString();
+        userViewModel.createNewUser(userName, userMail, userPassword);
     }
 
     private void tryToSignIn() {
         showLoading();
+        String userMail = Objects.requireNonNull(mailSignIn.getText()).toString();
+        String userPassword = Objects.requireNonNull(passwordSignIn.getText()).toString();
+        userViewModel.signInUser(userMail, userPassword);
     }
 
     private void setViewStates(){
+        //Set the correct page if the user is auth
+//        FirebaseManager.
+
         if(isWorkingOnPanel){
             workingOnCard.setVisibility(View.VISIBLE);
         }else {
@@ -336,9 +446,17 @@ public class ProfileFragment extends Fragment {
         goToSignUpButton = root.findViewById(R.id.button_go_to_sign_up);
         workingOnButton = root.findViewById(R.id.button_working_on);
         myPointsButton = root.findViewById(R.id.button_my_points);
+        forgotPasswordButton = root.findViewById(R.id.button_forgot_password);
+
+        checkBoxRemember = root.findViewById(R.id.checkbox_remember_me);
+        circularProgressIndicator = root.findViewById(R.id.progress_circular);
 
         //Card views
         workingOnCard = root.findViewById(R.id.card_working_on);
+
+        //Motions layouts
+        pageProfileConnexion = root.findViewById(R.id.motion_layout_profile);
+        pageProfileHome = root.findViewById(R.id.coordinatorLayout);
 
         //Card views
         recyclerViewExpandMyPoint = root.findViewById(R.id.recycler_expand_my_points);
@@ -360,10 +478,26 @@ public class ProfileFragment extends Fragment {
     }
 
     private void showLoading(){
-        //
+        checkBoxRemember.setVisibility(View.INVISIBLE);
+        forgotPasswordButton.setVisibility(View.INVISIBLE);
+        goToSignUpButton.setVisibility(View.INVISIBLE);
+        signInButton.setVisibility(View.INVISIBLE);
+
+        signUpButton.setVisibility(View.INVISIBLE);
+        goToSignInButton.setVisibility(View.INVISIBLE);
+
+        circularProgressIndicator.show();
     }
 
     private void hideLoading(){
-        //
+        checkBoxRemember.setVisibility(View.VISIBLE);
+        forgotPasswordButton.setVisibility(View.VISIBLE);
+        goToSignUpButton.setVisibility(View.VISIBLE);
+        signInButton.setVisibility(View.VISIBLE);
+
+        signUpButton.setVisibility(View.VISIBLE);
+        goToSignInButton.setVisibility(View.VISIBLE);
+
+        circularProgressIndicator.show();
     }
 }

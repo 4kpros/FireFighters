@@ -18,7 +18,7 @@
             android:layout_height="wrap_content"
             android:text="Filter by"
             style="@style/CustomCleanTextColor"
-            android:textSize="20sp"
+            android:textSize="16sp"
             app:textAllCaps="true"
             android:textStyle="bold"
             android:maxLines="1"
@@ -90,60 +90,6 @@
                 style="@style/Widget.MaterialComponents.Button.TextButton"
                 app:rippleColor="@color/light_300"
                 android:text="Degree"
-                android:layout_margin="10dp"
-                android:autoLink="all"
-                android:ellipsize="end"
-                android:linksClickable="true"
-                android:maxLines="1"
-                android:layout_gravity="center"
-                android:gravity="center"
-                android:textColor="@color/purple_200"
-                app:iconTint="@color/purple_200"
-                />
-        </RelativeLayout>
-    </LinearLayout>
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        >
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="center"
-            >
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/button_distance_filter"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                style="@style/Widget.MaterialComponents.Button.TextButton"
-                app:rippleColor="@color/light_300"
-                android:text="Distance"
-                android:layout_margin="10dp"
-                android:autoLink="all"
-                android:ellipsize="end"
-                android:linksClickable="true"
-                android:maxLines="1"
-                android:layout_gravity="center"
-                android:gravity="center"
-                android:textColor="@color/purple_200"
-                app:iconTint="@color/purple_200"
-                />
-        </RelativeLayout>
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="center"
-            >
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/button_date_filter"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                style="@style/Widget.MaterialComponents.Button.TextButton"
-                app:rippleColor="@color/light_300"
-                android:text="Date"
                 android:layout_margin="10dp"
                 android:autoLink="all"
                 android:ellipsize="end"

@@ -18,7 +18,7 @@
             android:layout_height="wrap_content"
             android:text="SOS"
             style="@style/CustomCleanTextColor"
-            android:textSize="20sp"
+            android:textSize="16sp"
             app:textAllCaps="true"
             android:textStyle="bold"
             android:maxLines="1"

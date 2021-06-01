@@ -38,6 +38,17 @@
     <color name="transparent_800">#CCFFFFFF</color>
     <color name="transparent_900">#E6FFFFFF</color>
 
+    <color name="transparent_dark_50">#0D000000</color>
+    <color name="transparent_dark_100">#1A000000</color>
+    <color name="transparent_dark_200">#33000000</color>
+    <color name="transparent_dark_300">#4D000000</color>
+    <color name="transparent_dark_400">#66000000</color>
+    <color name="transparent_dark_500">#99000000</color>
+    <color name="transparent_dark_600">#99000000</color>
+    <color name="transparent_dark_700">#B3000000</color>
+    <color name="transparent_dark_800">#CC000000</color>
+    <color name="transparent_dark_900">#E6000000</color>
+
     //Green colors
     <color name="green_200">#72D52F</color>
     <color name="green_300">#65BF28</color>

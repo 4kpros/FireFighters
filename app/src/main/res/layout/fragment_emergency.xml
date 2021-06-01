@@ -4,18 +4,18 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    app:layoutDescription="@xml/fragment_hydrants_scene"
+    app:layoutDescription="@xml/fragment_emergency_scene"
     style="@style/CustomShapeGradient"
     >
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recycler_hydrants"
+        android:id="@+id/recycler_emergencies"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
+        android:layout_height="0dp"
         android:scrollbars="vertical"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/linear_transparent"
-        android:paddingBottom="@dimen/title_height"
+        app:layout_constraintBottom_toBottomOf="parent"
         style="@style/ScrollView"
         android:scrollbarStyle="insideInset"
         />
@@ -30,7 +30,7 @@
         app:layout_constraintBottom_toBottomOf="@+id/linear_filter"
         />
     <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/text_input_layout_search_hydrants"
+        android:id="@+id/text_input_layout_search_emergencies"
         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -50,10 +50,10 @@
         app:boxCornerRadiusTopEnd="30dp"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/text_hydrant_title"
+        app:layout_constraintTop_toBottomOf="@+id/text_emergency_top_title"
         >
         <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/text_input_sign_search_hydrants"
+            android:id="@+id/text_input_sign_search_emergencies"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:inputType="textFilter"
@@ -69,7 +69,7 @@
         android:gravity="center"
         android:orientation="horizontal"
         app:layout_constraintBottom_toBottomOf="@+id/button_search"
-        app:layout_constraintLeft_toLeftOf="@+id/text_input_layout_search_hydrants"
+        app:layout_constraintLeft_toLeftOf="@+id/text_input_layout_search_emergencies"
         app:layout_constraintRight_toLeftOf="@+id/button_search"
         app:layout_constraintTop_toTopOf="@+id/button_search"
         >
@@ -108,7 +108,7 @@
         android:orientation="horizontal"
         app:layout_constraintBottom_toBottomOf="@+id/button_search"
         app:layout_constraintLeft_toRightOf="@+id/button_search"
-        app:layout_constraintRight_toRightOf="@+id/text_input_layout_search_hydrants"
+        app:layout_constraintRight_toRightOf="@+id/text_input_layout_search_emergencies"
         app:layout_constraintTop_toTopOf="@+id/button_search"
         >
         <TextView
@@ -146,25 +146,38 @@
         app:cornerRadius="5dp"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/text_input_layout_search_hydrants"
+        app:layout_constraintTop_toBottomOf="@+id/text_input_layout_search_emergencies"
         />
     <RelativeLayout
-        android:id="@+id/relative_hydrant_title"
+        android:id="@+id/relative_emergency_title"
         android:layout_width="0dp"
         android:layout_height="0dp"
         style="@style/CustomShapeSecondaryRoundedBottom"
-        app:layout_constraintBottom_toBottomOf="@+id/text_hydrant_title"
-        app:layout_constraintLeft_toLeftOf="@+id/text_hydrant_title"
-        app:layout_constraintRight_toRightOf="@+id/text_hydrant_title"
+        app:layout_constraintBottom_toBottomOf="@+id/text_emergency_top_title"
+        app:layout_constraintLeft_toLeftOf="@+id/text_emergency_top_title"
+        app:layout_constraintRight_toRightOf="@+id/text_emergency_top_title"
         app:layout_constraintTop_toTopOf="parent"
         />
+    <com.google.android.material.progressindicator.CircularProgressIndicator
+        android:id="@+id/progress_emergency"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintLeft_toLeftOf="@+id/relative_emergency_title"
+        app:layout_constraintRight_toRightOf="@+id/relative_emergency_title"
+        app:layout_constraintTop_toTopOf="@+id/relative_emergency_title"
+        app:layout_constraintBottom_toBottomOf="@+id/relative_emergency_title"
+        android:indeterminate="true"
+        app:trackColor="@color/white"
+        app:indicatorColor="@color/dark_600"
+        android:visibility="gone"
+        />
     <TextView
-        android:id="@+id/text_hydrant_title"
+        android:id="@+id/text_emergency_top_title"
         android:layout_width="wrap_content"
         android:layout_height="40dp"
         android:layout_margin="10dp"
         android:gravity="center"
-        android:text="     HYDRANTS     "
+        android:text="     EMERGENCIES     "
         android:textColor="@color/white"
         android:textSize="16sp"
         android:textStyle="bold"

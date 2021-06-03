@@ -1,20 +1,9 @@
 package com.example.firefighters.ui.profile;
 
-import androidx.annotation.Nullable;
-import androidx.cardview.widget.CardView;
-import androidx.constraintlayout.motion.widget.MotionLayout;
-import androidx.lifecycle.Observer;
-import androidx.lifecycle.ViewModelProvider;
-
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.content.Context;
 import android.os.Bundle;
-
-import androidx.annotation.NonNull;
-import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.RecyclerView;
-
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -42,51 +31,22 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Objects;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.cardview.widget.CardView;
+import androidx.constraintlayout.motion.widget.MotionLayout;
+import androidx.fragment.app.Fragment;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProvider;
+import androidx.recyclerview.widget.RecyclerView;
+
 
 public class ProfileFragment extends Fragment {
 
-    private Context context;
-
-    //Boolean
-    private boolean isMyPointsPanel;
-    private boolean isWorkingOnPanel;
-    private boolean isAllFabVisible;
-
-    //Edit text
-    private TextInputEditText mailSignIn;
-    private TextInputEditText passwordSignIn;
-    private TextInputEditText userNameSignUp;
-    private TextInputEditText mailSignUp;
-    private TextInputEditText passwordSignUp1;
-    private TextInputEditText passwordSignUp2;
-
-    //Buttons
-    private MaterialButton signInButton;
-    private MaterialButton signUpButton;
-    private MaterialButton goToSignInButton;
-    private MaterialButton goToSignUpButton;
-    private MaterialButton workingOnButton;
-    private MaterialButton myPointsButton;
-    private MaterialButton forgotPasswordButton;
-
-    private CircularProgressIndicator circularProgressIndicator;
-
-    //Card views
-    private CardView workingOnCard;
-
     //Toggle buttons
     MaterialCheckBox checkBoxRemember;
-    private MaterialButtonToggleGroup toggleButton;
-    private MaterialButton emergencyPointButton;
-    private MaterialButton waterPointButton;
-    private MaterialButton fireStationPointButton;
-
-    //Recyclers views
-    private RecyclerView recyclerViewExpandMyPoint;
-
     MotionLayout pageProfileConnexion;
     MotionLayout pageProfileHome;
-
     //Fab buttons
     ExtendedFloatingActionButton floatingButtonAdd;
     FloatingActionButton floatingButtonButtonAddEmergency;
@@ -95,7 +55,35 @@ public class ProfileFragment extends Fragment {
     MaterialTextView textAddEmergency;
     MaterialTextView textAddWater;
     MaterialTextView textAddFireStation;
-
+    private Context context;
+    //Boolean
+    private boolean isMyPointsPanel;
+    private boolean isWorkingOnPanel;
+    private boolean isAllFabVisible;
+    //Edit text
+    private TextInputEditText mailSignIn;
+    private TextInputEditText passwordSignIn;
+    private TextInputEditText userNameSignUp;
+    private TextInputEditText mailSignUp;
+    private TextInputEditText passwordSignUp1;
+    private TextInputEditText passwordSignUp2;
+    //Buttons
+    private MaterialButton signInButton;
+    private MaterialButton signUpButton;
+    private MaterialButton goToSignInButton;
+    private MaterialButton goToSignUpButton;
+    private MaterialButton workingOnButton;
+    private MaterialButton myPointsButton;
+    private MaterialButton forgotPasswordButton;
+    private CircularProgressIndicator circularProgressIndicator;
+    //Card views
+    private CardView workingOnCard;
+    private MaterialButtonToggleGroup toggleButton;
+    private MaterialButton emergencyPointButton;
+    private MaterialButton waterPointButton;
+    private MaterialButton fireStationPointButton;
+    //Recyclers views
+    private RecyclerView recyclerViewExpandMyPoint;
     private UserViewModel userViewModel;
     private EmergencyViewModel emergencyViewModel;
     private WaterSourceViewModel waterSourceViewModel;
@@ -116,9 +104,9 @@ public class ProfileFragment extends Fragment {
         userViewModel.getCurrentAuthUser().observe(requireActivity(), new Observer<FirebaseUser>() {
             @Override
             public void onChanged(FirebaseUser firebaseUser) {
-                if (firebaseUser == null){
+                if (firebaseUser == null) {
                     goToSignInPage();
-                }else {
+                } else {
                     //Update data
                 }
             }
@@ -126,9 +114,9 @@ public class ProfileFragment extends Fragment {
         userViewModel.getUser().observe(requireActivity(), new Observer<UserModel>() {
             @Override
             public void onChanged(UserModel userModel) {
-                if (userModel == null){
+                if (userModel == null) {
                     goToSignInPage();
-                }else {
+                } else {
                     //Update data
                 }
             }
@@ -136,9 +124,9 @@ public class ProfileFragment extends Fragment {
         userViewModel.getFireFighter().observe(requireActivity(), new Observer<UserFireFighterModel>() {
             @Override
             public void onChanged(UserFireFighterModel userFireFighterModel) {
-                if (userFireFighterModel == null){
+                if (userFireFighterModel == null) {
                     goToSignInPage();
-                }else {
+                } else {
                     //Update data
                 }
             }
@@ -156,9 +144,9 @@ public class ProfileFragment extends Fragment {
         userViewModel.getIsLoadingUser().observe(requireActivity(), new Observer<Boolean>() {
             @Override
             public void onChanged(Boolean aBoolean) {
-                if (!aBoolean){
+                if (!aBoolean) {
                     hideLoading();
-                    if(userViewModel.getCurrentAuthUser().getValue() != null){
+                    if (userViewModel.getCurrentAuthUser().getValue() != null) {
                         goToProfileHomePage();
                     }
                 }
@@ -217,11 +205,11 @@ public class ProfileFragment extends Fragment {
             @Override
             public void onButtonChecked(MaterialButtonToggleGroup group, int checkedId, boolean isChecked) {
                 int tempId = group.getCheckedButtonId();
-                if(tempId == emergencyPointButton.getId()){
+                if (tempId == emergencyPointButton.getId()) {
                     loadEmergencyRecycler();
-                }else if (tempId == waterPointButton.getId()){
+                } else if (tempId == waterPointButton.getId()) {
                     loadWaterRecycler();
-                }else if (tempId == fireStationPointButton.getId()){
+                } else if (tempId == fireStationPointButton.getId()) {
                     loadFireStationRecycler();
                 }
             }
@@ -230,9 +218,9 @@ public class ProfileFragment extends Fragment {
         floatingButtonAdd.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(isAllFabVisible){
+                if (isAllFabVisible) {
                     hideAllFab();
-                }else {
+                } else {
                     showAllFab();
                 }
             }
@@ -299,25 +287,25 @@ public class ProfileFragment extends Fragment {
         userViewModel.signInUser(userMail, userPassword);
     }
 
-    private void setViewStates(){
+    private void setViewStates() {
         //Set the correct page if the user is auth
 //        FirebaseManager.
 
-        if(isWorkingOnPanel){
+        if (isWorkingOnPanel) {
             workingOnCard.setVisibility(View.VISIBLE);
-        }else {
+        } else {
             workingOnCard.setVisibility(View.GONE);
         }
-        if (isMyPointsPanel){
+        if (isMyPointsPanel) {
             toggleButton.setVisibility(View.VISIBLE);
             recyclerViewExpandMyPoint.setVisibility(View.VISIBLE);
-        }else {
+        } else {
             toggleButton.setVisibility(View.GONE);
             recyclerViewExpandMyPoint.setVisibility(View.GONE);
         }
 
         //Set for action floating buttons
-        if(isAllFabVisible){
+        if (isAllFabVisible) {
             textAddEmergency.setVisibility(View.VISIBLE);
             textAddFireStation.setVisibility(View.VISIBLE);
             textAddWater.setVisibility(View.VISIBLE);
@@ -325,7 +313,7 @@ public class ProfileFragment extends Fragment {
             floatingButtonAddWater.setVisibility(View.VISIBLE);
             floatingButtonAddFireStation.setVisibility(View.VISIBLE);
             floatingButtonAdd.extend();
-        }else{
+        } else {
             textAddEmergency.setVisibility(View.GONE);
             textAddFireStation.setVisibility(View.GONE);
             textAddWater.setVisibility(View.GONE);
@@ -359,7 +347,7 @@ public class ProfileFragment extends Fragment {
     }
 
     private void getWorkingOnPanel(View v) {
-        if (isWorkingOnPanel){
+        if (isWorkingOnPanel) {
             isWorkingOnPanel = false;
             //Now hide working on panel
             workingOnCard.setAlpha(1);
@@ -374,7 +362,7 @@ public class ProfileFragment extends Fragment {
                             workingOnCard.setVisibility(View.GONE);
                         }
                     });
-        }else{
+        } else {
             isWorkingOnPanel = true;
             //Now show working on panel
             workingOnCard.setAlpha(0);
@@ -387,7 +375,7 @@ public class ProfileFragment extends Fragment {
     }
 
     private void getMyPointsPanel(View v) {
-        if (isMyPointsPanel){
+        if (isMyPointsPanel) {
             isMyPointsPanel = false;
             //Now hide my points panel
             toggleButton.setAlpha(1);
@@ -412,7 +400,7 @@ public class ProfileFragment extends Fragment {
                             recyclerViewExpandMyPoint.setVisibility(View.GONE);
                         }
                     });
-        }else{
+        } else {
             isMyPointsPanel = true;
             //Now show my points panel
             toggleButton.setAlpha(0);
@@ -477,7 +465,7 @@ public class ProfileFragment extends Fragment {
         textAddFireStation = root.findViewById(R.id.add_fire_station_action_text);
     }
 
-    private void showLoading(){
+    private void showLoading() {
         checkBoxRemember.setVisibility(View.INVISIBLE);
         forgotPasswordButton.setVisibility(View.INVISIBLE);
         goToSignUpButton.setVisibility(View.INVISIBLE);
@@ -489,7 +477,7 @@ public class ProfileFragment extends Fragment {
         circularProgressIndicator.show();
     }
 
-    private void hideLoading(){
+    private void hideLoading() {
         checkBoxRemember.setVisibility(View.VISIBLE);
         forgotPasswordButton.setVisibility(View.VISIBLE);
         goToSignUpButton.setVisibility(View.VISIBLE);

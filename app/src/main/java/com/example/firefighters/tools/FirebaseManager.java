@@ -32,8 +32,8 @@ public class FirebaseManager {
     private FirebaseFirestore fireStoreDb;
     private FirebaseStorage firebaseStorage;
 
-    public static FirebaseManager getInstance(){
-        if (instance == null){
+    public static FirebaseManager getInstance() {
+        if (instance == null) {
             instance = new FirebaseManager();
             instance.firebaseAuth = FirebaseAuth.getInstance();
             instance.fireStoreDb = FirebaseFirestore.getInstance();
@@ -42,20 +42,23 @@ public class FirebaseManager {
         return instance;
     }
 
-    public FirebaseAuth getFirebaseAuthInstance(){
+    public FirebaseAuth getFirebaseAuthInstance() {
         return firebaseAuth;
     }
-    public FirebaseFirestore getFirebaseFirestoreInstance(){
+
+    public FirebaseFirestore getFirebaseFirestoreInstance() {
         return fireStoreDb;
     }
-    public FirebaseStorage getFirebaseStorageInstance(){
+
+    public FirebaseStorage getFirebaseStorageInstance() {
         return firebaseStorage;
     }
 
-    public FirebaseUser getCurrentAuthUser(){
+    public FirebaseUser getCurrentAuthUser() {
         return firebaseAuth.getCurrentUser();
     }
-    public void signInUser(String userMail, String userPassword){
+
+    public void signInUser(String userMail, String userPassword) {
         firebaseAuth.signInWithEmailAndPassword(userMail, userPassword)
                 .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                     @Override
@@ -82,7 +85,8 @@ public class FirebaseManager {
                     }
                 });
     }
-    public void createNewUser(String userMail, String userPassword){
+
+    public void createNewUser(String userMail, String userPassword) {
         firebaseAuth.createUserWithEmailAndPassword(userMail, userPassword)
                 .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                     @Override
@@ -109,7 +113,8 @@ public class FirebaseManager {
                     }
                 });
     }
-    public void resetPasswordWithMail(String userMail){
+
+    public void resetPasswordWithMail(String userMail) {
         firebaseAuth.sendPasswordResetEmail(userMail)
                 .addOnCompleteListener(new OnCompleteListener<Void>() {
                     @Override
@@ -137,7 +142,7 @@ public class FirebaseManager {
                 });
     }
 
-    private void loadEmergencies(EventListener<QuerySnapshot> eventListener, int maxLoad){
+    private void loadEmergencies(EventListener<QuerySnapshot> eventListener, int maxLoad) {
         fireStoreDb.collection("emergency").addSnapshotListener(new EventListener<QuerySnapshot>() {
             @Override
             public void onEvent(@Nullable @org.jetbrains.annotations.Nullable QuerySnapshot value, @Nullable @org.jetbrains.annotations.Nullable FirebaseFirestoreException error) {
@@ -146,6 +151,7 @@ public class FirebaseManager {
             }
         });
     }
+
     private void uploadEmergency(EmergencyModel emergencyModel, Activity activity) {
         fireStoreDb.collection("emergency").add(emergencyModel)
                 .addOnCompleteListener(new OnCompleteListener<DocumentReference>() {
@@ -173,7 +179,8 @@ public class FirebaseManager {
                     }
                 });
     }
-    private void updateEmergency(int emergencyId, EmergencyModel emergencyModel){
+
+    private void updateEmergency(int emergencyId, EmergencyModel emergencyModel) {
         //
     }
 //

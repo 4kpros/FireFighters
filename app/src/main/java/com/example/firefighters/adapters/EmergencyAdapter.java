@@ -13,11 +13,11 @@ import java.util.ArrayList;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-public class EmergencyAdapter extends  RecyclerView.Adapter<EmergencyHolder> {
+public class EmergencyAdapter extends RecyclerView.Adapter<EmergencyHolder> {
 
-    private ArrayList<EmergencyModel> emergencies;
-    private Context context;
     private final OnItemClickListener listener;
+    private final ArrayList<EmergencyModel> emergencies;
+    private final Context context;
 
     public EmergencyAdapter(Context context, ArrayList<EmergencyModel> emergencies, OnItemClickListener listener) {
         this.emergencies = emergencies;
@@ -56,9 +56,11 @@ public class EmergencyAdapter extends  RecyclerView.Adapter<EmergencyHolder> {
         return emergencies.size();
     }
 
-    public interface OnItemClickListener{
+    public interface OnItemClickListener {
         void onItemMoreClick(int position);
+
         void onItemStreetClick(int position);
+
         void onItemCardClick(int position);
     }
 }

@@ -5,26 +5,18 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
-import android.location.GpsSatellite;
-import android.location.GpsStatus;
 import android.location.LocationManager;
 import android.os.Bundle;
-import android.os.Looper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.BounceInterpolator;
 
 import com.example.firefighters.R;
-import com.google.android.gms.location.LocationAvailability;
-import com.google.android.gms.location.LocationCallback;
-import com.google.android.gms.location.LocationRequest;
-import com.google.android.gms.location.LocationResult;
-import com.google.android.gms.location.LocationServices;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
-import com.mapbox.android.core.location.LocationEngineRequest;
 import com.mapbox.android.core.permissions.PermissionsManager;
+import com.mapbox.mapboxsdk.Mapbox;
 import com.mapbox.mapboxsdk.camera.CameraPosition;
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
 import com.mapbox.mapboxsdk.geometry.LatLng;
@@ -45,8 +37,6 @@ import androidx.annotation.Nullable;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.core.app.ActivityCompat;
 
-import static android.content.Context.LOCATION_SERVICE;
-
 public class MapViewFragment extends BottomSheetDialogFragment {
 
     private Context context;
@@ -57,6 +47,12 @@ public class MapViewFragment extends BottomSheetDialogFragment {
     public static MapViewFragment newInstance(Context context) {
         //this.context = context;
         return new MapViewFragment();
+    }
+
+    @Override
+    public void onCreate(@Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        Mapbox.getInstance(requireContext(), getString(R.string.mapbox_access_token));
     }
 
     @Nullable
@@ -82,7 +78,7 @@ public class MapViewFragment extends BottomSheetDialogFragment {
                     public void onStyleLoaded(@NonNull Style style) {
                         // Map is set up and the style has loaded. Now you can add data or make other map adjustments
 
-//                        enableRotatingClick(mapboxMap);
+                        enableRotatingClick(mapboxMap);
 //                        enableLocationComponent(mapboxMap, style);
                     }
                 });
@@ -109,48 +105,48 @@ public class MapViewFragment extends BottomSheetDialogFragment {
         });
     }
 
-//    private void enableLocationComponent(MapboxMap mapboxMap, Style style) {
-//
-//        LocationComponentOptions locationComponentOptions =
-//                LocationComponentOptions.builder(context)
-//                        .pulseEnabled(true)
-//                        .pulseColor(Color.GREEN)
-//                        .pulseAlpha(.4f)
-//                        .pulseInterpolator(new BounceInterpolator())
-//                        .build();
-//
-//        LocationComponentActivationOptions locationComponentActivationOptions = LocationComponentActivationOptions
-//                .builder(context, style)
-//                .locationComponentOptions(locationComponentOptions)
-//                .build();
-//
-//        locationComponent = mapboxMap.getLocationComponent();
-//        locationComponent.activateLocationComponent(locationComponentActivationOptions);
-//
-//
-//        // Check if permissions are enabled and if not request
-//        if (PermissionsManager.areLocationPermissionsGranted(context)) {
-//
-//            // Get an instance of the component
-//            LocationComponent locationComponent = mapboxMap.getLocationComponent();
-//
-//            // Activate with a built LocationComponentActivationOptions object
-//            locationComponent.activateLocationComponent(LocationComponentActivationOptions.builder(context, style).build());
-//
-//            if (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-//                return;
-//            }
-//            // Enable to make component visible
-//            locationComponent.setLocationComponentEnabled(true);
-//
-//                // Set the component's camera mode
-//                locationComponent.setCameraMode(CameraMode.TRACKING_GPS);
-//
-//                // Set the component's render mode
-//                locationComponent.setRenderMode(RenderMode.COMPASS);
-//
-//            }
-//    }
+    private void enableLocationComponent(MapboxMap mapboxMap, Style style) {
+
+        LocationComponentOptions locationComponentOptions =
+                LocationComponentOptions.builder(context)
+                        .pulseEnabled(true)
+                        .pulseColor(Color.GREEN)
+                        .pulseAlpha(.4f)
+                        .pulseInterpolator(new BounceInterpolator())
+                        .build();
+
+        LocationComponentActivationOptions locationComponentActivationOptions = LocationComponentActivationOptions
+                .builder(context, style)
+                .locationComponentOptions(locationComponentOptions)
+                .build();
+
+        locationComponent = mapboxMap.getLocationComponent();
+        locationComponent.activateLocationComponent(locationComponentActivationOptions);
+
+
+        // Check if permissions are enabled and if not request
+        if (PermissionsManager.areLocationPermissionsGranted(context)) {
+
+            // Get an instance of the component
+            LocationComponent locationComponent = mapboxMap.getLocationComponent();
+
+            // Activate with a built LocationComponentActivationOptions object
+            locationComponent.activateLocationComponent(LocationComponentActivationOptions.builder(context, style).build());
+
+            if (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                return;
+            }
+            // Enable to make component visible
+            locationComponent.setLocationComponentEnabled(true);
+
+                // Set the component's camera mode
+                locationComponent.setCameraMode(CameraMode.TRACKING_GPS);
+
+                // Set the component's render mode
+                locationComponent.setRenderMode(RenderMode.COMPASS);
+
+            }
+    }
 
     @Override
     public void onStart() {

@@ -13,11 +13,11 @@ public abstract class ConstantsValues {
     public static final String FILTER_STATUS = "status";
 
     //Permissions
-    public static  int CALL_PERMISSION_CODE = 1;
-    public static  int LOCATION_PERMISSION_CODE = 2;
-    public static  int SMS_PERMISSION_CODE = 3;
-    public static  int STORAGE_READ_PERMISSION_CODE = 4;
-    public static  int STORAGE_WRITE_PERMISSION_CODE = 5;
+    public static int CALL_PERMISSION_CODE = 1;
+    public static int LOCATION_PERMISSION_CODE = 2;
+    public static int SMS_PERMISSION_CODE = 3;
+    public static int STORAGE_READ_PERMISSION_CODE = 4;
+    public static int STORAGE_WRITE_PERMISSION_CODE = 5;
 
     //Gravities
     public static String GRAVITY_NORMAL = "Normal";

@@ -11,11 +11,6 @@ import android.view.ViewGroup;
 import com.example.firefighters.R;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
-import com.mapbox.mapboxsdk.Mapbox;
-import com.mapbox.mapboxsdk.maps.MapView;
-import com.mapbox.mapboxsdk.maps.MapboxMap;
-import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
-import com.mapbox.mapboxsdk.maps.Style;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -24,19 +19,18 @@ import androidx.annotation.Nullable;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
 
 public class StreetViewFragment extends BottomSheetDialogFragment {
+    private static String emergencyId;
     private Context context;
     private LocationManager locationManager;
-
-    private static String emergencyId;
-
-    @Override
-    public void onCreate(@Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-    }
 
     public static StreetViewFragment newInstance(Context context, String id) {
         emergencyId = id;
         return new StreetViewFragment();
+    }
+
+    @Override
+    public void onCreate(@Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
     }
 
     @Nullable
@@ -69,6 +63,7 @@ public class StreetViewFragment extends BottomSheetDialogFragment {
 
         });
     }
+
     private void initViews(View view) {
     }
 }

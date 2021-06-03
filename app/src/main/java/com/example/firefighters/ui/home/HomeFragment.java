@@ -4,22 +4,11 @@ import android.Manifest;
 import android.animation.FloatEvaluator;
 import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentTransaction;
-import androidx.lifecycle.ViewModelProvider;
-
 import android.os.CountDownTimer;
 import android.os.Looper;
 import android.view.LayoutInflater;
@@ -44,20 +33,24 @@ import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
-import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textview.MaterialTextView;
-import com.mapbox.mapboxsdk.camera.CameraPosition;
-import com.mapbox.mapboxsdk.geometry.LatLng;
-import com.mapbox.mapboxsdk.maps.MapboxMap;
-import com.mapbox.mapboxsdk.maps.MapboxMapOptions;
-import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
-import com.mapbox.mapboxsdk.maps.Style;
-import com.mapbox.mapboxsdk.maps.SupportMapFragment;
 
 import org.jetbrains.annotations.NotNull;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
+
 public class HomeFragment extends Fragment {
+    private final int phoneNumber = 000;
+    EmergencyViewModel emergencyViewModel;
+    CountDownTimer countDownTimerCall;
+    CountDownTimer countDownTimerSos;
     //Relative layouts
     private LinearLayout sosBackground;
     //Image view
@@ -71,11 +64,6 @@ public class HomeFragment extends Fragment {
     private Context context;
     private AppCompatActivity activity;
 
-    EmergencyViewModel emergencyViewModel;
-    private final int phoneNumber = 000;
-    CountDownTimer countDownTimerCall;
-    CountDownTimer countDownTimerSos;
-
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
@@ -88,6 +76,7 @@ public class HomeFragment extends Fragment {
         observeLiveData();
         return view;
     }
+
     private void observeLiveData() {
 //        tryToGetCallPermissions(view, bottomSheet);
     }
@@ -150,11 +139,11 @@ public class HomeFragment extends Fragment {
     }
 
     private void showMapView(View v) {
-        Intent myIntent = new Intent(activity, TestActivity.class);
-        myIntent.putExtra("key", "ras"); //Optional parameters
-        activity.startActivity(myIntent);
-//        MapViewFragment mapViewFragment = MapViewFragment.newInstance(context);
-//        mapViewFragment.show(activity.getSupportFragmentManager(), ConstantsValues.MAP_VIEW_TAG);
+//        Intent myIntent = new Intent(activity, TestActivity.class);
+//        myIntent.putExtra("key", "ras"); //Optional parameters
+//        activity.startActivity(myIntent);
+        MapViewFragment mapViewFragment = MapViewFragment.newInstance(context);
+        mapViewFragment.show(activity.getSupportFragmentManager(), ConstantsValues.MAP_VIEW_TAG);
     }
 
     private void showBottomSheetDialogSettings(View view) {
@@ -268,12 +257,12 @@ public class HomeFragment extends Fragment {
                         super.onLocationResult(locationResult);
                         LocationServices.getFusedLocationProviderClient(context)
                                 .removeLocationUpdates(this);
-                        if (locationResult != null && locationResult.getLocations().size() > 0){
+                        if (locationResult != null && locationResult.getLocations().size() > 0) {
                             EmergencyModel emergencyModel = new EmergencyModel();
-                            emergencyModel.setLongitude(locationResult.getLocations().get(locationResult.getLocations().size()-1).getLongitude());
-                            emergencyModel.setLatitude(locationResult.getLocations().get(locationResult.getLocations().size()-1).getLatitude());
+                            emergencyModel.setLongitude(locationResult.getLocations().get(locationResult.getLocations().size() - 1).getLongitude());
+                            emergencyModel.setLatitude(locationResult.getLocations().get(locationResult.getLocations().size() - 1).getLatitude());
                             emergencyViewModel.uploadEmergency(emergencyModel, activity);
-                        }else {
+                        } else {
                             Toast.makeText(context, "Not sent", Toast.LENGTH_SHORT).show();
                         }
                     }
@@ -311,9 +300,10 @@ public class HomeFragment extends Fragment {
         tryToGetCallPermissions(view, bottomSheet);
         bottomSheet.show();
     }
+
     private void tryToGetCallPermissions(View view, BottomSheetDialog bottomSheet) {
         int startCount = 5;
-        if(PermissionsManager.getInstance().isCallPermissions(activity)){
+        if (PermissionsManager.getInstance().isCallPermissions(activity)) {
             bottomSheet.findViewById(R.id.linear_no_permissions).setVisibility(View.GONE);
             bottomSheet.findViewById(R.id.linear_waiting).setVisibility(View.VISIBLE);
             MaterialTextView text = (MaterialTextView) bottomSheet.findViewById(R.id.text_progression);
@@ -331,19 +321,20 @@ public class HomeFragment extends Fragment {
 
             };
             countDownTimerCall.start();
-        }else{
+        } else {
             bottomSheet.findViewById(R.id.linear_no_permissions).setVisibility(View.VISIBLE);
             bottomSheet.findViewById(R.id.linear_waiting).setVisibility(View.GONE);
         }
     }
+
     private void callNow() {
         if (ContextCompat.checkSelfPermission(context,
                 Manifest.permission.CALL_PHONE)
-                != PackageManager.PERMISSION_GRANTED){
+                != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(activity, new String[]{Manifest.permission.CALL_PHONE}, ConstantsValues.CALL_PERMISSION_CODE);
-        }else {
+        } else {
             Intent intent = new Intent(Intent.ACTION_CALL);
-            intent.setData(Uri.parse("tel:"+phoneNumber));
+            intent.setData(Uri.parse("tel:" + phoneNumber));
             startActivity(intent);
         }
     }
@@ -359,8 +350,9 @@ public class HomeFragment extends Fragment {
         buttonShowMap = view.findViewById(R.id.button_show_map);
     }
 
-    public interface LoadPermissions{
+    public interface LoadPermissions {
         void loadLocationPermissions();
+
         void loadCallPermissions();
     }
 }

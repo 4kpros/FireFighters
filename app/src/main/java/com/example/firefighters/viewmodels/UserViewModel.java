@@ -21,7 +21,7 @@ public class UserViewModel extends ViewModel {
 
     private UserRepository repository;
 
-    public void init(){
+    public void init() {
         if (repository != null)
             return;
         repository = UserRepository.getInstance();
@@ -34,32 +34,38 @@ public class UserViewModel extends ViewModel {
         currentUserAdminMutableLiveData = repository.bindAdmin();
     }
 
-    public LiveData<Boolean> getIsLoadingUser(){
+    public LiveData<Boolean> getIsLoadingUser() {
         return isLoadingUserMutableLiveData;
     }
-    public LiveData<FirebaseUser> getCurrentAuthUser(){
+
+    public LiveData<FirebaseUser> getCurrentAuthUser() {
         return currentAuthUserMutableLiveData;
     }
-    public LiveData<UserModel> getUser(){
+
+    public LiveData<UserModel> getUser() {
         return currentUserMutableLiveData;
     }
-    public LiveData<UserFireFighterModel> getFireFighter(){
+
+    public LiveData<UserFireFighterModel> getFireFighter() {
         return currentUserFireFighterMutableLiveData;
     }
-    public LiveData<UserAdminModel> getAdmin(){
+
+    public LiveData<UserAdminModel> getAdmin() {
         return currentUserAdminMutableLiveData;
     }
 
     //Sign in with mail and password
-    public void signInUser(String userMail, String userPassword){
+    public void signInUser(String userMail, String userPassword) {
         repository.signInUser(userMail, userPassword);
     }
+
     //Create new user
-    public void createNewUser(String userName, String userMail, String userPassword){
+    public void createNewUser(String userName, String userMail, String userPassword) {
         repository.createNewUser(userName, userMail, userPassword);
     }
+
     //Reset password
-    public void resetPasswordWithMail(String userMail){
+    public void resetPasswordWithMail(String userMail) {
         repository.resetPasswordWithMail(userMail);
     }
 

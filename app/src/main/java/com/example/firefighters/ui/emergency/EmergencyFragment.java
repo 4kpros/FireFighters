@@ -2,27 +2,15 @@ package com.example.firefighters.ui.emergency;
 
 import android.app.Dialog;
 import android.content.Context;
-import android.net.sip.SipSession;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
-import android.view.animation.AnimationSet;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
-import androidx.lifecycle.LiveData;
-import androidx.lifecycle.Observer;
-import androidx.lifecycle.ViewModelProvider;
-import androidx.recyclerview.widget.GridLayoutManager;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.firefighters.R;
 import com.example.firefighters.adapters.EmergencyAdapter;
@@ -37,28 +25,31 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProvider;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
 public class EmergencyFragment extends Fragment {
-
-    private EmergencyViewModel emergencyViewModel;
-    private EmergencyAdapter emergencyAdapter;
-    private RecyclerView emergenciesRecyclerView;
-
-    private Context context;
-
-    //Image views
-    private ImageView buttonFilter;
-    private ImageView buttonOrder;
-
-    //Text views
-    private TextView textEmergencyTitle;
 
     //Progress indicator
     CircularProgressIndicator circularProgressIndicator;
-    private LinearLayoutManager layoutManager;
-    private int loadQte = 10;
-
-    private boolean loading = true;
     int pastVisibleItems, visibleItemCount, totalItemCount;
+    private EmergencyViewModel emergencyViewModel;
+    private EmergencyAdapter emergencyAdapter;
+    private RecyclerView emergenciesRecyclerView;
+    private Context context;
+    //Image views
+    private ImageView buttonFilter;
+    private ImageView buttonOrder;
+    //Text views
+    private TextView textEmergencyTitle;
+    private LinearLayoutManager layoutManager;
+    private final int loadQte = 10;
+    private boolean loading = true;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -137,11 +128,11 @@ public class EmergencyFragment extends Fragment {
         emergencyViewModel.getIsLoading().observe(getViewLifecycleOwner(), new Observer<Boolean>() {
             @Override
             public void onChanged(Boolean aBoolean) {
-                if(aBoolean){
+                if (aBoolean) {
                     showLoadingView();
-                }else{
+                } else {
                     hideLoadingView();
-                    if(emergencyViewModel.getEmergencies().getValue() != null && emergencyViewModel.getEmergencies().getValue().size() > 0){
+                    if (emergencyViewModel.getEmergencies().getValue() != null && emergencyViewModel.getEmergencies().getValue().size() > 0) {
                         emergencyAdapter.notifyItemRangeInserted(emergencyViewModel.getEmergencies().getValue().size(), loadQte);
                     }
                 }
@@ -150,7 +141,7 @@ public class EmergencyFragment extends Fragment {
     }
 
     private void hideLoadingView() {
-        new CountDownTimer(500, 1000){
+        new CountDownTimer(500, 1000) {
             @Override
             public void onTick(long millisUntilFinished) {
 
@@ -224,10 +215,10 @@ public class EmergencyFragment extends Fragment {
             }
         });
         //Check if is working or not and if it's firefighter or admin
-        if(1 <= 2){
+        if (1 <= 2) {
             bottomSheet.findViewById(R.id.linear_work_on_emergency).setVisibility(View.VISIBLE);
             bottomSheet.findViewById(R.id.linear_pause_finish_emergency).setVisibility(View.GONE);
-        }else{
+        } else {
             bottomSheet.findViewById(R.id.linear_pause_finish_emergency).setVisibility(View.VISIBLE);
             bottomSheet.findViewById(R.id.linear_work_on_emergency).setVisibility(View.GONE);
         }
@@ -246,10 +237,10 @@ public class EmergencyFragment extends Fragment {
         bottomSheet.show();
     }
 
-    private void setEmergencyWorkOn(BottomSheetDialog bottomSheet ,int position) {
+    private void setEmergencyWorkOn(BottomSheetDialog bottomSheet, int position) {
         bottomSheet.dismiss();
 //        emergencyViewModel.updateEmergency(emergencyViewModel, );
-        Toast.makeText(context, emergencyViewModel.getEmergencies().getValue().get(position)+"", Toast.LENGTH_SHORT).show();
+        Toast.makeText(context, emergencyViewModel.getEmergencies().getValue().get(position) + "", Toast.LENGTH_SHORT).show();
     }
 
     private void showBottomSheetDialogFilter(View view) {
@@ -291,7 +282,7 @@ public class EmergencyFragment extends Fragment {
     private void filterResultsBy(String filterName) {
         emergencyViewModel.setFilterEmergencies(filterName);
         emergencyViewModel.firstLoad(requireActivity(), loadQte);
-        Toast.makeText(context, filterName+"", Toast.LENGTH_SHORT).show();
+        Toast.makeText(context, filterName + "", Toast.LENGTH_SHORT).show();
     }
 
     private void showBottomSheetDialogOrder(View view) {
@@ -326,7 +317,7 @@ public class EmergencyFragment extends Fragment {
     private void reorderResultsBy(Query.Direction order) {
         emergencyViewModel.setOrderEmergencies(order);
         emergencyViewModel.firstLoad(requireActivity(), loadQte);
-        Toast.makeText(context, order+"", Toast.LENGTH_SHORT).show();
+        Toast.makeText(context, order + "", Toast.LENGTH_SHORT).show();
     }
 
     private void loadFirstData(int qte) {
@@ -339,7 +330,7 @@ public class EmergencyFragment extends Fragment {
         emergencyViewModel.init();
     }
 
-    private void initViews(View view){
+    private void initViews(View view) {
         emergenciesRecyclerView = view.findViewById(R.id.recycler_emergencies);
 
         //Buttons

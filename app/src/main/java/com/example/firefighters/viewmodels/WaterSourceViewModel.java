@@ -2,12 +2,8 @@ package com.example.firefighters.viewmodels;
 
 import android.app.Activity;
 
-import com.example.firefighters.models.EmergencyModel;
-import com.example.firefighters.models.WaterSourceModel;
 import com.example.firefighters.models.WaterSourceModel;
 import com.example.firefighters.repositories.WaterSourceRepository;
-import com.google.firebase.firestore.Query;
-import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
 
@@ -22,7 +18,7 @@ public class WaterSourceViewModel extends ViewModel {
     private MutableLiveData<Integer> lastVisiblePositionMutableLiveData;
     private WaterSourceRepository repository;
 
-    public void init(){
+    public void init() {
         if (waterSourcesMutableLiveData != null)
             return;
         repository = WaterSourceRepository.getInstance();
@@ -32,31 +28,36 @@ public class WaterSourceViewModel extends ViewModel {
     }
 
     //Getters
-    public LiveData<ArrayList<WaterSourceModel>> getWaterSources(){
+    public LiveData<ArrayList<WaterSourceModel>> getWaterSources() {
         return waterSourcesMutableLiveData;
     }
-    public LiveData<Boolean> getIsLoading(){
+
+    public LiveData<Boolean> getIsLoading() {
         return isLoadingMutableLiveData;
     }
 
     //Setters
-    public void firstLoad(Activity activity, int qte){
+    public void firstLoad(Activity activity, int qte) {
         repository.firstLoad(activity, qte);
     }
-    public void loadWaterSources(Activity activity, int qte){
+
+    public void loadWaterSources(Activity activity, int qte) {
         repository.loadWaterSources(activity, qte);
     }
-    public void clearWaterSources(){
+
+    public void clearWaterSources() {
         repository.clearWaterSources();
     }
 
     public void uploadWaterSource(WaterSourceModel waterSourceModel, Activity activity) {
         repository.uploadWaterSource(waterSourceModel, activity);
     }
-    public void updateWaterSource(WaterSourceModel waterSourceModel, Activity activity){
+
+    public void updateWaterSource(WaterSourceModel waterSourceModel, Activity activity) {
         repository.updateWaterSource(waterSourceModel, activity);
     }
-    public void deleteWaterSource(WaterSourceModel waterSourceModel, Activity activity){
+
+    public void deleteWaterSource(WaterSourceModel waterSourceModel, Activity activity) {
         repository.deleteWaterSource(waterSourceModel, activity);
     }
 }

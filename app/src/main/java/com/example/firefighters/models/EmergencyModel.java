@@ -1,7 +1,7 @@
 package com.example.firefighters.models;
+
 import com.example.firefighters.tools.ConstantsValues;
 
-import java.sql.Date;
 import java.util.Calendar;
 
 public class EmergencyModel {
@@ -26,7 +26,7 @@ public class EmergencyModel {
         Calendar calendar = Calendar.getInstance();
         int year = calendar.get(Calendar.YEAR);
         int month = calendar.get(Calendar.MONTH);
-        int day = calendar.get(Calendar.DAY_OF_MONTH)+1;
+        int day = calendar.get(Calendar.DAY_OF_MONTH) + 1;
         int utc = calendar.get(Calendar.ZONE_OFFSET);
         int hours = calendar.get(Calendar.HOUR_OF_DAY);
         int minutes = calendar.get(Calendar.MINUTE);

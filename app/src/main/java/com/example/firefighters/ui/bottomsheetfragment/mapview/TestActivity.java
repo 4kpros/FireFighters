@@ -1,34 +1,15 @@
 package com.example.firefighters.ui.bottomsheetfragment.mapview;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.coordinatorlayout.widget.CoordinatorLayout;
-import androidx.core.app.ActivityCompat;
-
-import android.Manifest;
-import android.app.Dialog;
 import android.content.Context;
-import android.content.pm.PackageManager;
-import android.graphics.Color;
 import android.location.LocationManager;
 import android.os.Bundle;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.view.animation.BounceInterpolator;
 
 import com.example.firefighters.R;
-import com.google.android.material.bottomsheet.BottomSheetBehavior;
-import com.mapbox.android.core.permissions.PermissionsManager;
+import com.mapbox.mapboxsdk.Mapbox;
 import com.mapbox.mapboxsdk.camera.CameraPosition;
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.location.LocationComponent;
-import com.mapbox.mapboxsdk.location.LocationComponentActivationOptions;
-import com.mapbox.mapboxsdk.location.LocationComponentOptions;
-import com.mapbox.mapboxsdk.location.modes.CameraMode;
-import com.mapbox.mapboxsdk.location.modes.RenderMode;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
@@ -36,26 +17,27 @@ import com.mapbox.mapboxsdk.maps.Style;
 
 import org.jetbrains.annotations.NotNull;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+
 public class TestActivity extends AppCompatActivity {
-
-
     private Context context;
     private LocationManager locationManager;
     private MapView mapView;
     private LocationComponent locationComponent;
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Mapbox.getInstance(this, getString(R.string.mapbox_access_token));
         setContentView(R.layout.activity_test);
+        initViews();
 
         context = getApplicationContext();
-        initViews();
-        mapView.onCreate(savedInstanceState);
         setupMapView(savedInstanceState);
 
     }
+
     private void setupMapView(Bundle savedInstanceState) {
         mapView.onCreate(savedInstanceState);
         mapView.getMapAsync(new OnMapReadyCallback() {
@@ -94,7 +76,7 @@ public class TestActivity extends AppCompatActivity {
         });
     }
 
-//    private void enableLocationComponent(MapboxMap mapboxMap, Style style) {
+    //    private void enableLocationComponent(MapboxMap mapboxMap, Style style) {
 //
 //        LocationComponentOptions locationComponentOptions =
 //                LocationComponentOptions.builder(context)

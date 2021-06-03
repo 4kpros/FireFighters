@@ -16,22 +16,24 @@ public class WaterSourceRepository {
     private Boolean isLoading;
     private int lastVisiblePosition;
 
-    public static WaterSourceRepository getInstance(){
+    public static WaterSourceRepository getInstance() {
         if (instance == null)
             instance = new WaterSourceRepository();
         return instance;
     }
 
-    public MutableLiveData<ArrayList<WaterSourceModel>> bindWaterSources(){
+    public MutableLiveData<ArrayList<WaterSourceModel>> bindWaterSources() {
         MutableLiveData<ArrayList<WaterSourceModel>> mutableLiveData = new MutableLiveData<>();
         mutableLiveData.setValue(waterSources);
         return mutableLiveData;
     }
+
     public MutableLiveData<Boolean> bindIsLoading() {
         MutableLiveData<Boolean> mutableLiveData = new MutableLiveData<>();
         mutableLiveData.setValue(isLoading);
         return mutableLiveData;
     }
+
     public MutableLiveData<Integer> bindLastVisiblePosition() {
         MutableLiveData<Integer> mutableLiveData = new MutableLiveData<>();
         mutableLiveData.setValue(lastVisiblePosition);

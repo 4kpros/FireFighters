@@ -9,7 +9,6 @@ import com.example.firefighters.tools.ConstantsValues;
 import com.example.firefighters.ui.home.HomeFragment;
 import com.facebook.drawee.backends.pipeline.Fresco;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
-import com.mapbox.mapboxsdk.Mapbox;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -23,7 +22,6 @@ public class MainActivity extends AppCompatActivity implements HomeFragment.Load
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        Mapbox.getInstance(this, getString(R.string.mapbox_access_token));
         super.onCreate(savedInstanceState);
 
         //Initialize fresco
@@ -42,24 +40,24 @@ public class MainActivity extends AppCompatActivity implements HomeFragment.Load
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (requestCode == ConstantsValues.SMS_PERMISSION_CODE){
-            if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED){
+        if (requestCode == ConstantsValues.SMS_PERMISSION_CODE) {
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
                 Toast.makeText(this, "Location permissions refused", Toast.LENGTH_SHORT).show();
-            }else{
+            } else {
                 //Work
             }
         }
-        if (requestCode == ConstantsValues.CALL_PERMISSION_CODE){
-            if (ContextCompat.checkSelfPermission(this, Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED){
+        if (requestCode == ConstantsValues.CALL_PERMISSION_CODE) {
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED) {
                 Toast.makeText(this, "Call permissions refused", Toast.LENGTH_SHORT).show();
-            }else{
+            } else {
                 //Work
             }
         }
-        if (requestCode == ConstantsValues.SMS_PERMISSION_CODE){
-            if (ContextCompat.checkSelfPermission(this, Manifest.permission.SEND_SMS) != PackageManager.PERMISSION_GRANTED){
+        if (requestCode == ConstantsValues.SMS_PERMISSION_CODE) {
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.SEND_SMS) != PackageManager.PERMISSION_GRANTED) {
                 Toast.makeText(this, "Sms permissions refused", Toast.LENGTH_SHORT).show();
-            }else{
+            } else {
                 //Work
             }
         }

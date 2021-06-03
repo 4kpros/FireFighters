@@ -1,7 +1,5 @@
 package com.example.firefighters.models;
 
-import java.util.ArrayList;
-
 public class MessageModel {
 
     private String message;

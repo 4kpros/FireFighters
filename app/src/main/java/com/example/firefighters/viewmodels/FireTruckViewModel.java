@@ -10,12 +10,11 @@ import androidx.lifecycle.ViewModel;
 
 public class FireTruckViewModel extends ViewModel {
 
-    private FireTruckRepository repository;
-
     MutableLiveData<ArrayList<FireTruckModel>> fireTrucksMutableLiveData;
     MutableLiveData<Boolean> isLoadingMutableLiveData;
+    private FireTruckRepository repository;
 
-    public void init(){
+    public void init() {
         if (repository != null)
             return;
         repository = new FireTruckRepository();

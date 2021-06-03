@@ -2,7 +2,6 @@ package com.example.firefighters.repositories;
 
 import android.app.Activity;
 import android.os.Handler;
-import android.util.Log;
 import android.widget.Toast;
 
 import com.example.firefighters.models.EmergencyModel;
@@ -23,7 +22,6 @@ import com.google.firebase.firestore.QuerySnapshot;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -32,21 +30,22 @@ import androidx.lifecycle.MutableLiveData;
 public class EmergencyRepository {
 
     private static EmergencyRepository instance;
+    private final ArrayList<EmergencyModel> emergencies = new ArrayList<>();
+    DocumentSnapshot lastVisible;
     private boolean isLoading;
     private boolean canRunThread;
-    private final ArrayList<EmergencyModel> emergencies = new ArrayList<>();
     private QuerySnapshot queryUpdates;
     private Query queryEmergenciesLimit;
-    DocumentSnapshot lastVisible;
     private String lastFilter = ConstantsValues.FILTER_STATUS;
     private Query.Direction lastOrder = Query.Direction.DESCENDING;
     private Integer lastVisiblePosition;
 
     /**
      * Constructor for design pattern single
+     *
      * @return instance
      */
-    public static EmergencyRepository getInstance(){
+    public static EmergencyRepository getInstance() {
         if (instance == null) {
             instance = new EmergencyRepository();
             //getEmergenciesFromFireBase();
@@ -55,42 +54,48 @@ public class EmergencyRepository {
     }
 
     //These functions are used to bind live data and mutable live data with their views
-    public MutableLiveData<QuerySnapshot> bindQueryUpdates(){
+    public MutableLiveData<QuerySnapshot> bindQueryUpdates() {
         MutableLiveData<QuerySnapshot> data = new MutableLiveData<>();
         data.setValue(queryUpdates);
         return data;
     }
-    public MutableLiveData<ArrayList<EmergencyModel>> bindEmergencies(){
+
+    public MutableLiveData<ArrayList<EmergencyModel>> bindEmergencies() {
         MutableLiveData<ArrayList<EmergencyModel>> data = new MutableLiveData<>();
         data.setValue(emergencies);
         return data;
     }
-    public MutableLiveData<Boolean> bindIsLoading(){
+
+    public MutableLiveData<Boolean> bindIsLoading() {
         MutableLiveData<Boolean> data = new MutableLiveData<>();
         data.setValue(isLoading);
         return data;
     }
-    public MutableLiveData<String> bindLastFilter(){
+
+    public MutableLiveData<String> bindLastFilter() {
         MutableLiveData<String> data = new MutableLiveData<>();
         data.setValue(lastFilter);
         return data;
     }
-    public MutableLiveData<Query.Direction> bindLastOrder(){
+
+    public MutableLiveData<Query.Direction> bindLastOrder() {
         MutableLiveData<Query.Direction> data = new MutableLiveData<>();
         data.setValue(lastOrder);
         return data;
     }
+
     public MutableLiveData<Integer> bindLastVisiblePosition() {
         MutableLiveData<Integer> data = new MutableLiveData<>();
         data.setValue(lastVisiblePosition);
         return data;
     }
+
     //Initialize the observer for firebase
     private void getEmergenciesFromFireBase() {
         FirebaseManager.getInstance().getFirebaseFirestoreInstance().collection("emergencies").addSnapshotListener(new EventListener<QuerySnapshot>() {
             @Override
             public void onEvent(@Nullable @org.jetbrains.annotations.Nullable QuerySnapshot value, @Nullable @org.jetbrains.annotations.Nullable FirebaseFirestoreException error) {
-                if (value != null){
+                if (value != null) {
                     queryUpdates = value;
                 }
             }
@@ -98,13 +103,15 @@ public class EmergencyRepository {
     }
 
     //These functions are used to do modify (or work) with values of live data and mutable live data
-    public void setFilter(String filter){
+    public void setFilter(String filter) {
         lastFilter = filter;
     }
-    public void setOrder(Query.Direction order){
+
+    public void setOrder(Query.Direction order) {
         lastOrder = order;
     }
-    public void firstLoad(Activity activity, int qte){
+
+    public void firstLoad(Activity activity, int qte) {
         clearEmergencies();
         isLoading = true;
         canRunThread = true;
@@ -117,20 +124,20 @@ public class EmergencyRepository {
             @Override
             public void onComplete(@NonNull @NotNull Task<QuerySnapshot> task) {
                 if (task.isSuccessful()) {
-                    if(task.getResult() != null && task.getResult().size() > 0){
-                        lastVisible = task.getResult().getDocuments().get(task.getResult().size() -1);
-                        lastVisiblePosition = task.getResult().size() -1;
+                    if (task.getResult() != null && task.getResult().size() > 0) {
+                        lastVisible = task.getResult().getDocuments().get(task.getResult().size() - 1);
+                        lastVisiblePosition = task.getResult().size() - 1;
                         for (QueryDocumentSnapshot document : task.getResult()) {
                             EmergencyModel emergencyModel = document.toObject(EmergencyModel.class);
                             emergencies.add(emergencyModel);
                         }
                         canRunThread = false;
                         isLoading = false;
-                        Toast.makeText(activity, task.getResult().size()+" initial", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(activity, task.getResult().size() + " initial", Toast.LENGTH_SHORT).show();
                         new Handler().postDelayed(new Runnable() {
                             @Override
                             public void run() {
-                                while (canRunThread){
+                                while (canRunThread) {
                                     for (QueryDocumentSnapshot document : task.getResult()) {
                                         EmergencyModel emergencyModel = document.toObject(EmergencyModel.class);
                                         emergencies.add(emergencyModel);
@@ -149,13 +156,15 @@ public class EmergencyRepository {
             }
         });
     }
-    public void clearEmergencies(){
+
+    public void clearEmergencies() {
         canRunThread = false;
         isLoading = false;
         emergencies.clear();
     }
+
     public void loadEmergencies(Activity activity, int qte) {
-        if (emergencies.size() < qte-1)
+        if (emergencies.size() < qte - 1)
             return;
         isLoading = true;
         canRunThread = true;
@@ -165,18 +174,18 @@ public class EmergencyRepository {
                 .orderBy(lastFilter)
                 .startAfter(lastVisible)
                 .limit(qte)
-                );
+        );
         queryEmergenciesLimit.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             @Override
             public void onComplete(@NonNull @NotNull Task<QuerySnapshot> task) {
                 if (task.isSuccessful()) {
-                    if(task.getResult() != null && task.getResult().size() > 0){
-                        lastVisible = task.getResult().getDocuments().get(task.getResult().size() -1);
-                        lastVisiblePosition = task.getResult().size() -1;
+                    if (task.getResult() != null && task.getResult().size() > 0) {
+                        lastVisible = task.getResult().getDocuments().get(task.getResult().size() - 1);
+                        lastVisiblePosition = task.getResult().size() - 1;
                         new Handler().postDelayed(new Runnable() {
                             @Override
                             public void run() {
-                                while (canRunThread){
+                                while (canRunThread) {
                                     for (QueryDocumentSnapshot document : task.getResult()) {
                                         EmergencyModel emergencyModel = document.toObject(EmergencyModel.class);
                                         emergencies.add(emergencyModel);
@@ -213,11 +222,11 @@ public class EmergencyRepository {
                 });
     }
 
-    public void updateEmergency(EmergencyModel emergencyModel, Activity activity){
+    public void updateEmergency(EmergencyModel emergencyModel, Activity activity) {
         Toast.makeText(activity, "update not implemented", Toast.LENGTH_SHORT).show();
     }
 
-    public void deleteEmergency(EmergencyModel emergencyModel, Activity activity){
+    public void deleteEmergency(EmergencyModel emergencyModel, Activity activity) {
         Toast.makeText(activity, "Delete not implemented", Toast.LENGTH_SHORT).show();
     }
 }

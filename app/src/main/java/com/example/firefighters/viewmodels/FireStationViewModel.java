@@ -1,10 +1,7 @@
 package com.example.firefighters.viewmodels;
 
-import com.example.firefighters.models.EmergencyModel;
 import com.example.firefighters.models.FireStationModel;
-import com.example.firefighters.repositories.EmergencyRepository;
 import com.example.firefighters.repositories.FireStationRepository;
-import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
@@ -21,7 +18,7 @@ public class FireStationViewModel extends ViewModel {
     private MutableLiveData<QuerySnapshot> queryUpdatesMutableLiveData;
     private MutableLiveData<Integer> lastVisiblePositionMutableLiveData;
 
-    public void init(){
+    public void init() {
         if (repository != null)
             return;
         repository = new FireStationRepository();

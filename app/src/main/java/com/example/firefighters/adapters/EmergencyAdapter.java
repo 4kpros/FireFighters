@@ -40,7 +40,7 @@ public class EmergencyAdapter extends  RecyclerView.Adapter<EmergencyHolder> {
     @Override
     public void onViewAttachedToWindow(@NonNull EmergencyHolder holder) {
         super.onViewAttachedToWindow(holder);
-        holder.date.setText(emergencies.get(holder.getAdapterPosition()).getSendDate().getDay() + "-" + emergencies.get(holder.getAdapterPosition()).getSendDate().getMonth() + "-" + emergencies.get(holder.getAdapterPosition()).getSendDate().getYear());
+        holder.date.setText(emergencies.get(holder.getAdapterPosition()).getSendDate() + "  " + emergencies.get(holder.getAdapterPosition()).getSendHour());
         holder.status.setText(emergencies.get(holder.getAdapterPosition()).getStatus());
         holder.degree.setText(emergencies.get(holder.getAdapterPosition()).getGravity());
         holder.streetName.setText(emergencies.get(holder.getAdapterPosition()).getStreetName());

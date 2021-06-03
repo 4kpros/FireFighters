@@ -1,23 +1,14 @@
 package com.example.firefighters.models;
 
 public class UserModel {
-    int userId;
+    int phoneNumber;
     String mail;
     String userName;
     String firstName;
     String lastName;
-    int phoneNumber;
     String picture;
 
     public UserModel() {
-    }
-
-    public int getUserId() {
-        return userId;
-    }
-
-    public void setUserId(int userId) {
-        this.userId = userId;
     }
 
     public String getMail() {

@@ -28,7 +28,7 @@
             android:layout_centerInParent="true"
             />
         <com.google.android.material.button.MaterialButton
-            android:id="@+id/button_close_dialog"
+            android:id="@+id/button_add_media_dialog"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             style="@style/Widget.MaterialComponents.Button.TextButton"
@@ -38,7 +38,6 @@
             android:ellipsize="end"
             android:linksClickable="true"
             android:maxLines="1"
-            app:icon="@drawable/ic_baseline_close_24"
             android:textColor="@color/purple_200"
             app:iconTint="@color/purple_200"
             app:iconGravity="textEnd"
@@ -46,7 +45,7 @@
             android:gravity="center"
             android:layout_alignParentEnd="true"
             android:layout_alignParentRight="true"
-            android:alpha="0"
+            android:text="Add media"
             />
     </RelativeLayout>
     <LinearLayout

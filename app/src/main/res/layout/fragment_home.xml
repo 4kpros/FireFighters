@@ -196,4 +196,9 @@
             app:iconGravity="top"
             />
     </RelativeLayout>
+    <FrameLayout
+        android:id="@+id/frame_layout_map_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        />
 </androidx.constraintlayout.widget.ConstraintLayout>

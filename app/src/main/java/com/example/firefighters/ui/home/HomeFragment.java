@@ -13,12 +13,15 @@ import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.ViewModelProvider;
 
 import android.os.CountDownTimer;
+import android.os.Looper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -26,15 +29,31 @@ import android.view.animation.AccelerateDecelerateInterpolator;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.firefighters.R;
 import com.example.firefighters.models.EmergencyModel;
 import com.example.firefighters.tools.ConstantsValues;
 import com.example.firefighters.tools.PermissionsManager;
+import com.example.firefighters.ui.bottomsheetfragment.mapview.MapViewFragment;
+import com.example.firefighters.ui.bottomsheetfragment.mapview.TestActivity;
 import com.example.firefighters.viewmodels.EmergencyViewModel;
+import com.google.android.gms.location.LocationAvailability;
+import com.google.android.gms.location.LocationCallback;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationResult;
+import com.google.android.gms.location.LocationServices;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
+import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textview.MaterialTextView;
+import com.mapbox.mapboxsdk.camera.CameraPosition;
+import com.mapbox.mapboxsdk.geometry.LatLng;
+import com.mapbox.mapboxsdk.maps.MapboxMap;
+import com.mapbox.mapboxsdk.maps.MapboxMapOptions;
+import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
+import com.mapbox.mapboxsdk.maps.Style;
+import com.mapbox.mapboxsdk.maps.SupportMapFragment;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -50,26 +69,26 @@ public class HomeFragment extends Fragment {
     //Text View
     private TextView buttonSos;
     private Context context;
-    private Activity activity;
+    private AppCompatActivity activity;
 
     EmergencyViewModel emergencyViewModel;
     private final int phoneNumber = 000;
+    CountDownTimer countDownTimerCall;
+    CountDownTimer countDownTimerSos;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_home, container, false);
         context = view.getContext();
-        activity = getActivity();
+        activity = (AppCompatActivity) getActivity();
         initViews(view);
         initViewModels(view);
         setAnimations();
         observeLiveData();
         return view;
     }
-
     private void observeLiveData() {
-
 //        tryToGetCallPermissions(view, bottomSheet);
     }
 
@@ -131,7 +150,11 @@ public class HomeFragment extends Fragment {
     }
 
     private void showMapView(View v) {
-        //
+        Intent myIntent = new Intent(activity, TestActivity.class);
+        myIntent.putExtra("key", "ras"); //Optional parameters
+        activity.startActivity(myIntent);
+//        MapViewFragment mapViewFragment = MapViewFragment.newInstance(context);
+//        mapViewFragment.show(activity.getSupportFragmentManager(), ConstantsValues.MAP_VIEW_TAG);
     }
 
     private void showBottomSheetDialogSettings(View view) {
@@ -159,27 +182,46 @@ public class HomeFragment extends Fragment {
         bottomSheetSos.setCancelable(false);
         bottomSheetSos.setCanceledOnTouchOutside(false);
         bottomSheetSos.getWindow().findViewById(R.id.design_bottom_sheet).setBackgroundResource(android.R.color.transparent);
+        bottomSheetSos.findViewById(R.id.button_add_media_dialog).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showBottomSheetFragmentAddMedia(v, bottomSheetSos);
+            }
+        });
         bottomSheetSos.findViewById(R.id.button_cancel_sos).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 bottomSheetSos.dismiss();
+                if (countDownTimerSos != null)
+                    countDownTimerSos.cancel();
             }
         });
         bottomSheetSos.findViewById(R.id.button_get_permissions).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                if (bottomSheetSos != null)
+                    bottomSheetSos.dismiss();
                 PermissionsManager.getInstance().requestLocationPermission(activity);
             }
         });
         tryToGetSosPermissions(view, bottomSheetSos);
         bottomSheetSos.show();
     }
-    private void tryToGetSosPermissions(View view, BottomSheetDialog bottomSheet) { int startCount = 5;
-        if(PermissionsManager.getInstance().isLocationPermissions(activity)){
+
+    private void showBottomSheetFragmentAddMedia(View v, BottomSheetDialog bottomSheetSos) {
+//        if (countDownTimerSos != null)
+//            countDownTimerSos.cancel();
+//        BottomSheetDialogFragment bottomSheetDialogFragment = new BottomSheetDialogFragment();
+//        bottomSheetDialogFragment.sho
+    }
+
+    private void tryToGetSosPermissions(View view, BottomSheetDialog bottomSheet) {
+        int startCount = 5;
+        if (PermissionsManager.getInstance().isLocationPermissions(activity)) {
             bottomSheet.findViewById(R.id.linear_no_permissions).setVisibility(View.GONE);
             bottomSheet.findViewById(R.id.linear_waiting).setVisibility(View.VISIBLE);
             MaterialTextView text = (MaterialTextView) bottomSheet.findViewById(R.id.text_progression);
-            new CountDownTimer(6000, 1000) {
+            countDownTimerSos = new CountDownTimer(6000, 1000) {
                 public void onTick(long millisUntilFinished) {
                     text.setText("" + millisUntilFinished / 1000);
                     //here you can have your logic to set text to edittext
@@ -191,18 +233,56 @@ public class HomeFragment extends Fragment {
                     bottomSheet.dismiss();
                 }
 
-            }.start();
-        }else{
+            };
+            countDownTimerSos.start();
+        } else {
             bottomSheet.findViewById(R.id.linear_no_permissions).setVisibility(View.VISIBLE);
             bottomSheet.findViewById(R.id.linear_waiting).setVisibility(View.GONE);
         }
     }
+
     private void sendSOS() {
-        EmergencyModel emergencyModel = new EmergencyModel();
-        emergencyModel.setLongitude(1);
-        emergencyModel.setLatitude(1);
-        emergencyModel.setSenderId(1);
-        emergencyViewModel.uploadEmergency(emergencyModel, activity);
+        getLocation();
+    }
+
+
+    private void getLocation() {
+        if (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            return;
+        }
+        LocationRequest locationRequest = new LocationRequest();
+        locationRequest.setInterval(10000);
+        locationRequest.setFastestInterval(3000);
+        locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+        LocationServices.getFusedLocationProviderClient(context)
+                .requestLocationUpdates(locationRequest, new LocationCallback() {
+                    @Override
+                    public void onLocationResult(LocationResult locationResult) {
+                        super.onLocationResult(locationResult);
+                        LocationServices.getFusedLocationProviderClient(context)
+                                .removeLocationUpdates(this);
+                        if (locationResult != null && locationResult.getLocations().size() > 0){
+                            EmergencyModel emergencyModel = new EmergencyModel();
+                            emergencyModel.setLongitude(locationResult.getLocations().get(locationResult.getLocations().size()-1).getLongitude());
+                            emergencyModel.setLatitude(locationResult.getLocations().get(locationResult.getLocations().size()-1).getLatitude());
+                            emergencyViewModel.uploadEmergency(emergencyModel, activity);
+                        }else {
+                            Toast.makeText(context, "Not sent", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+
+                    @Override
+                    public void onLocationAvailability(LocationAvailability locationAvailability) {
+                        super.onLocationAvailability(locationAvailability);
+                    }
+                }, Looper.getMainLooper());
     }
 
     //Show bottom sheet dialog for call
@@ -216,11 +296,15 @@ public class HomeFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 bottomSheet.dismiss();
+                if (countDownTimerCall != null)
+                    countDownTimerCall.cancel();
             }
         });
         bottomSheet.findViewById(R.id.button_get_permissions).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                if (bottomSheet != null)
+                    bottomSheet.dismiss();
                 PermissionsManager.getInstance().requestCallPermission(activity);
             }
         });
@@ -233,7 +317,7 @@ public class HomeFragment extends Fragment {
             bottomSheet.findViewById(R.id.linear_no_permissions).setVisibility(View.GONE);
             bottomSheet.findViewById(R.id.linear_waiting).setVisibility(View.VISIBLE);
             MaterialTextView text = (MaterialTextView) bottomSheet.findViewById(R.id.text_progression);
-            new CountDownTimer(6000, 1000) {
+            countDownTimerCall = new CountDownTimer(6000, 1000) {
                 public void onTick(long millisUntilFinished) {
                     text.setText("" + millisUntilFinished / 1000);
                     //here you can have your logic to set text to edittext
@@ -245,7 +329,8 @@ public class HomeFragment extends Fragment {
                     bottomSheet.dismiss();
                 }
 
-            }.start();
+            };
+            countDownTimerCall.start();
         }else{
             bottomSheet.findViewById(R.id.linear_no_permissions).setVisibility(View.VISIBLE);
             bottomSheet.findViewById(R.id.linear_waiting).setVisibility(View.GONE);

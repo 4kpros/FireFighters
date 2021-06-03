@@ -1,24 +1,36 @@
 package com.example.firefighters.models;
 
 
+import java.util.Calendar;
 import java.util.Date;
 
 public class FireStationModel {
-    private int fireStationId; //Primary key
+    private int sendUtc;
     private float longitude;
     private float latitude;
-    private Date sendDate;
-    private Date updatedDate;
+    private String sendDate;
+    private String sendHour;
 
     public FireStationModel() {
+        Calendar calendar = Calendar.getInstance();
+        int year = calendar.get(Calendar.YEAR);
+        int month = calendar.get(Calendar.MONTH);
+        int day = calendar.get(Calendar.DAY_OF_MONTH)+1;
+        int utc = calendar.get(Calendar.ZONE_OFFSET);
+        int hours = calendar.get(Calendar.HOUR_OF_DAY);
+        int minutes = calendar.get(Calendar.MINUTE);
+        int sec = calendar.get(Calendar.SECOND);
+        sendDate = day + "/" + month + "/" + year;
+        sendHour = hours + ":" + minutes + ":" + sec;
+        sendUtc = utc;
     }
 
-    public int getFireStationId() {
-        return fireStationId;
+    public int getSendUtc() {
+        return sendUtc;
     }
 
-    public void setFireStationId(int fireStationId) {
-        this.fireStationId = fireStationId;
+    public void setSendUtc(int sendUtc) {
+        this.sendUtc = sendUtc;
     }
 
     public float getLongitude() {
@@ -37,19 +49,19 @@ public class FireStationModel {
         this.latitude = latitude;
     }
 
-    public Date getSendDate() {
+    public String getSendDate() {
         return sendDate;
     }
 
-    public void setSendDate(Date sendDate) {
+    public void setSendDate(String sendDate) {
         this.sendDate = sendDate;
     }
 
-    public Date getUpdatedDate() {
-        return updatedDate;
+    public String getSendHour() {
+        return sendHour;
     }
 
-    public void setUpdatedDate(Date updatedDate) {
-        this.updatedDate = updatedDate;
+    public void setSendHour(String sendHour) {
+        this.sendHour = sendHour;
     }
 }

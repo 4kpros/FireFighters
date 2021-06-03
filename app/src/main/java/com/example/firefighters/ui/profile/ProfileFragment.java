@@ -108,7 +108,7 @@ public class ProfileFragment extends Fragment {
         initViews(view);
         initViewModel();
         setViewStates();
-        ObserveLiveData();
+//        ObserveLiveData();
         return view;
     }
 

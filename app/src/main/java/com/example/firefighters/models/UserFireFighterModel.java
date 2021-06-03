@@ -1,34 +1,25 @@
 package com.example.firefighters.models;
 
 public class UserFireFighterModel {
-    int fireFighterId;
-    String cIN;
+    int phoneNumber;
+    String cin;
     String matNo;
     String mail;
     String grade;
     String userName;
     String firstName;
     String lastName;
-    int phoneNumber;
     String picture;
 
     public UserFireFighterModel() {
     }
 
-    public int getFireFighterId() {
-        return fireFighterId;
+    public String getCin() {
+        return cin;
     }
 
-    public void setFireFighterId(int fireFighterId) {
-        this.fireFighterId = fireFighterId;
-    }
-
-    public String getcIN() {
-        return cIN;
-    }
-
-    public void setcIN(String cIN) {
-        this.cIN = cIN;
+    public void setCin(String cin) {
+        this.cin = cin;
     }
 
     public String getMatNo() {

@@ -9,6 +9,7 @@ import com.example.firefighters.tools.ConstantsValues;
 import com.example.firefighters.ui.home.HomeFragment;
 import com.facebook.drawee.backends.pipeline.Fresco;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.mapbox.mapboxsdk.Mapbox;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -22,6 +23,7 @@ public class MainActivity extends AppCompatActivity implements HomeFragment.Load
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        Mapbox.getInstance(this, getString(R.string.mapbox_access_token));
         super.onCreate(savedInstanceState);
 
         //Initialize fresco

@@ -7,4 +7,6 @@
     <string name="title_home">Home</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="title_emergency">Emergency</string>
+
+    <string name="mapbox_access_token">MAPBOX_ACCESS_TOKEN</string>
 </resources>

@@ -1,32 +1,39 @@
 package com.example.firefighters.models;
 
+import java.util.Calendar;
 import java.util.Date;
 
 public class WaterSourceModel {
-    private int waterSourceId; //Primary key
-    private int estimatedQte;
-    private String type;
+    private String senderId;   //Foreign key user sender
 
+    private int estimatedQte;
+    private int sendUtc;
     private float longitude;
     private float latitude;
-
-    private int senderId;
-    private int verifiedId;
-    private int signaledId;
-    private Date sendDate;
-    private Date updatedDate;
-    private Date verifiedDate;
-    private Date signaledDate;
+    private String sourceType;
+    private String sendDate;
+    private String sendHour;
 
     public WaterSourceModel() {
+        Calendar calendar = Calendar.getInstance();
+        int year = calendar.get(Calendar.YEAR);
+        int month = calendar.get(Calendar.MONTH);
+        int day = calendar.get(Calendar.DAY_OF_MONTH)+1;
+        int utc = calendar.get(Calendar.ZONE_OFFSET);
+        int hours = calendar.get(Calendar.HOUR_OF_DAY);
+        int minutes = calendar.get(Calendar.MINUTE);
+        int sec = calendar.get(Calendar.SECOND);
+        sendDate = day + "/" + month + "/" + year;
+        sendHour = hours + ":" + minutes + ":" + sec;
+        sendUtc = utc;
     }
 
-    public int getWaterSourceId() {
-        return waterSourceId;
+    public String getSenderId() {
+        return senderId;
     }
 
-    public void setWaterSourceId(int waterSourceId) {
-        this.waterSourceId = waterSourceId;
+    public void setSenderId(String senderId) {
+        this.senderId = senderId;
     }
 
     public int getEstimatedQte() {
@@ -37,12 +44,12 @@ public class WaterSourceModel {
         this.estimatedQte = estimatedQte;
     }
 
-    public String getType() {
-        return type;
+    public int getSendUtc() {
+        return sendUtc;
     }
 
-    public void setType(String type) {
-        this.type = type;
+    public void setSendUtc(int sendUtc) {
+        this.sendUtc = sendUtc;
     }
 
     public float getLongitude() {
@@ -61,59 +68,27 @@ public class WaterSourceModel {
         this.latitude = latitude;
     }
 
-    public int getSenderId() {
-        return senderId;
+    public String getSourceType() {
+        return sourceType;
     }
 
-    public void setSenderId(int senderId) {
-        this.senderId = senderId;
+    public void setSourceType(String sourceType) {
+        this.sourceType = sourceType;
     }
 
-    public int getVerifiedId() {
-        return verifiedId;
-    }
-
-    public void setVerifiedId(int verifiedId) {
-        this.verifiedId = verifiedId;
-    }
-
-    public int getSignaledId() {
-        return signaledId;
-    }
-
-    public void setSignaledId(int signaledId) {
-        this.signaledId = signaledId;
-    }
-
-    public Date getSendDate() {
+    public String getSendDate() {
         return sendDate;
     }
 
-    public void setSendDate(Date sendDate) {
+    public void setSendDate(String sendDate) {
         this.sendDate = sendDate;
     }
 
-    public Date getUpdatedDate() {
-        return updatedDate;
+    public String getSendHour() {
+        return sendHour;
     }
 
-    public void setUpdatedDate(Date updatedDate) {
-        this.updatedDate = updatedDate;
-    }
-
-    public Date getVerifiedDate() {
-        return verifiedDate;
-    }
-
-    public void setVerifiedDate(Date verifiedDate) {
-        this.verifiedDate = verifiedDate;
-    }
-
-    public Date getSignaledDate() {
-        return signaledDate;
-    }
-
-    public void setSignaledDate(Date signaledDate) {
-        this.signaledDate = signaledDate;
+    public void setSendHour(String sendHour) {
+        this.sendHour = sendHour;
     }
 }

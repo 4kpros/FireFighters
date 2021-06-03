@@ -248,6 +248,7 @@ public class EmergencyFragment extends Fragment {
 
     private void setEmergencyWorkOn(BottomSheetDialog bottomSheet ,int position) {
         bottomSheet.dismiss();
+//        emergencyViewModel.updateEmergency(emergencyViewModel, );
         Toast.makeText(context, emergencyViewModel.getEmergencies().getValue().get(position)+"", Toast.LENGTH_SHORT).show();
     }
 

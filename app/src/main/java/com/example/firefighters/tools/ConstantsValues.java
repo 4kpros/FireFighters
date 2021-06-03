@@ -23,4 +23,15 @@ public abstract class ConstantsValues {
     public static String GRAVITY_NORMAL = "Normal";
     public static String GRAVITY_HIGH = "High";
     public static String GRAVITY_LOW = "Low";
+
+    //Bottom sheet fragments
+    public static String MAP_VIEW_TAG = "Map view fragment";
+    public static String STREET_VIEW_TAG = "Street view fragment";
+
+    public static String EMERGENCY_DETAIL_TAG = "Emergency detail fragment";
+    public static String WATER_SOURCE_DETAIL_TAG = "Water source detail fragment";
+    public static String FIRE_STATION_DETAIL_TAG = "Fire station detail fragment";
+    public static String FIRE_TRUCK_DETAIL_TAG = "Fire truck detail fragment";
+    public static String FIRE_FIGHTER_DETAIL_TAG = "Fire fighter detail fragment";
+
 }

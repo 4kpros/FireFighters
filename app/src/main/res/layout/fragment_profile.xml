@@ -10,11 +10,11 @@
     <include layout="@layout/page_profile_connexion"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:visibility="gone"
         />
     <include layout="@layout/page_profile_home"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:visibility="gone"
         />
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/constraint_floating_action_buttons"

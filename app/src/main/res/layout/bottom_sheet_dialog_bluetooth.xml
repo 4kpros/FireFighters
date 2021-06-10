@@ -16,7 +16,8 @@
             android:id="@+id/text_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Settings"
+            android:text="Bluetooth device connected"
+            android:gravity="center"
             style="@style/CustomCleanTextColor"
             android:textSize="16sp"
             app:textAllCaps="true"
@@ -25,7 +26,9 @@
             android:ellipsize="end"
             android:maxLength="10"
             android:textAllCaps="true"
-            android:layout_centerInParent="true"
+            android:layout_centerHorizontal="true"
+            android:layout_alignTop="@+id/button_close_dialog"
+            android:layout_alignBottom="@+id/button_close_dialog"
             />
         <com.google.android.material.button.MaterialButton
             android:id="@+id/button_close_dialog"
@@ -47,5 +50,44 @@
             android:layout_alignParentStart="true"
             android:layout_alignParentLeft="true"
             />
+        <RelativeLayout
+            android:id="@+id/relative_device_connected"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/button_close_dialog"
+            android:layout_margin="20dp"
+            android:visibility="gone"
+            >
+            <TextView
+                android:id="@+id/text_title_bluetooth"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Connected devices"
+                android:textSize="16sp"
+                />
+            <RelativeLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/text_title_bluetooth"
+                >
+                <include layout="@layout/card_connected_bluetooth"/>
+            </RelativeLayout>
+        </RelativeLayout>
+        <RelativeLayout
+            android:id="@+id/relative_no_device_connected"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/button_close_dialog"
+            android:layout_margin="20dp"
+            >
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="None device connected !"
+                android:layout_centerInParent="true"
+                android:gravity="center"
+                android:textSize="16sp"
+                />
+        </RelativeLayout>
     </RelativeLayout>
 </LinearLayout>

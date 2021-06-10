@@ -7,12 +7,14 @@ import android.widget.Toast;
 
 import com.example.firefighters.tools.ConstantsValues;
 import com.example.firefighters.ui.home.HomeFragment;
+import com.example.firefighters.ui.main.MainFragment;
 import com.facebook.drawee.backends.pipeline.Fresco;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
@@ -27,14 +29,11 @@ public class MainActivity extends AppCompatActivity implements HomeFragment.Load
         //Initialize fresco
         Fresco.initialize(this);
         setContentView(R.layout.activity_main);
-        BottomNavigationView navView = findViewById(R.id.nav_view);
 
-        AppBarConfiguration appBarConfiguration = new AppBarConfiguration.Builder(
-                R.id.navigation_home, R.id.navigation_emergency, R.id.navigation_profile)
-                .build();
-        NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment);
-//        NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
-        NavigationUI.setupWithNavController(navView, navController);
+        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+        ft.setCustomAnimations(R.anim.anim_scale_in, R.anim.anim_scale_in);
+        ft.replace(R.id.main_frame_layout, new MainFragment()).addToBackStack(null);
+        ft.commit();
     }
 
     @Override

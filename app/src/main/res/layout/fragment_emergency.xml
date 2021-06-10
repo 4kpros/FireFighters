@@ -168,8 +168,6 @@
         app:layout_constraintBottom_toBottomOf="@+id/relative_emergency_title"
         android:indeterminate="true"
         app:trackColor="@color/white"
-        app:indicatorColor="@color/dark_600"
-        android:visibility="gone"
         />
     <TextView
         android:id="@+id/text_emergency_top_title"

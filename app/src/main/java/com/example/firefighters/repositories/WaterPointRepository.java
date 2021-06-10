@@ -3,8 +3,7 @@ package com.example.firefighters.repositories;
 import android.app.Activity;
 import android.widget.Toast;
 
-import com.example.firefighters.models.FireTruckModel;
-import com.example.firefighters.models.FireTruckModel;
+import com.example.firefighters.models.WaterPointModel;
 import com.example.firefighters.tools.ConstantsValues;
 import com.example.firefighters.tools.FirebaseManager;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -18,15 +17,13 @@ import com.google.firebase.firestore.QuerySnapshot;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.lifecycle.MutableLiveData;
 
-public class FireTruckRepository {
+public class WaterPointRepository {
 
-    private static FireTruckRepository instance;
+    private static WaterPointRepository instance;
 
     private QuerySnapshot query;
     private QuerySnapshot querySnapshot;
@@ -34,9 +31,9 @@ public class FireTruckRepository {
     private boolean isLoadingRead;
     private boolean isLoadingWrite;
 
-    public static FireTruckRepository getInstance() {
+    public static WaterPointRepository getInstance() {
         if (instance == null)
-            instance = new FireTruckRepository();
+            instance = new WaterPointRepository();
         return instance;
     }
 
@@ -66,12 +63,12 @@ public class FireTruckRepository {
         return mutableLiveData;
     }
 
-    public void loadFireTrucksQuery(Activity activity) {
+    public void loadWaterPointsQuery(Activity activity) {
         if (isLoadingQuery)
             return;
         isLoadingQuery = true;
         FirebaseManager.getInstance().getFirebaseFirestoreInstance()
-                .collection(ConstantsValues.FIRE_TRUCKS_COLLECTION)
+                .collection(ConstantsValues.WATER_POINTS_COLLECTION)
                 .get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
@@ -81,42 +78,42 @@ public class FireTruckRepository {
                     }
                 });
     }
-    public void loadFireTrucksQuerySnapshot(Activity activity) {if (isLoadingQuery)
+    public void loadWaterPointsQuerySnapshot(Activity activity) {if (isLoadingQuery)
         FirebaseManager.getInstance().getFirebaseFirestoreInstance()
-                .collection(ConstantsValues.FIRE_TRUCKS_COLLECTION)
+                .collection(ConstantsValues.WATER_POINTS_COLLECTION)
                 .addSnapshotListener(new EventListener<QuerySnapshot>() {
                     @Override
                     public void onEvent(@Nullable @org.jetbrains.annotations.Nullable QuerySnapshot value, @Nullable @org.jetbrains.annotations.Nullable FirebaseFirestoreException error) {
-                        query = value;
+                        querySnapshot = value;
                     }
                 });
     }
-    public void saveFireTruckPoint(FireTruckModel fireTruckModel, Activity activity) {
+    public void saveWaterPoint(WaterPointModel waterPointModel, Activity activity) {
         if (isLoadingWrite)
             return;
         isLoadingWrite = true;
         FirebaseManager.getInstance().getFirebaseFirestoreInstance()
-                .collection(ConstantsValues.FIRE_TRUCKS_COLLECTION)
-                .add(fireTruckModel)
+                .collection(ConstantsValues.WATER_POINTS_COLLECTION)
+                .add(waterPointModel)
                 .addOnCompleteListener(new OnCompleteListener<DocumentReference>() {
                     @Override
                     public void onComplete(@NonNull @NotNull Task<DocumentReference> task) {
                         isLoadingWrite = false;
                         if (task.isSuccessful()){
-                            Toast.makeText(activity, "Fire truck saved !", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(activity, "Water point saved !", Toast.LENGTH_SHORT).show();
                         }else{
                             Toast.makeText(activity, "Not sent !", Toast.LENGTH_SHORT).show();
                         }
                     }
                 });
     }
-    public void deleteFireTruckPoint(FireTruckModel fireTruckModel, Activity activity) {
+    public void deleteWaterPoint(WaterPointModel waterPointModel, Activity activity) {
         if (isLoadingWrite)
             return;
         isLoadingWrite = true;
         FirebaseManager.getInstance().getFirebaseFirestoreInstance()
-                .collection(ConstantsValues.FIRE_TRUCKS_COLLECTION)
-                .whereEqualTo("id", fireTruckModel.getId())
+                .collection(ConstantsValues.WATER_POINTS_COLLECTION)
+                .whereEqualTo("id", waterPointModel.getId())
                 .get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
@@ -130,7 +127,7 @@ public class FireTruckRepository {
                                             public void onComplete(@NonNull @NotNull Task<Void> task) {
                                                 isLoadingWrite = false;
                                                 if(task.isSuccessful()){
-                                                    Toast.makeText(activity, "Fire truck deleted !", Toast.LENGTH_SHORT).show();
+                                                    Toast.makeText(activity, "Water point deleted !", Toast.LENGTH_SHORT).show();
                                                 }else{
                                                     Toast.makeText(activity, "Not deleted !", Toast.LENGTH_SHORT).show();
                                                 }

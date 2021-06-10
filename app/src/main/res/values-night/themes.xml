@@ -32,6 +32,10 @@
     <style name="CustomExtendedFloatingAction" parent="@style/Widget.MaterialComponents.ExtendedFloatingActionButton">
         <item name="android:backgroundTint" tools:targetApi="lollipop">@color/purple_200</item>
     </style>
+    <!-- floating action button -->
+    <style name="CustomFlatFloatingAction" parent="@style/Widget.MaterialComponents.ExtendedFloatingActionButton">
+        <item name="android:backgroundTint" tools:targetApi="lollipop">@color/dark_200</item>
+    </style>
 
     <!-- Background -->
     <style name="CustomShape">

@@ -109,6 +109,7 @@
                 app:layout_constraintBottom_toBottomOf="parent"
                 android:layout_margin="10dp"
                 android:indeterminate="true"
+                app:indicatorColor="@color/purple_200"
                 />
             <com.google.android.material.textview.MaterialTextView
                 android:id="@+id/text_progression"

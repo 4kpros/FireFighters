@@ -1,6 +1,7 @@
 package com.example.firefighters.models;
 
 public class MessageModel {
+    private String id;
 
     private String message;
     private String imagesSrc;

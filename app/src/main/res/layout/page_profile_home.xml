@@ -16,7 +16,7 @@
         android:layout_height="wrap_content"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/button_edit_profile"
+        app:layout_constraintTop_toBottomOf="@+id/button_log_out"
         android:paddingBottom="@dimen/title_height"
         >
         <androidx.constraintlayout.widget.ConstraintLayout
@@ -35,6 +35,7 @@
                     android:id="@+id/linear_expand_working_on"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:visibility="gone"
                     android:orientation="vertical">
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/button_working_on"
@@ -50,7 +51,7 @@
                         android:gravity="center"
                         android:linksClickable="true"
                         android:maxLines="1"
-                        android:text="Working on (1/10)"
+                        android:text="Working on"
                         app:icon="@drawable/ic_baseline_keyboard_arrow_down_24"
                         app:iconGravity="textEnd"
                         app:layout_constraintLeft_toLeftOf="parent"
@@ -96,54 +97,81 @@
                     android:gravity="center"
                     android:linksClickable="true"
                     android:maxLines="1"
-                    android:text="My points (10)"
+                    android:text="My points"
                     app:icon="@drawable/ic_baseline_keyboard_arrow_down_24"
                     app:iconGravity="textEnd"
                     app:layout_constraintLeft_toLeftOf="parent"
                     app:layout_constraintRight_toRightOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/text_profile_mail"
                     app:rippleColor="@color/light_300" />
-
-                <com.google.android.material.button.MaterialButtonToggleGroup
-                    android:id="@+id/toggle_button"
+                <LinearLayout
+                    android:id="@+id/linear_my_points_expand"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="center_horizontal"
-                    android:layout_marginBottom="5dp"
-                    android:gravity="center"
-                    app:selectionRequired="true"
-                    app:checkedButton="@+id/button_emergency_points"
-                    app:singleSelection="true">
-
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/button_emergency_points"
-                        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-                        android:layout_width="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:orientation="vertical"
+                    >
+                    <com.google.android.material.button.MaterialButtonToggleGroup
+                        android:id="@+id/toggle_button"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Emergency" />
+                        android:layout_gravity="center_horizontal"
+                        android:layout_marginBottom="5dp"
+                        android:gravity="center"
+                        app:selectionRequired="true"
+                        app:checkedButton="@+id/button_emergency_points"
+                        app:singleSelection="true">
 
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/button_water_points"
-                        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-                        android:layout_width="wrap_content"
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/button_emergency_points"
+                            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Emergency" />
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/button_water_points"
+                            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Water" />
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/button_station_points"
+                            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Fire station" />
+                    </com.google.android.material.button.MaterialButtonToggleGroup>
+
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/recycler_my_emergencies"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Water" />
-
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/button_station_points"
-                        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-                        android:layout_width="wrap_content"
+                        android:clipToPadding="false"
+                        android:orientation="vertical"
+                        android:visibility="visible"
+                        tools:listitem="@layout/card_my_point_emergency"
+                        />
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/recycler_my_fire_station"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Fire station" />
-                </com.google.android.material.button.MaterialButtonToggleGroup>
-
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/recycler_expand_my_points"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    tools:itemCount="20"
-                    tools:listitem="@layout/card_my_point_emergency"
-                    />
+                        android:clipToPadding="false"
+                        android:orientation="vertical"
+                        android:visibility="gone"
+                        tools:listitem="@layout/card_my_point_fire_station"
+                        />
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/recycler_my_water_points"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:clipToPadding="false"
+                        android:orientation="vertical"
+                        android:visibility="gone"
+                        tools:listitem="@layout/card_my_point_water"
+                        />
+                </LinearLayout>
             </LinearLayout>
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.core.widget.NestedScrollView>
@@ -207,7 +235,7 @@
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/linear_transparent"
-        app:placeholderImage="@drawable/img1"
+        app:placeholderImage="@color/light_500"
         app:placeholderImageScaleType="centerCrop"
         app:roundAsCircle="true" />
     <com.google.android.material.textview.MaterialTextView
@@ -261,5 +289,24 @@
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/text_profile_mail"
+        app:rippleColor="@color/light_300" />
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/button_log_out"
+        style="@style/Widget.MaterialComponents.Button.TextButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="10dp"
+        android:layout_marginTop="15dp"
+        android:layout_marginRight="10dp"
+        android:layout_marginBottom="10dp"
+        android:autoLink="all"
+        android:ellipsize="end"
+        android:linksClickable="true"
+        android:maxLines="1"
+        android:text="Sign out"
+        app:icon="@drawable/ic_log_out"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/button_edit_profile"
         app:rippleColor="@color/light_300" />
 </androidx.constraintlayout.motion.widget.MotionLayout>

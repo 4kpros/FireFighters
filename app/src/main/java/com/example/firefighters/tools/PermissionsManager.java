@@ -19,11 +19,13 @@ public class PermissionsManager {
 
     public boolean isLocationPermissions(Activity activity) {
         return ContextCompat.checkSelfPermission(activity,
-                Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED;
+                Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED &&
+                ContextCompat.checkSelfPermission(activity,
+                        Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED;
     }
 
     public void requestLocationPermission(Activity activity) {
-        ActivityCompat.requestPermissions(activity, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, ConstantsValues.LOCATION_PERMISSION_CODE);
+        ActivityCompat.requestPermissions(activity, new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION}, ConstantsValues.LOCATION_PERMISSION_CODE);
     }
 
     public boolean isCallPermissions(Activity activity) {
@@ -31,7 +33,16 @@ public class PermissionsManager {
                 Manifest.permission.CALL_PHONE) == PackageManager.PERMISSION_GRANTED;
     }
 
+    public boolean isBluetoothPermissions(Activity activity) {
+        return ContextCompat.checkSelfPermission(activity,
+                Manifest.permission.BLUETOOTH) == PackageManager.PERMISSION_GRANTED;
+    }
+
     public void requestCallPermission(Activity activity) {
         ActivityCompat.requestPermissions(activity, new String[]{Manifest.permission.CALL_PHONE}, ConstantsValues.CALL_PERMISSION_CODE);
+    }
+
+    public void requestBluetoothPermission(Activity activity) {
+        ActivityCompat.requestPermissions(activity, new String[]{Manifest.permission.BLUETOOTH}, ConstantsValues.BLUETOOTH_PERMISSION_CODE);
     }
 }

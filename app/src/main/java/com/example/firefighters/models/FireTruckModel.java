@@ -3,6 +3,7 @@ package com.example.firefighters.models;
 import java.util.Calendar;
 
 public class FireTruckModel {
+    private String id;
 
     private String fireStationId;  //Foreign key
 
@@ -24,6 +25,14 @@ public class FireTruckModel {
         sendDate = day + "/" + month + "/" + year;
         sendHour = hours + ":" + minutes + ":" + sec;
         sendUtc = utc;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 
     public String getFireStationId() {

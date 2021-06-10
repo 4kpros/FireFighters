@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/card_my_point_water"
+    android:id="@+id/point_my_point_emergency"
     android:layout_width="match_parent"
-    android:layout_height="100dp"
+    android:layout_height="50dp"
     android:layout_marginLeft="10dp"
     android:layout_marginRight="10dp"
     android:layout_marginTop="5dp"
@@ -12,7 +12,26 @@
     app:cardCornerRadius="10dp"
     >
     <RelativeLayout
-        style="@style/CustomShapeGradient"
+        style="@style/CustomShape"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent" >
+        <ImageView
+            android:id="@+id/image_card_item"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_baseline_water_damage_24"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            />
+        <TextView
+            android:id="@+id/text_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="temp text"
+            android:layout_toRightOf="@+id/image_card_item"
+            android:layout_centerVertical="true"
+            android:layout_marginEnd="10dp"
+            />
+    </RelativeLayout>
 </androidx.cardview.widget.CardView>

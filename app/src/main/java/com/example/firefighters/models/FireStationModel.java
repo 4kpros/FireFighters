@@ -4,6 +4,8 @@ package com.example.firefighters.models;
 import java.util.Calendar;
 
 public class FireStationModel {
+    private String id;
+
     private int sendUtc;
     private float longitude;
     private float latitude;
@@ -22,6 +24,14 @@ public class FireStationModel {
         sendDate = day + "/" + month + "/" + year;
         sendHour = hours + ":" + minutes + ":" + sec;
         sendUtc = utc;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 
     public int getSendUtc() {
@@ -63,4 +73,5 @@ public class FireStationModel {
     public void setSendHour(String sendHour) {
         this.sendHour = sendHour;
     }
+
 }

@@ -5,6 +5,7 @@ import android.os.Handler;
 import android.widget.Toast;
 
 import com.example.firefighters.models.EmergencyModel;
+import com.example.firefighters.models.EmergencyModel;
 import com.example.firefighters.tools.ConstantsValues;
 import com.example.firefighters.tools.FirebaseManager;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -25,208 +26,168 @@ import java.util.ArrayList;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
 public class EmergencyRepository {
 
     private static EmergencyRepository instance;
-    private final ArrayList<EmergencyModel> emergencies = new ArrayList<>();
-    DocumentSnapshot lastVisible;
-    private boolean isLoading;
-    private boolean canRunThread;
-    private QuerySnapshot queryUpdates;
-    private Query queryEmergenciesLimit;
+
     private String lastFilter = ConstantsValues.FILTER_STATUS;
     private Query.Direction lastOrder = Query.Direction.DESCENDING;
-    private Integer lastVisiblePosition;
+    private DocumentSnapshot lastDocument;
 
-    /**
-     * Constructor for design pattern single
-     *
-     * @return instance
-     */
     public static EmergencyRepository getInstance() {
-        if (instance == null) {
+        if (instance == null)
             instance = new EmergencyRepository();
-            //getEmergenciesFromFireBase();
-        }
         return instance;
     }
 
-    //These functions are used to bind live data and mutable live data with their views
-    public MutableLiveData<QuerySnapshot> bindQueryUpdates() {
+    public LiveData<QuerySnapshot> getEmergenciesQuery(Activity activity) {
         MutableLiveData<QuerySnapshot> data = new MutableLiveData<>();
-        data.setValue(queryUpdates);
-        return data;
-    }
-
-    public MutableLiveData<ArrayList<EmergencyModel>> bindEmergencies() {
-        MutableLiveData<ArrayList<EmergencyModel>> data = new MutableLiveData<>();
-        data.setValue(emergencies);
-        return data;
-    }
-
-    public MutableLiveData<Boolean> bindIsLoading() {
-        MutableLiveData<Boolean> data = new MutableLiveData<>();
-        data.setValue(isLoading);
-        return data;
-    }
-
-    public MutableLiveData<String> bindLastFilter() {
-        MutableLiveData<String> data = new MutableLiveData<>();
-        data.setValue(lastFilter);
-        return data;
-    }
-
-    public MutableLiveData<Query.Direction> bindLastOrder() {
-        MutableLiveData<Query.Direction> data = new MutableLiveData<>();
-        data.setValue(lastOrder);
-        return data;
-    }
-
-    public MutableLiveData<Integer> bindLastVisiblePosition() {
-        MutableLiveData<Integer> data = new MutableLiveData<>();
-        data.setValue(lastVisiblePosition);
-        return data;
-    }
-
-    //Initialize the observer for firebase
-    private void getEmergenciesFromFireBase() {
-        FirebaseManager.getInstance().getFirebaseFirestoreInstance().collection("emergencies").addSnapshotListener(new EventListener<QuerySnapshot>() {
-            @Override
-            public void onEvent(@Nullable @org.jetbrains.annotations.Nullable QuerySnapshot value, @Nullable @org.jetbrains.annotations.Nullable FirebaseFirestoreException error) {
-                if (value != null) {
-                    queryUpdates = value;
-                }
-            }
-        });
-    }
-
-    //These functions are used to do modify (or work) with values of live data and mutable live data
-    public void setFilter(String filter) {
-        lastFilter = filter;
-    }
-
-    public void setOrder(Query.Direction order) {
-        lastOrder = order;
-    }
-
-    public void firstLoad(Activity activity, int qte) {
-        clearEmergencies();
-        isLoading = true;
-        canRunThread = true;
-        queryEmergenciesLimit = (FirebaseManager.getInstance().getFirebaseFirestoreInstance()
-                .collection("emergencies")
-                .orderBy(lastFilter)
-                .limit(qte)
-        );
-        queryEmergenciesLimit.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-            @Override
-            public void onComplete(@NonNull @NotNull Task<QuerySnapshot> task) {
-                if (task.isSuccessful()) {
-                    if (task.getResult() != null && task.getResult().size() > 0) {
-                        lastVisible = task.getResult().getDocuments().get(task.getResult().size() - 1);
-                        lastVisiblePosition = task.getResult().size() - 1;
-                        for (QueryDocumentSnapshot document : task.getResult()) {
-                            EmergencyModel emergencyModel = document.toObject(EmergencyModel.class);
-                            emergencies.add(emergencyModel);
+        if (lastDocument != null){
+            FirebaseManager.getInstance().getFirebaseFirestoreInstance()
+                    .collection(ConstantsValues.EMERGENCIES_COLLECTION)
+                    .orderBy(lastFilter, lastOrder)
+                    .startAfter(lastDocument)
+                    .get()
+                    .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                        @Override
+                        public void onComplete(@NonNull @NotNull Task<QuerySnapshot> task) {
+                            if(task.getResult().getDocuments().size() > 0){
+                                lastDocument = task.getResult().getDocuments().get(task.getResult().size()-1);
+                            }
+                            data.setValue(task.getResult());
                         }
-                        canRunThread = false;
-                        isLoading = false;
-                        Toast.makeText(activity, task.getResult().size() + " initial", Toast.LENGTH_SHORT).show();
-                        new Handler().postDelayed(new Runnable() {
-                            @Override
-                            public void run() {
-                                while (canRunThread) {
-                                    for (QueryDocumentSnapshot document : task.getResult()) {
-                                        EmergencyModel emergencyModel = document.toObject(EmergencyModel.class);
-                                        emergencies.add(emergencyModel);
-                                    }
-                                    canRunThread = false;
-                                    isLoading = false;
-                                }
-                            }
-                        }, 1000);
-                    }
-
-                } else {
-                    isLoading = false;
-                    Toast.makeText(activity, "Failed to load data", Toast.LENGTH_SHORT).show();
-                }
-            }
-        });
+                    });
+        }else{
+            FirebaseManager.getInstance().getFirebaseFirestoreInstance()
+                    .collection(ConstantsValues.EMERGENCIES_COLLECTION)
+                    .orderBy(lastFilter, lastOrder)
+                    .get()
+                    .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                        @Override
+                        public void onComplete(@NonNull @NotNull Task<QuerySnapshot> task) {
+                            lastDocument = task.getResult().getDocuments().get(task.getResult().size()-1);
+                            data.setValue(task.getResult());
+                        }
+                    });
+        }
+        return data;
     }
-
-    public void clearEmergencies() {
-        canRunThread = false;
-        isLoading = false;
-        emergencies.clear();
-    }
-
-    public void loadEmergencies(Activity activity, int qte) {
-        if (emergencies.size() < qte - 1)
-            return;
-        isLoading = true;
-        canRunThread = true;
-        Toast.makeText(activity, " loaded", Toast.LENGTH_SHORT).show();
-        queryEmergenciesLimit = (FirebaseManager.getInstance().getFirebaseFirestoreInstance()
-                .collection("emergencies")
-                .orderBy(lastFilter)
-                .startAfter(lastVisible)
-                .limit(qte)
-        );
-        queryEmergenciesLimit.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-            @Override
-            public void onComplete(@NonNull @NotNull Task<QuerySnapshot> task) {
-                if (task.isSuccessful()) {
-                    if (task.getResult() != null && task.getResult().size() > 0) {
-                        lastVisible = task.getResult().getDocuments().get(task.getResult().size() - 1);
-                        lastVisiblePosition = task.getResult().size() - 1;
-                        new Handler().postDelayed(new Runnable() {
-                            @Override
-                            public void run() {
-                                while (canRunThread) {
-                                    for (QueryDocumentSnapshot document : task.getResult()) {
-                                        EmergencyModel emergencyModel = document.toObject(EmergencyModel.class);
-                                        emergencies.add(emergencyModel);
-                                    }
-                                    canRunThread = false;
-                                    isLoading = false;
-                                }
-                            }
-                        }, 1000);
-                    }
-                } else {
-                    isLoading = false;
-                    Toast.makeText(activity, "Failed to load data", Toast.LENGTH_SHORT).show();
-                }
-            }
-        });
-    }
-
-    public void uploadEmergency(EmergencyModel emergencyModel, Activity activity) {
+    public LiveData<QuerySnapshot> getEmergenciesQuerySnapshot(Activity activity) {
+        MutableLiveData<QuerySnapshot> data = new MutableLiveData<>();
         FirebaseManager.getInstance().getFirebaseFirestoreInstance()
-                .collection("emergencies")
-                .add(emergencyModel)
-                .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+                .collection(ConstantsValues.EMERGENCIES_COLLECTION)
+                .orderBy(lastFilter, lastOrder)
+                .addSnapshotListener(new EventListener<QuerySnapshot>() {
                     @Override
-                    public void onSuccess(DocumentReference documentReference) {
-                        Toast.makeText(activity, "Sos sent", Toast.LENGTH_SHORT).show();
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Toast.makeText(activity, "Not sent", Toast.LENGTH_SHORT).show();
+                    public void onEvent(@Nullable @org.jetbrains.annotations.Nullable QuerySnapshot value, @Nullable @org.jetbrains.annotations.Nullable FirebaseFirestoreException error) {
+                        data.setValue(value);
                     }
                 });
+        return data;
     }
-
-    public void updateEmergency(EmergencyModel emergencyModel, Activity activity) {
-        Toast.makeText(activity, "update not implemented", Toast.LENGTH_SHORT).show();
+    public LiveData<Integer> saveEmergency(EmergencyModel emergencyModel, Activity activity) {
+        MutableLiveData<Integer> data = new MutableLiveData<>();
+        FirebaseManager.getInstance().getFirebaseFirestoreInstance()
+                .collection(ConstantsValues.EMERGENCIES_COLLECTION)
+                .add(emergencyModel)
+                .addOnCompleteListener(new OnCompleteListener<DocumentReference>() {
+                    @Override
+                    public void onComplete(@NonNull @NotNull Task<DocumentReference> task) {
+                        if (task.isSuccessful()){
+                            task.getResult()
+                                    .update("id", task.getResult().getId()
+                                    )
+                                    .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                        @Override
+                                        public void onComplete(@NonNull @NotNull Task<Void> task) {
+                                            if(task.isSuccessful()){
+                                                data.setValue(1);
+                                            }else{
+                                                data.setValue(-1);
+                                            }
+                                        }
+                                    });
+                        }else{
+                            data.setValue(-1);
+                        }
+                    }
+                });
+        return data;
     }
-
-    public void deleteEmergency(EmergencyModel emergencyModel, Activity activity) {
-        Toast.makeText(activity, "Delete not implemented", Toast.LENGTH_SHORT).show();
+    public LiveData<Integer> deleteEmergency(EmergencyModel emergencyModel, Activity activity) {
+        MutableLiveData<Integer> data = new MutableLiveData<>();
+        FirebaseManager.getInstance().getFirebaseFirestoreInstance()
+                .collection(ConstantsValues.EMERGENCIES_COLLECTION)
+                .whereEqualTo("id", emergencyModel.getId())
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull @NotNull Task<QuerySnapshot> task) {
+                        if (task.isSuccessful()){
+                            for (DocumentSnapshot document: task.getResult()) {
+                                document.getReference()
+                                        .delete()
+                                        .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                            @Override
+                                            public void onComplete(@NonNull @NotNull Task<Void> task) {
+                                                if(task.isSuccessful()){
+                                                    data.setValue(1);
+                                                }else{
+                                                    data.setValue(-1);
+                                                }
+                                            }
+                                        });
+                            }
+                        }else{
+                            data.setValue(-1);
+                        }
+                    }
+                });
+        return data;
+    }
+    public LiveData<Integer> updateEmergency(EmergencyModel emergencyModel){
+        MutableLiveData<Integer> data = new MutableLiveData<>();
+        FirebaseManager.getInstance().getFirebaseFirestoreInstance()
+                .collection(ConstantsValues.EMERGENCIES_COLLECTION)
+                .whereEqualTo("id", emergencyModel.getId())
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull @NotNull Task<QuerySnapshot> task) {
+                        if (task.isSuccessful()){
+                            for (DocumentSnapshot document: task.getResult()) {
+                                document.getReference()
+                                        .update("gravity", emergencyModel.getGravity(),
+                                                "status", emergencyModel.getStatus(),
+                                                "messageId", emergencyModel.getMessageId()
+                                                )
+                                        .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                            @Override
+                                            public void onComplete(@NonNull @NotNull Task<Void> task) {
+                                                if(task.isSuccessful()){
+                                                    data.setValue(1);
+                                                }else{
+                                                    data.setValue(-1);
+                                                }
+                                            }
+                                        });
+                            }
+                        }else{
+                            data.setValue(-1);
+                        }
+                    }
+                });
+        return data;
+    }
+    public void setFilter(String filter) {
+        lastFilter = filter;
+        lastDocument = null;
+    }
+    public void setOrder(Query.Direction order) {
+        lastOrder = order;
+        lastDocument = null;
     }
 }

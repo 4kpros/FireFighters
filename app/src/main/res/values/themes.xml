@@ -27,11 +27,15 @@
     <!-- BottomTab bar -->
     <style name="CustomTab">
         <item name="android:background">@drawable/custom_tab_light</item>
-    </style>
+    </style>v
 
     <!-- Extended floating action button -->
     <style name="CustomExtendedFloatingAction" parent="@style/Widget.MaterialComponents.ExtendedFloatingActionButton">
         <item name="android:backgroundTint" tools:targetApi="lollipop">@color/purple_200</item>
+    </style>
+    <!-- floating action button -->
+    <style name="CustomFlatFloatingAction" parent="@style/Widget.MaterialComponents.ExtendedFloatingActionButton">
+        <item name="android:backgroundTint" tools:targetApi="lollipop">@color/light_300</item>
     </style>
 
     <!-- Background primary rounded -->

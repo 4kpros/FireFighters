@@ -2,8 +2,10 @@ package com.example.firefighters.models;
 
 import java.util.Calendar;
 
-public class WaterSourceModel {
-    private String senderId;   //Foreign key user sender
+public class WaterPointModel {
+    private String id;
+
+    private String senderMail;   //Foreign key user sender
 
     private int estimatedQte;
     private int sendUtc;
@@ -13,7 +15,7 @@ public class WaterSourceModel {
     private String sendDate;
     private String sendHour;
 
-    public WaterSourceModel() {
+    public WaterPointModel() {
         Calendar calendar = Calendar.getInstance();
         int year = calendar.get(Calendar.YEAR);
         int month = calendar.get(Calendar.MONTH);
@@ -27,12 +29,20 @@ public class WaterSourceModel {
         sendUtc = utc;
     }
 
-    public String getSenderId() {
-        return senderId;
+    public String getId() {
+        return id;
     }
 
-    public void setSenderId(String senderId) {
-        this.senderId = senderId;
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public String getSenderMail() {
+        return senderMail;
+    }
+
+    public void setSenderMail(String senderMail) {
+        this.senderMail = senderMail;
     }
 
     public int getEstimatedQte() {

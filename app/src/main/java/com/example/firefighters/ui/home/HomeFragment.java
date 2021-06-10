@@ -4,6 +4,8 @@ import android.Manifest;
 import android.animation.FloatEvaluator;
 import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
+import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothDevice;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -23,9 +25,9 @@ import android.widget.Toast;
 import com.example.firefighters.R;
 import com.example.firefighters.models.EmergencyModel;
 import com.example.firefighters.tools.ConstantsValues;
+import com.example.firefighters.tools.FirebaseManager;
 import com.example.firefighters.tools.PermissionsManager;
-import com.example.firefighters.ui.bottomsheetfragment.mapview.MapViewFragment;
-import com.example.firefighters.ui.bottomsheetfragment.mapview.TestActivity;
+import com.example.firefighters.ui.mapview.MapViewFragment;
 import com.example.firefighters.viewmodels.EmergencyViewModel;
 import com.google.android.gms.location.LocationAvailability;
 import com.google.android.gms.location.LocationCallback;
@@ -38,12 +40,18 @@ import com.google.android.material.textview.MaterialTextView;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Set;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
+import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
 public class HomeFragment extends Fragment {
@@ -63,6 +71,7 @@ public class HomeFragment extends Fragment {
     private TextView buttonSos;
     private Context context;
     private AppCompatActivity activity;
+    private FragmentManager fragmentManager;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
@@ -77,6 +86,13 @@ public class HomeFragment extends Fragment {
         return view;
     }
 
+    @Override
+    public void onViewCreated(@NonNull @NotNull View view, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+        checkInteractions(view);
+    }
+
     private void observeLiveData() {
 //        tryToGetCallPermissions(view, bottomSheet);
     }
@@ -84,13 +100,6 @@ public class HomeFragment extends Fragment {
     private void initViewModels(View view) {
         emergencyViewModel = new ViewModelProvider(requireActivity()).get(EmergencyViewModel.class);
         emergencyViewModel.init();
-    }
-
-    @Override
-    public void onViewCreated(@NonNull @NotNull View view, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-
-        checkInteractions(view);
     }
 
     private void setAnimations() {
@@ -138,20 +147,72 @@ public class HomeFragment extends Fragment {
         });
     }
 
+    private void setBluetoothViews(BottomSheetDialog bottomSheet) {
+        if( PermissionsManager.getInstance().isBluetoothPermissions(requireActivity()))
+            return;
+        TextView deviceName = bottomSheet.findViewById(R.id.text_device_name);
+        ImageView buttonDisconnect = bottomSheet.findViewById(R.id.image_button_disconnect);
+        ConstraintLayout cardBluetoothDevices = bottomSheet.findViewById(R.id.constraint_button_device_connected);
+        //Getting bluetooth connected info
+        Set<BluetoothDevice> pairedDevices = BluetoothAdapter.getDefaultAdapter().getBondedDevices();
+        if (pairedDevices.size() > 0){
+            bottomSheet.findViewById(R.id.relative_device_connected).setVisibility(View.VISIBLE);
+            bottomSheet.findViewById(R.id.relative_no_device_connected).setVisibility(View.GONE);
+            String deviceNameText = "";
+            String deviceNHarWareAddress = "";
+            for (BluetoothDevice device : pairedDevices){
+                deviceNameText = device.getName();
+                deviceNHarWareAddress = device.getAddress();
+            }
+            deviceName.setText(deviceNameText + "");
+            buttonDisconnect.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    //
+                }
+            });
+            cardBluetoothDevices.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    //
+                }
+            });
+        }else {
+            bottomSheet.findViewById(R.id.relative_device_connected).setVisibility(View.GONE);
+            bottomSheet.findViewById(R.id.relative_no_device_connected).setVisibility(View.VISIBLE);
+        }
+    }
+
+    private void getBluetoothPermissions(BottomSheetDialog bottomSheet) {
+        PermissionsManager.getInstance().isBluetoothPermissions(requireActivity());
+    }
+
     private void showMapView(View v) {
-//        Intent myIntent = new Intent(activity, TestActivity.class);
-//        myIntent.putExtra("key", "ras"); //Optional parameters
+//        Intent myIntent = new Intent(activity, MapViewActivity.class);
+//        myIntent.putExtra("mapView", "Default"); //Optional parameters
 //        activity.startActivity(myIntent);
-        MapViewFragment mapViewFragment = MapViewFragment.newInstance(context);
-        mapViewFragment.show(activity.getSupportFragmentManager(), ConstantsValues.MAP_VIEW_TAG);
+//
+//        MapViewFragment mapViewFragment = MapViewFragment.newInstance(context);
+//        mapViewFragment.show(activity.getSupportFragmentManager(), ConstantsValues.MAP_VIEW_TAG);
+
+        if(PermissionsManager.getInstance().isLocationPermissions(requireActivity())) {
+            fragmentManager = activity.getSupportFragmentManager();
+            FragmentTransaction ft = fragmentManager.beginTransaction();
+            ft.setCustomAnimations(R.anim.anim_tanslate_scale_in, R.anim.anim_tanslate_scale_out);
+            ft.add(R.id.main_frame_layout, new MapViewFragment()).addToBackStack(null);
+            ft.commit();
+        }else{
+            showBottomSheetDialogLocationPermissions(v);
+        }
     }
 
     private void showBottomSheetDialogSettings(View view) {
         BottomSheetDialog bottomSheet = new BottomSheetDialog(context);
-        bottomSheet.setContentView(R.layout.bottom_sheet_dialog_settings);
+        bottomSheet.setContentView(R.layout.bottom_sheet_dialog_bluetooth);
         bottomSheet.setCancelable(true);
         bottomSheet.setCanceledOnTouchOutside(true);
         bottomSheet.getWindow().findViewById(R.id.design_bottom_sheet).setBackgroundResource(android.R.color.transparent);
+        getBluetoothPermissions(bottomSheet);
         bottomSheet.show();
     }
 
@@ -195,6 +256,29 @@ public class HomeFragment extends Fragment {
         });
         tryToGetSosPermissions(view, bottomSheetSos);
         bottomSheetSos.show();
+    }    //Show bottom sheet dialog send sos
+
+    private void showBottomSheetDialogLocationPermissions(View view) {
+        BottomSheetDialog bottomSheet = new BottomSheetDialog(context);
+        bottomSheet.setContentView(R.layout.bottom_sheet_dialog_location_permissions);
+        bottomSheet.setCancelable(false);
+        bottomSheet.setCanceledOnTouchOutside(false);
+        bottomSheet.getWindow().findViewById(R.id.design_bottom_sheet).setBackgroundResource(android.R.color.transparent);
+        bottomSheet.findViewById(R.id.button_cancel_permission).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                bottomSheet.dismiss();
+            }
+        });
+        bottomSheet.findViewById(R.id.button_get_permissions).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (bottomSheet != null)
+                    bottomSheet.dismiss();
+                PermissionsManager.getInstance().requestLocationPermission(activity);
+            }
+        });
+        bottomSheet.show();
     }
 
     private void showBottomSheetFragmentAddMedia(View v, BottomSheetDialog bottomSheetSos) {
@@ -236,34 +320,39 @@ public class HomeFragment extends Fragment {
 
 
     private void getLocation() {
-        if (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            // TODO: Consider calling
-            //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
+        if (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
+                && ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             return;
         }
-        LocationRequest locationRequest = new LocationRequest();
+        LocationRequest locationRequest = LocationRequest.create();
         locationRequest.setInterval(10000);
         locationRequest.setFastestInterval(3000);
         locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
         LocationServices.getFusedLocationProviderClient(context)
                 .requestLocationUpdates(locationRequest, new LocationCallback() {
                     @Override
-                    public void onLocationResult(LocationResult locationResult) {
+                    public void onLocationResult(@NotNull LocationResult locationResult) {
                         super.onLocationResult(locationResult);
                         LocationServices.getFusedLocationProviderClient(context)
                                 .removeLocationUpdates(this);
-                        if (locationResult != null && locationResult.getLocations().size() > 0) {
+                        if (locationResult.getLocations().size() > 0) {
                             EmergencyModel emergencyModel = new EmergencyModel();
+                            if (FirebaseManager.getInstance().getCurrentAuthUser() != null)
+                                emergencyModel.setSenderMail(FirebaseManager.getInstance().getCurrentAuthUser().getEmail());
                             emergencyModel.setLongitude(locationResult.getLocations().get(locationResult.getLocations().size() - 1).getLongitude());
                             emergencyModel.setLatitude(locationResult.getLocations().get(locationResult.getLocations().size() - 1).getLatitude());
-                            emergencyViewModel.uploadEmergency(emergencyModel, activity);
+                            emergencyViewModel.saveEmergency(emergencyModel, activity).observe(requireActivity(), new Observer<Integer>() {
+                                @Override
+                                public void onChanged(Integer integer) {
+                                    if (integer >= 1){
+                                        Toast.makeText(context, "SOS Sent !", Toast.LENGTH_SHORT).show();
+                                    }else {
+                                        Toast.makeText(context, "SOS not sent !", Toast.LENGTH_SHORT).show();
+                                    }
+                                }
+                            });
                         } else {
-                            Toast.makeText(context, "Not sent", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(context, "SOS not sent !", Toast.LENGTH_SHORT).show();
                         }
                     }
 

@@ -9,6 +9,7 @@ public class UserModel {
     String picture;
 
     public UserModel() {
+
     }
 
     public String getMail() {

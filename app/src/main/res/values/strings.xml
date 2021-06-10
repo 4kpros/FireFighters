@@ -9,4 +9,6 @@
     <string name="title_emergency">Emergency</string>
 
     <string name="mapbox_access_token">sk.eyJ1IjoiNGtwcm9zeiIsImEiOiJja3BncXV2YmgyajNyMnpvZ2xqcTRsdnQxIn0.dKNuwojM1l0dRUy4TinnfQ</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

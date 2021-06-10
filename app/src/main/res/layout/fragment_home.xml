@@ -26,7 +26,7 @@
         android:layout_margin="10dp"
         android:background="@drawable/ripple_circle"
         android:scaleType="centerCrop"
-        android:src="@drawable/ic_outline_settings_24"
+        android:src="@drawable/ic_baseline_bluetooth_24"
         android:padding="5dp"
         android:clickable="true"
         android:focusable="true"
@@ -196,9 +196,4 @@
             app:iconGravity="top"
             />
     </RelativeLayout>
-    <FrameLayout
-        android:id="@+id/frame_layout_map_view"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        />
 </androidx.constraintlayout.widget.ConstraintLayout>

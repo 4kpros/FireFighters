@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/bottom_sheet_container"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="10dp"
+    style="@style/CustomShapeRoundedGradient"
+    >
+    <LinearLayout
+        android:id="@+id/linear_no_permissions"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:orientation="vertical"
+        >
+        <com.google.android.material.textview.MaterialTextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="No location permission accepted !"
+            style="@style/CustomCleanTextColor"
+            android:textSize="16sp"
+            android:layout_gravity="center"
+            android:gravity="center"
+            />
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/button_get_permissions"
+            style="@style/Widget.MaterialComponents.Button.TextButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:autoLink="all"
+            android:ellipsize="end"
+            android:linksClickable="true"
+            android:maxLines="1"
+            android:layout_margin="10dp"
+            android:text="Get permissions"
+            android:textColor="@color/purple_200"
+            android:layout_gravity="center"
+            android:gravity="center"
+            app:rippleColor="@color/light_400" />
+    </LinearLayout>
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/button_cancel_permission"
+        style="@style/Widget.MaterialComponents.Button.TextButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:autoLink="all"
+        android:ellipsize="end"
+        android:linksClickable="true"
+        android:maxLines="1"
+        android:layout_margin="10dp"
+        android:text="Cancel"
+        android:textColor="@color/purple_200"
+        android:layout_gravity="center"
+        android:gravity="center"
+        app:rippleColor="@color/light_400" />
+</LinearLayout>

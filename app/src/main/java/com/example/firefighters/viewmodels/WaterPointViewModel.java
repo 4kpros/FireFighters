@@ -2,19 +2,16 @@ package com.example.firefighters.viewmodels;
 
 import android.app.Activity;
 
-import com.example.firefighters.models.FireTruckModel;
-import com.example.firefighters.models.FireTruckModel;
-import com.example.firefighters.repositories.FireTruckRepository;
-import com.example.firefighters.repositories.FireTruckRepository;
+import com.example.firefighters.models.WaterPointModel;
+import com.example.firefighters.repositories.WaterPointRepository;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
 
-import java.util.ArrayList;
-
+import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
-public class FireTruckViewModel extends ViewModel {
+public class WaterPointViewModel extends ViewModel {
 
     private MutableLiveData<QuerySnapshot> queryMutableLiveData;
     private MutableLiveData<QuerySnapshot> querySnapshotMutableLiveData;
@@ -22,12 +19,12 @@ public class FireTruckViewModel extends ViewModel {
     private MutableLiveData<Boolean> isLoadingReadMutableLiveData;
     private MutableLiveData<Boolean> isLoadingWriteMutableLiveData;
 
-    private FireTruckRepository repository;
+    private WaterPointRepository repository;
 
     public void init() {
         if (repository != null)
             return;
-        repository = FireTruckRepository.getInstance();
+        repository = WaterPointRepository.getInstance();
 
         queryMutableLiveData = repository.bindQuery();
         querySnapshotMutableLiveData = repository.bindQuerySnapshot();
@@ -36,23 +33,25 @@ public class FireTruckViewModel extends ViewModel {
         isLoadingWriteMutableLiveData = repository.bindIsLoadingWrite();
     }
 
-    public MutableLiveData<QuerySnapshot> getFireTrucksQuery(Activity activity) {
+    //Getters
+    public LiveData<QuerySnapshot> getWaterSourcesQuery(Activity activity) {
         return queryMutableLiveData;
     }
-    public MutableLiveData<QuerySnapshot> getFireTrucksQuerySnapshot(Activity activity) {
+    public LiveData<QuerySnapshot> getWaterSourcesQuerySnapshot(Activity activity) {
         return querySnapshotMutableLiveData;
     }
 
-    public void loadFireTrucksQuery(Activity activity) {
-        repository.loadFireTrucksQuery(activity);
+    public void loadWaterPoints(Activity activity){
+        repository.loadWaterPointsQuery(activity);
     }
-    public void loadFireTrucksQuerySnapshot(Activity activity) {
-        repository.loadFireTrucksQuerySnapshot(activity);
+    public void loadWaterPointsSnapshot(Activity activity){
+        repository.loadWaterPointsQuerySnapshot(activity);
     }
-    public void saveFireTruckPoint(FireTruckModel fireTruckModel, Activity activity) {
-        repository.saveFireTruckPoint(fireTruckModel, activity);
+    public void saveWaterPoint(WaterPointModel waterPointModel, Activity activity) {
+        repository.saveWaterPoint(waterPointModel, activity);
     }
-    public void deleteFireTruckPoint(FireTruckModel fireTruckModel, Activity activity) {
-        repository.deleteFireTruckPoint(fireTruckModel, activity);
+    public void deleteWaterPoint(WaterPointModel waterPointModel, Activity activity) {
+        repository.deleteWaterPoint(waterPointModel, activity);
     }
+
 }

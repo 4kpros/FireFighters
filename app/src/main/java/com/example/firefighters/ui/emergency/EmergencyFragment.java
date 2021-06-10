@@ -9,6 +9,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -19,11 +20,15 @@ import com.example.firefighters.tools.ConstantsValues;
 import com.example.firefighters.viewmodels.EmergencyViewModel;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.progressindicator.CircularProgressIndicator;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.Query;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
+import java.util.Objects;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -37,7 +42,6 @@ public class EmergencyFragment extends Fragment {
 
     //Progress indicator
     CircularProgressIndicator circularProgressIndicator;
-    int pastVisibleItems, visibleItemCount, totalItemCount;
     private EmergencyViewModel emergencyViewModel;
     private EmergencyAdapter emergencyAdapter;
     private RecyclerView emergenciesRecyclerView;
@@ -46,28 +50,31 @@ public class EmergencyFragment extends Fragment {
     private ImageView buttonFilter;
     private ImageView buttonOrder;
     //Text views
-    private TextView textEmergencyTitle;
+    private TextView textEmergenciesListTitle;
     private LinearLayoutManager layoutManager;
     private final int loadQte = 10;
-    private boolean loading = true;
+    private ArrayList<EmergencyModel> emergencies;
+
+    @Override
+    public void onCreate(@Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        initViewModel();
+    }
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_emergency, container, false);
         context = view.getContext();
-        initViews(view);
-        initViewModel();
-        checkInteractions();
-        initRecyclerView(view);
-        observeLiveData();
-        loadFirstData(loadQte);
         return view;
     }
 
     @Override
     public void onViewCreated(@NonNull @NotNull View view, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-
+        initViews(view);
+        checkInteractions();
+        initRecyclerView(view);
+        reloadMoreEmergencies();
     }
 
     private void checkInteractions() {
@@ -85,101 +92,52 @@ public class EmergencyFragment extends Fragment {
         });
         emergenciesRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
-            public void onScrollStateChanged(@NonNull @NotNull RecyclerView recyclerView, int newState) {
-                super.onScrollStateChanged(recyclerView, newState);
-            }
-
-            @Override
             public void onScrolled(@NonNull @NotNull RecyclerView recyclerView, int dx, int dy) {
                 super.onScrolled(recyclerView, dx, dy);
-                if (dy > 0) { //check for scroll down
-                    visibleItemCount = layoutManager.getChildCount();
-                    totalItemCount = layoutManager.getItemCount();
-                    pastVisibleItems = layoutManager.findFirstVisibleItemPosition();
-
-                    if (loading) {
-                        if ((visibleItemCount + pastVisibleItems) >= totalItemCount) {
-                            loading = false;
-                            emergencyViewModel.loadEmergencies(requireActivity(), loadQte);
-                            loading = true;
-                        }
-                    }
-                }
-//                if (layoutManager.findLastVisibleItemPosition() >= emergencyViewModel.getEmergencies().getValue().size() - 1 && !emergencyViewModel.getIsLoading().getValue()){
-//                    emergencyViewModel.loadEmergencies(requireActivity(), loadQte);
-//                }
-            }
-        });
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        emergencyViewModel.clearEmergencies();
-    }
-
-    private void observeLiveData() {
-        emergencyViewModel.getEmergencies().observe(getViewLifecycleOwner(), new Observer<ArrayList<EmergencyModel>>() {
-            @Override
-            public void onChanged(ArrayList<EmergencyModel> emergencyModels) {
-                //
-            }
-        });
-        emergencyViewModel.getIsLoading().observe(getViewLifecycleOwner(), new Observer<Boolean>() {
-            @Override
-            public void onChanged(Boolean aBoolean) {
-                if (aBoolean) {
-                    showLoadingView();
-                } else {
-                    hideLoadingView();
-                    if (emergencyViewModel.getEmergencies().getValue() != null && emergencyViewModel.getEmergencies().getValue().size() > 0) {
-                        emergencyAdapter.notifyItemRangeInserted(emergencyViewModel.getEmergencies().getValue().size(), loadQte);
-                    }
+                if (!recyclerView.canScrollVertically(1)){
+                    loadMoreEmergencies();
                 }
             }
         });
     }
 
-    private void hideLoadingView() {
-        new CountDownTimer(500, 1000) {
+    private void loadMoreEmergencies() {
+        showEmergenciesLoadingView();
+        emergencyViewModel.getEmergenciesQuery(requireActivity()).observe(requireActivity(), new Observer<QuerySnapshot>() {
             @Override
-            public void onTick(long millisUntilFinished) {
-
-            }
-
-            @Override
-            public void onFinish() {
-                textEmergencyTitle.setVisibility(View.VISIBLE);
-                circularProgressIndicator.hide();
-            }
-        }.start();
-    }
-
-    private void showLoadingView() {
-        textEmergencyTitle.setVisibility(View.INVISIBLE);
-        circularProgressIndicator.show();
-    }
-
-    private void initRecyclerView(View view) {
-        layoutManager = new LinearLayoutManager(context, RecyclerView.VERTICAL, false);
-        emergencyAdapter = new EmergencyAdapter(context, emergencyViewModel.getEmergencies().getValue(), new EmergencyAdapter.OnItemClickListener() {
-            @Override
-            public void onItemMoreClick(int position) {
-                showBottomSheetDialogEmergencyMore(view, position);
-            }
-
-            @Override
-            public void onItemStreetClick(int position) {
-                showStreetMap(view, position);
-            }
-
-            @Override
-            public void onItemCardClick(int position) {
-                showDetailsDialog(view, position);
+            public void onChanged(QuerySnapshot queryDocumentSnapshots) {
+                for (DocumentSnapshot document:queryDocumentSnapshots) {
+                    emergencies.add(document.toObject(EmergencyModel.class));
+                }
+                emergencyAdapter.notifyItemRangeInserted(emergencyAdapter.getItemCount(), emergencies.size());
+                hideEmergenciesLoadingView();
             }
         });
-        emergenciesRecyclerView.setLayoutManager(layoutManager);
-        emergenciesRecyclerView.setAdapter(emergencyAdapter);
+    }
+
+    private void reloadMoreEmergencies() {
+        showEmergenciesLoadingView();
+        emergencies.clear();
+        emergencyViewModel.getEmergenciesQuery(requireActivity()).observe(requireActivity(), new Observer<QuerySnapshot>() {
+            @Override
+            public void onChanged(QuerySnapshot queryDocumentSnapshots) {
+                for (DocumentSnapshot document:queryDocumentSnapshots) {
+                    emergencies.add(document.toObject(EmergencyModel.class));
+                }
+                emergencyAdapter.notifyDataSetChanged();
+                hideEmergenciesLoadingView();
+            }
+        });
+    }
+
+    private void hideEmergenciesLoadingView() {
+//        circularProgressIndicator.setVisibility(View.INVISIBLE);
+        textEmergenciesListTitle.setVisibility(View.VISIBLE);
+    }
+
+    private void showEmergenciesLoadingView() {
+//        circularProgressIndicator.setVisibility(View.VISIBLE);
+        textEmergenciesListTitle.setVisibility(View.INVISIBLE);
     }
 
     private void showDetailsDialog(View view, int position) {
@@ -239,8 +197,7 @@ public class EmergencyFragment extends Fragment {
 
     private void setEmergencyWorkOn(BottomSheetDialog bottomSheet, int position) {
         bottomSheet.dismiss();
-//        emergencyViewModel.updateEmergency(emergencyViewModel, );
-        Toast.makeText(context, emergencyViewModel.getEmergencies().getValue().get(position) + "", Toast.LENGTH_SHORT).show();
+//        emergencyViewModel.up(emergencyViewModel, );
     }
 
     private void showBottomSheetDialogFilter(View view) {
@@ -280,9 +237,8 @@ public class EmergencyFragment extends Fragment {
     }
 
     private void filterResultsBy(String filterName) {
-        emergencyViewModel.setFilterEmergencies(filterName);
-        emergencyViewModel.firstLoad(requireActivity(), loadQte);
-        Toast.makeText(context, filterName + "", Toast.LENGTH_SHORT).show();
+        emergencyViewModel.setFilter(filterName);
+        reloadMoreEmergencies();
     }
 
     private void showBottomSheetDialogOrder(View view) {
@@ -315,14 +271,31 @@ public class EmergencyFragment extends Fragment {
     }
 
     private void reorderResultsBy(Query.Direction order) {
-        emergencyViewModel.setOrderEmergencies(order);
-        emergencyViewModel.firstLoad(requireActivity(), loadQte);
-        Toast.makeText(context, order + "", Toast.LENGTH_SHORT).show();
+        emergencyViewModel.setOrder(order);
+        reloadMoreEmergencies();
     }
 
-    private void loadFirstData(int qte) {
-        emergencyViewModel.clearEmergencies();
-        emergencyViewModel.firstLoad(requireActivity(), qte);
+    private void initRecyclerView(View view) {
+        emergencies = new ArrayList<>();
+        layoutManager = new LinearLayoutManager(context, RecyclerView.VERTICAL, false);
+        emergencyAdapter = new EmergencyAdapter(context, emergencies, new EmergencyAdapter.OnItemClickListener() {
+            @Override
+            public void onItemMoreClick(int position) {
+                showBottomSheetDialogEmergencyMore(view, position);
+            }
+
+            @Override
+            public void onItemStreetClick(int position) {
+                showStreetMap(view, position);
+            }
+
+            @Override
+            public void onItemCardClick(int position) {
+                showDetailsDialog(view, position);
+            }
+        });
+        emergenciesRecyclerView.setLayoutManager(layoutManager);
+        emergenciesRecyclerView.setAdapter(emergencyAdapter);
     }
 
     private void initViewModel() {
@@ -338,9 +311,9 @@ public class EmergencyFragment extends Fragment {
         buttonOrder = view.findViewById(R.id.button_image_order);
 
         //Text view
-        textEmergencyTitle = (TextView) view.findViewById(R.id.text_emergency_top_title);
+        textEmergenciesListTitle = view.findViewById(R.id.text_emergency_top_title);
 
         //Circular progress indicator
-        circularProgressIndicator = (CircularProgressIndicator) view.findViewById(R.id.progress_emergency);
+        circularProgressIndicator = view.findViewById(R.id.progress_emergency);
     }
 }

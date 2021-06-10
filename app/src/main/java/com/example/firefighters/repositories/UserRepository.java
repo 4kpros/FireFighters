@@ -1,8 +1,13 @@
 package com.example.firefighters.repositories;
 
+import android.app.Activity;
+import android.widget.Toast;
+
+import com.example.firefighters.models.EmergencyModel;
 import com.example.firefighters.models.UserAdminModel;
 import com.example.firefighters.models.UserFireFighterModel;
 import com.example.firefighters.models.UserModel;
+import com.example.firefighters.tools.ConstantsValues;
 import com.example.firefighters.tools.FirebaseManager;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -10,20 +15,20 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.Query;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 
 import org.jetbrains.annotations.NotNull;
 
 import androidx.annotation.NonNull;
+import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
 public class UserRepository {
 
     private static UserRepository instance;
-    private final UserModel currentUserModel = new UserModel();
-    private final UserFireFighterModel currentUserFireFighterModel = new UserFireFighterModel();
-    private final UserAdminModel currentUserAdminModel = new UserAdminModel();
-    private boolean isLoadingUser;
-    private FirebaseUser currentAuthUser;
+    private String typeUser;
 
     public static UserRepository getInstance() {
         if (instance == null)
@@ -31,112 +36,235 @@ public class UserRepository {
         return instance;
     }
 
-    public MutableLiveData<Boolean> bindIsLoadingUser() {
-        MutableLiveData<Boolean> mutableLiveData = new MutableLiveData<>();
-        mutableLiveData.setValue(isLoadingUser);
-        return mutableLiveData;
-    }
-
-    public MutableLiveData<FirebaseUser> bindCurrentAuthUser() {
-        MutableLiveData<FirebaseUser> mutableLiveData = new MutableLiveData<>();
-        mutableLiveData.setValue(currentAuthUser);
-        return mutableLiveData;
-    }
-
-    public MutableLiveData<UserModel> bindUser() {
-        MutableLiveData<UserModel> mutableLiveData = new MutableLiveData<>();
-        mutableLiveData.setValue(currentUserModel);
-        return mutableLiveData;
-    }
-
-    public MutableLiveData<UserFireFighterModel> bindFireFighter() {
-        MutableLiveData<UserFireFighterModel> mutableLiveData = new MutableLiveData<>();
-        mutableLiveData.setValue(currentUserFireFighterModel);
-        return mutableLiveData;
-    }
-
-    public MutableLiveData<UserAdminModel> bindAdmin() {
-        MutableLiveData<UserAdminModel> mutableLiveData = new MutableLiveData<>();
-        mutableLiveData.setValue(currentUserAdminModel);
+    public MutableLiveData<String> bindTypeUser() {
+        MutableLiveData<String> mutableLiveData = new MutableLiveData<>();
+        mutableLiveData.setValue(typeUser);
         return mutableLiveData;
     }
 
     //Sign in with mail and password
-    public void signInUser(String userMail, String userPassword) {
-        if (userMail == null || userPassword == null)
-            return;
-        if (userMail.length() <= 0 || userPassword.length() <= 0)
-            return;
-        FirebaseManager.getInstance().getFirebaseAuthInstance().signInWithEmailAndPassword(userMail, userPassword)
-                .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
-                    @Override
-                    public void onComplete(@NonNull @NotNull Task<AuthResult> task) {
-                        isLoadingUser = false;
-                        if (task.isSuccessful()) {
-                            //
-                        } else {
-                            //
+    public LiveData<Integer> signInUser(Activity activity, String userMail, String userPassword) {
+        MutableLiveData<Integer> data = new MutableLiveData<>();
+        if (userMail == null || userPassword == null) {
+            data.setValue(-1);
+        } else {
+            FirebaseManager.getInstance().getFirebaseAuthInstance().signInWithEmailAndPassword(userMail, userPassword)
+                    .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+                        @Override
+                        public void onComplete(@NonNull @NotNull Task<AuthResult> task) {
+                            if (!task.isSuccessful()) {
+                                FirebaseManager.getInstance().getFirebaseFirestoreInstance()
+                                        .collection(ConstantsValues.ADMINS_COLLECTION)
+                                        .whereEqualTo("mail", userMail)
+                                        .get()
+                                        .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                                            @Override
+                                            public void onComplete(@NonNull @NotNull Task<QuerySnapshot> task) {
+                                                if (task.isSuccessful()) {
+                                                    if (task.getResult().size() > 0) {
+                                                        typeUser = ConstantsValues.ADMIN_USER;
+                                                        data.setValue(1);
+                                                    } else {
+                                                        FirebaseManager.getInstance().getFirebaseFirestoreInstance()
+                                                                .collection(ConstantsValues.FIRE_FIGHTERS_COLLECTION)
+                                                                .whereEqualTo("mail", userMail)
+                                                                .get()
+                                                                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                                                                    @Override
+                                                                    public void onComplete(@NonNull @NotNull Task<QuerySnapshot> task) {
+                                                                        if (task.isSuccessful()) {
+                                                                            if (task.getResult().size() > 0) {
+                                                                                typeUser = ConstantsValues.FIRE_FIGHTER_USER;
+                                                                                data.setValue(1);
+                                                                            } else {
+                                                                                FirebaseManager.getInstance().getFirebaseFirestoreInstance()
+                                                                                        .collection(ConstantsValues.USERS_COLLECTION)
+                                                                                        .whereEqualTo("mail", userMail)
+                                                                                        .get()
+                                                                                        .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                                                                                            @Override
+                                                                                            public void onComplete(@NonNull @NotNull Task<QuerySnapshot> task) {
+                                                                                                if (task.isSuccessful()) {
+                                                                                                    if (task.getResult().size() > 0) {
+                                                                                                        typeUser = ConstantsValues.NORMAL_USER;
+                                                                                                        data.setValue(1);
+                                                                                                    } else {
+                                                                                                        data.setValue(-1);
+                                                                                                    }
+                                                                                                } else {
+                                                                                                    data.setValue(-1);
+                                                                                                }
+                                                                                            }
+                                                                                        });
+                                                                            }
+                                                                        } else {
+                                                                            data.setValue(-1);
+                                                                        }
+                                                                    }
+                                                                });
+                                                    }
+                                                } else {
+                                                    data.setValue(-1);
+                                                }
+                                            }
+                                        });
+                            } else {
+                                data.setValue(-1);
+                            }
                         }
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull @NotNull Exception e) {
-                        isLoadingUser = false;
-                    }
-                });
+                    })
+                    .addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull @NotNull Exception e) {
+                            data.setValue(-1);
+                        }
+                    });
+        }
+        return data;
     }
 
     //Create new user
-    public void createNewUser(String userName, String userMail, String userPassword) {
-        isLoadingUser = true;
+    public LiveData<Integer> createNewUser(Activity activity, String userName, String userMail, String userPassword) {
+        MutableLiveData<Integer> data = new MutableLiveData<>();
         FirebaseManager.getInstance().getFirebaseAuthInstance().createUserWithEmailAndPassword(userMail, userPassword)
                 .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                     @Override
                     public void onComplete(@NonNull @NotNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
+                            UserModel currentUserModel = new UserModel();
                             currentUserModel.setUserName(userName);
                             currentUserModel.setMail(userMail);
-                            uploadUserProfile(currentUserModel);
+                            FirebaseManager.getInstance().getFirebaseFirestoreInstance()
+                                    .collection(ConstantsValues.USERS_COLLECTION)
+                                    .add(currentUserModel)
+                                    .addOnCompleteListener(new OnCompleteListener<DocumentReference>() {
+                                        @Override
+                                        public void onComplete(@NonNull @NotNull Task<DocumentReference> task) {
+                                            if (task.isSuccessful()) {
+                                                data.setValue(1);
+                                            } else {
+                                                data.setValue(-1);
+                                            }
+                                        }
+                                    });
                         } else {
-                            isLoadingUser = false;
+                            data.setValue(-1);
                         }
                     }
                 });
+        return data;
     }
 
     //Reset password
-    public void resetPasswordWithMail(String userMail) {
-        isLoadingUser = true;
+    public LiveData<Integer> resetPasswordWithMail(Activity activity, String userMail) {
+        MutableLiveData<Integer> data = new MutableLiveData<>();
         FirebaseManager.getInstance().getFirebaseAuthInstance().sendPasswordResetEmail(userMail)
                 .addOnCompleteListener(new OnCompleteListener<Void>() {
                     @Override
                     public void onComplete(@NonNull @NotNull Task<Void> task) {
-                        isLoadingUser = false;
+                        if (task.isSuccessful()) {
+                            data.setValue(1);
+                        } else {
+                            data.setValue(-1);
+                        }
                     }
                 });
+        return data;
     }
 
-    //Create user profile with username and password
-    public void uploadUserProfile(UserModel userModel) {
-        FirebaseManager.getInstance().getFirebaseFirestoreInstance().collection("users").add(userModel)
+    //Create Fire Fighter profile with mail
+    public LiveData<Integer> createFireFighterProfile(Activity activity, String mail) {
+        MutableLiveData<Integer> data = new MutableLiveData<>();
+        UserFireFighterModel fireFighterModel = new UserFireFighterModel();
+        fireFighterModel.setMail(mail);
+        FirebaseManager.getInstance().getFirebaseFirestoreInstance()
+                .collection(ConstantsValues.FIRE_FIGHTERS_COLLECTION)
+                .add(fireFighterModel)
                 .addOnCompleteListener(new OnCompleteListener<DocumentReference>() {
                     @Override
                     public void onComplete(@NonNull @NotNull Task<DocumentReference> task) {
-                        isLoadingUser = false;
                         if (task.isSuccessful()) {
-                            //Say to the user that is successful
+                            data.setValue(1);
                         } else {
-                            //Say to the user that is failed
+                            data.setValue(-1);
                         }
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
-                        isLoadingUser = false;
-                        //Say to the user that is failed
+                        data.setValue(-1);
                     }
                 });
+        return data;
+    }
+
+    public LiveData<Integer> logOut() {
+        MutableLiveData<Integer> data = new MutableLiveData<>();
+        UserFireFighterModel fireFighterModel = new UserFireFighterModel();
+        FirebaseManager.getInstance().getFirebaseAuthInstance().signOut();
+        data.setValue(1);
+        return data;
+    }
+
+    public LiveData<String> loadTypeUser() {
+        String userMail = FirebaseManager.getInstance().getCurrentAuthUser().getEmail();
+        MutableLiveData<String> data = new MutableLiveData<>();
+        FirebaseManager.getInstance().getFirebaseFirestoreInstance()
+                .collection(ConstantsValues.ADMINS_COLLECTION)
+                .whereEqualTo("mail", userMail)
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull @NotNull Task<QuerySnapshot> task) {
+                        if (task.isSuccessful()) {
+                            if (task.getResult().size() > 0) {
+                                typeUser = ConstantsValues.ADMIN_USER;
+                                data.setValue(ConstantsValues.ADMIN_USER);
+                            } else {
+                                FirebaseManager.getInstance().getFirebaseFirestoreInstance()
+                                        .collection(ConstantsValues.FIRE_FIGHTERS_COLLECTION)
+                                        .whereEqualTo("mail", userMail)
+                                        .get()
+                                        .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                                            @Override
+                                            public void onComplete(@NonNull @NotNull Task<QuerySnapshot> task) {
+                                                if (task.isSuccessful()) {
+                                                    if (task.getResult().size() > 0) {
+                                                        typeUser = ConstantsValues.FIRE_FIGHTER_USER;
+                                                        data.setValue(ConstantsValues.FIRE_FIGHTER_USER);
+                                                    } else {
+                                                        FirebaseManager.getInstance().getFirebaseFirestoreInstance()
+                                                                .collection(ConstantsValues.USERS_COLLECTION)
+                                                                .whereEqualTo("mail", userMail)
+                                                                .get()
+                                                                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                                                                    @Override
+                                                                    public void onComplete(@NonNull @NotNull Task<QuerySnapshot> task) {
+                                                                        if (task.isSuccessful()) {
+                                                                            if (task.getResult().size() > 0) {
+                                                                                typeUser = ConstantsValues.NORMAL_USER;
+                                                                                data.setValue(ConstantsValues.NORMAL_USER);
+                                                                            } else {
+                                                                                data.setValue("null");
+                                                                            }
+                                                                        } else {
+                                                                            data.setValue("null");
+                                                                        }
+                                                                    }
+                                                                });
+                                                    }
+                                                } else {
+                                                    data.setValue("null");
+                                                }
+                                            }
+                                        });
+                            }
+                        } else {
+                            data.setValue("null");
+                        }
+                    }
+                });
+        return data;
     }
 }

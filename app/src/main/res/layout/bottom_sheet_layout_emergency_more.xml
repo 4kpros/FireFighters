@@ -77,33 +77,9 @@
                 app:iconTint="@color/purple_200"
                 />
         </RelativeLayout>
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="center"
-            >
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/button_signal_emergency"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                style="@style/Widget.MaterialComponents.Button.TextButton"
-                app:rippleColor="@color/light_300"
-                android:text="Signal"
-                android:layout_margin="10dp"
-                android:autoLink="all"
-                android:ellipsize="end"
-                android:linksClickable="true"
-                android:maxLines="1"
-                android:layout_gravity="center"
-                android:gravity="center"
-                android:textColor="@color/purple_200"
-                app:iconTint="@color/purple_200"
-                />
-        </RelativeLayout>
     </LinearLayout>
     <LinearLayout
-        android:id="@+id/linear_pause_finish_emergency"
+        android:id="@+id/linear_finish_work_emergency"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
@@ -132,37 +108,13 @@
                 app:iconTint="@color/purple_200"
                 />
         </RelativeLayout>
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="center"
-            >
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/button_pause_emergency"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                style="@style/Widget.MaterialComponents.Button.TextButton"
-                app:rippleColor="@color/light_300"
-                android:text="Pause work"
-                android:layout_margin="10dp"
-                android:autoLink="all"
-                android:ellipsize="end"
-                android:linksClickable="true"
-                android:maxLines="1"
-                android:layout_gravity="center"
-                android:gravity="center"
-                android:textColor="@color/purple_200"
-                app:iconTint="@color/purple_200"
-                />
-        </RelativeLayout>
     </LinearLayout>
+
     <LinearLayout
-        android:id="@+id/linear_work_on_emergency"
+        android:id="@+id/linear_work_emergency"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:visibility="gone"
         >
         <RelativeLayout
             android:layout_width="match_parent"
@@ -188,11 +140,5 @@
                 app:iconTint="@color/purple_200"
                 />
         </RelativeLayout>
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="center"
-            />
     </LinearLayout>
 </LinearLayout>

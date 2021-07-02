@@ -152,11 +152,14 @@
                 android:id="@+id/progress_circular_connexion"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                app:layout_constraintLeft_toLeftOf="@+id/button_sign_in"
-                app:layout_constraintRight_toRightOf="@+id/button_sign_in"
-                app:layout_constraintTop_toTopOf="@+id/button_sign_in"
-                app:layout_constraintBottom_toBottomOf="@+id/button_sign_in"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/linear_remember_forgot"
                 app:indicatorColor="@color/purple_200"
+                android:layout_margin="5dp"
+                android:indeterminate="true"
+                app:minHideDelay="1000"
+                android:visibility="invisible"
                 />
             <RelativeLayout
                 android:id="@+id/relative_go_to_sign_up"
@@ -164,7 +167,7 @@
                 android:layout_height="wrap_content"
                 app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintRight_toRightOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/button_sign_in"
+                app:layout_constraintTop_toBottomOf="@+id/progress_circular_connexion"
                 android:gravity="center"
                 android:layout_marginTop="5dp"
                 >
@@ -358,13 +361,26 @@
                 app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintRight_toRightOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/text_input_layout_sign_up_password_repeat" />
+            <com.google.android.material.progressindicator.CircularProgressIndicator
+                android:id="@+id/progress_circular_create"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/text_input_layout_sign_up_password_repeat"
+                app:indicatorColor="@color/purple_200"
+                android:layout_margin="5dp"
+                android:indeterminate="true"
+                app:minHideDelay="1000"
+                android:visibility="invisible"
+                />
             <RelativeLayout
                 android:id="@+id/relative_go_to_sign_in"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintRight_toRightOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/button_sign_up"
+                app:layout_constraintTop_toBottomOf="@+id/progress_circular_create"
                 android:gravity="center"
                 android:layout_marginTop="5dp"
                 >

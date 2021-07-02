@@ -19,10 +19,11 @@
             android:id="@+id/image_card_item"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/ic_alert"
+            android:src="@drawable/ic_fire_station"
             android:layout_centerVertical="true"
             android:layout_marginLeft="10dp"
             android:layout_marginRight="10dp"
+            app:tint="@color/light_500"
             />
         <TextView
             android:id="@+id/text_name"
@@ -32,6 +33,20 @@
             android:layout_toRightOf="@+id/image_card_item"
             android:layout_centerVertical="true"
             android:layout_marginEnd="10dp"
+            />
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/button_delete"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:text="Delete"
+            app:cornerRadius="5dp"
+            android:layout_alignParentEnd="true"
+            android:layout_gravity="center"
+            style="@style/Widget.MaterialComponents.Button.TextButton"
+            app:rippleColor="@color/light_300"
+            android:textColor="@color/purple_200"
             />
     </RelativeLayout>
 </androidx.cardview.widget.CardView>

@@ -11,9 +11,7 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.example.firefighters.R;
-import com.example.firefighters.models.FireTruckModel;
 import com.example.firefighters.viewmodels.EmergencyViewModel;
-import com.example.firefighters.viewmodels.FireTruckViewModel;
 import com.example.firefighters.viewmodels.WaterPointViewModel;
 import com.google.android.gms.location.LocationAvailability;
 import com.google.android.gms.location.LocationCallback;
@@ -54,7 +52,6 @@ public class MapViewFragment extends Fragment {
 
     EmergencyViewModel emergencyViewModel;
     WaterPointViewModel waterPointViewModel;
-    FireTruckViewModel fireTruckViewModel;
     private MaterialButton buttonStartNavigation;
 
     int startLon;
@@ -89,7 +86,6 @@ public class MapViewFragment extends Fragment {
         emergencyViewModel.init();
         waterPointViewModel = new ViewModelProvider(requireActivity()).get(WaterPointViewModel.class);
         emergencyViewModel.init();
-        fireTruckViewModel = new ViewModelProvider(requireActivity()).get(FireTruckViewModel.class);
         emergencyViewModel.init();
     }
 
@@ -138,7 +134,7 @@ public class MapViewFragment extends Fragment {
     }
 
     private void observeEmergenciesPoints(MapboxMap mapboxMap, Style style){
-        emergencyViewModel.getEmergenciesQuerySnapshot(requireActivity()).observe(requireActivity(), new Observer<QuerySnapshot>() {
+        emergencyViewModel.getEmergenciesQuerySnapshot(null, null).observe(requireActivity(), new Observer<QuerySnapshot>() {
             @Override
             public void onChanged(QuerySnapshot queryDocumentSnapshots) {
                 addEmergenciesOnMap(mapboxMap, style, queryDocumentSnapshots);

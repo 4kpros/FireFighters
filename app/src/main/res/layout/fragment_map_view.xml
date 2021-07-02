@@ -154,7 +154,7 @@
             style="@style/Widget.MaterialComponents.Button.OutlinedButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Fire station" />
+            android:text="Fire fighters" />
     </com.google.android.material.button.MaterialButtonToggleGroup>
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/floating_button_my_position"

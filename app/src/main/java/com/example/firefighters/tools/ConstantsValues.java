@@ -27,13 +27,12 @@ public abstract class ConstantsValues {
 
     //Queries
     public static final String EMERGENCIES_COLLECTION = "emergencies";
+    public static final String UNIT_COLLECTION = "units";
     public static final String WATER_POINTS_COLLECTION = "waterpoints";
     public static final String USERS_COLLECTION = "users";
-    public static final String FIRE_FIGHTERS_COLLECTION = "firefighters";
-    public static final String ADMINS_COLLECTION = "admins";
     public static final String MESSAGE_COLLECTION = "messages";
-    public static final String FIRE_TRUCKS_COLLECTION = "firetrucks";
-    public static final String FIRE_STATIONS_COLLECTION = "firestations";
+
+    public static final String ADMIN_EMAIL = "admin@gmail.com";
 
     //User Type
     public static final String NORMAL_USER = "Normal user";
@@ -50,4 +49,22 @@ public abstract class ConstantsValues {
     public static final String FIRE_TRUCK_DETAIL_TAG = "Fire truck detail fragment";
     public static final String FIRE_FIGHTER_DETAIL_TAG = "Fire fighter detail fragment";
 
+    public static boolean isFirefighter = false;
+    public static boolean isChief = false;
+
+    public static boolean isIsChief() {
+        return isChief;
+    }
+
+    public static void setIsChief(boolean isChief) {
+        ConstantsValues.isChief = isChief;
+    }
+
+    public static boolean isIsFirefighter() {
+        return isFirefighter;
+    }
+
+    public static void setIsFirefighter(boolean isFirefighter) {
+        ConstantsValues.isFirefighter = isFirefighter;
+    }
 }

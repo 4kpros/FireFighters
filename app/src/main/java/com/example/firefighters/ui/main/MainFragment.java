@@ -6,10 +6,6 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
-import androidx.navigation.NavController;
-import androidx.navigation.Navigation;
-import androidx.navigation.ui.AppBarConfiguration;
-import androidx.navigation.ui.NavigationUI;
 
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -19,9 +15,7 @@ import android.view.ViewGroup;
 import com.example.firefighters.R;
 import com.example.firefighters.ui.emergency.EmergencyFragment;
 import com.example.firefighters.ui.home.HomeFragment;
-import com.example.firefighters.ui.mapview.MapViewFragment;
 import com.example.firefighters.ui.profile.ProfileFragment;
-import com.facebook.drawee.backends.pipeline.Fresco;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import org.jetbrains.annotations.NotNull;

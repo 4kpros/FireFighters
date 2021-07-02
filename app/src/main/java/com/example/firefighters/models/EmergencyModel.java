@@ -13,11 +13,19 @@ public class EmergencyModel {
     private int sendUtc;
     private double longitude;
     private double latitude;
-    private String streetName;
     private String gravity;
     private String status;
     private String sendDate;
     private String sendHour;
+    private String currentUnit;
+
+    public String getCurrentUnit() {
+        return currentUnit;
+    }
+
+    public void setCurrentUnit(String currentUnit) {
+        this.currentUnit = currentUnit;
+    }
 
     public EmergencyModel() {
         gravity = ConstantsValues.GRAVITY_NORMAL;
@@ -82,14 +90,6 @@ public class EmergencyModel {
 
     public void setLatitude(double latitude) {
         this.latitude = latitude;
-    }
-
-    public String getStreetName() {
-        return streetName;
-    }
-
-    public void setStreetName(String streetName) {
-        this.streetName = streetName;
     }
 
     public String getGravity() {

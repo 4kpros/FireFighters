@@ -4,6 +4,7 @@ import android.app.Activity;
 
 import com.example.firefighters.models.EmergencyModel;
 import com.example.firefighters.repositories.EmergencyRepository;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
 
@@ -20,24 +21,21 @@ public class EmergencyViewModel extends ViewModel {
             return;
         repository = EmergencyRepository.getInstance();
     }
-    public LiveData<QuerySnapshot> getEmergenciesQuery(Activity activity) {
-        return repository.getEmergenciesQuery(activity);
+    public LiveData<QuerySnapshot> getEmergenciesQuery(DocumentSnapshot lastDocument, String lastFilter, Query.Direction lastOrder, int limitCount) {
+        return repository.getEmergenciesQuery(lastDocument, lastFilter, lastOrder, limitCount);
     }
-    public LiveData<QuerySnapshot> getEmergenciesQuerySnapshot(Activity activity) {
-        return repository.getEmergenciesQuerySnapshot(activity);
+    public LiveData<QuerySnapshot> getEmergenciesQuerySnapshot(String lastFilter, Query.Direction lastOrder) {
+        return repository.getEmergenciesQuerySnapshot(lastFilter, lastOrder);
     }
 
-    public LiveData<Integer> saveEmergency(EmergencyModel emergencyModel, Activity activity) {
-        return repository.saveEmergency(emergencyModel, activity);
+    public LiveData<Integer> saveEmergency(EmergencyModel emergencyModel) {
+        return repository.saveEmergency(emergencyModel);
     }
-    public LiveData<Integer> deleteEmergency(EmergencyModel emergencyModel, Activity activity) {
-        return repository.deleteEmergency(emergencyModel, activity);
+    public LiveData<Integer> deleteEmergency(EmergencyModel emergencyModel) {
+        return repository.deleteEmergency(emergencyModel);
     }
-    public void setFilter(String filter) {
-        repository.setFilter(filter);
-    }
-    public void setOrder(Query.Direction order) {
-        repository.setOrder(order);
+    public LiveData<Integer> updateEmergency(EmergencyModel emergencyModel) {
+        return repository.updateEmergency(emergencyModel);
     }
 
 }

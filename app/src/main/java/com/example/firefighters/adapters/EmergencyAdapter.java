@@ -7,6 +7,7 @@ import android.view.ViewGroup;
 
 import com.example.firefighters.R;
 import com.example.firefighters.models.EmergencyModel;
+import com.example.firefighters.tools.ConstantsValues;
 
 import java.util.ArrayList;
 
@@ -40,10 +41,18 @@ public class EmergencyAdapter extends RecyclerView.Adapter<EmergencyHolder> {
     @Override
     public void onViewAttachedToWindow(@NonNull EmergencyHolder holder) {
         super.onViewAttachedToWindow(holder);
+        if (emergencies.get(holder.getAdapterPosition()).getStatus().equals(ConstantsValues.WORKING)){
+            holder.statusColor.setBackground(context.getResources().getDrawable(R.drawable.circle_shape_hydrant_working));
+        }else if (emergencies.get(holder.getAdapterPosition()).getStatus().equals(ConstantsValues.FINISHED)){
+            holder.statusColor.setBackground(context.getResources().getDrawable(R.drawable.circle_shape_hydrant_finished));
+        }else{
+            holder.statusColor.setBackground(context.getResources().getDrawable(R.drawable.circle_shape_hydrant_not_working));
+        }
+        holder.emergencyName.setText("EM"+emergencies.get(holder.getAdapterPosition()).getId());
         holder.date.setText(emergencies.get(holder.getAdapterPosition()).getSendDate() + "  " + emergencies.get(holder.getAdapterPosition()).getSendHour());
         holder.status.setText(emergencies.get(holder.getAdapterPosition()).getStatus());
         holder.degree.setText(emergencies.get(holder.getAdapterPosition()).getGravity());
-        holder.streetName.setText(emergencies.get(holder.getAdapterPosition()).getStreetName());
+//        holder.emergencyName.setText(emergencies.get(holder.getAdapterPosition()).getStreetName());
     }
 
     @Override

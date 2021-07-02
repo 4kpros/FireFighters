@@ -2,8 +2,14 @@ package com.example.firefighters.viewmodels;
 
 import android.app.Activity;
 
+import com.example.firefighters.models.UserModel;
+import com.example.firefighters.models.WaterPointModel;
 import com.example.firefighters.repositories.UserRepository;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
+
+import java.util.ArrayList;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
@@ -11,39 +17,39 @@ import androidx.lifecycle.ViewModel;
 
 public class UserViewModel extends ViewModel {
 
-    private MutableLiveData<QuerySnapshot> queryMutableLiveData;
-    private MutableLiveData<QuerySnapshot> querySnapshotMutableLiveData;
-    private MutableLiveData<Boolean> isLoadingSignInMutableLiveData;
-    private MutableLiveData<Boolean> isLoadingSignUpMutableLiveData;
-    private MutableLiveData<String> typeUserMutableLiveData;
-
     private UserRepository repository;
 
     public void init() {
         if (repository != null)
             return;
         repository = UserRepository.getInstance();
-        typeUserMutableLiveData = repository.bindTypeUser();
     }
 
-    public LiveData<String> getTypeUser() {
-        return typeUserMutableLiveData;
+    public LiveData<QuerySnapshot> loadFireFighters(DocumentSnapshot lastDocument, int limitCount){
+        return repository.loadFireFightersQuery(lastDocument, limitCount);
+    }
+    public LiveData<QuerySnapshot> loadFireFightersSnapshot(){
+        return repository.loadFireFightersQuerySnapshot();
+    }
+    public LiveData<Integer> saveFireFighter(UserModel firefighterModel) {
+        return repository.saveFireFighter(firefighterModel);
+    }
+    public LiveData<Integer> deleteFireFighter(UserModel firefighterModel) {
+        return repository.deleteFireFighter(firefighterModel);
     }
 
     //Sign in with mail and password
-    public LiveData<Integer> signInUser(Activity activity, String userMail, String userPassword) {
-        return repository.signInUser(activity, userMail, userPassword);
+    public LiveData<Integer> signInUser(String userMail, String userPassword) {
+        return repository.signInUser(userMail, userPassword);
     }
-
-    public LiveData<String> loadTypeUser() {
-        return repository.loadTypeUser();
-    }
-
     //Create new user
-    public LiveData<Integer> createNewUser(Activity activity, String userName, String userMail, String userPassword) {
-        return repository.createNewUser(activity, userName, userMail, userPassword);
+    public LiveData<Integer> createNewUser(String userName, String userMail, String userPassword, boolean isFirefighter) {
+        return repository.createNewUser(userName, userMail, userPassword, isFirefighter);
     }
-
+    //Load to my page
+    public LiveData<UserModel> loadUserModel(String userMail) {
+        return repository.loadUserModel(userMail);
+    }
     //Reset password
     public LiveData<Integer> resetPasswordWithMail(Activity activity, String userMail) {
         return repository.resetPasswordWithMail(activity, userMail);

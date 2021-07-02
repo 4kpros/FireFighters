@@ -55,20 +55,8 @@
             tools:targetApi="o"
             app:fabSize="normal"
             />
-        <com.google.android.material.textview.MaterialTextView
-            android:id="@+id/add_fire_fighter_action_text"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="8dp"
-            android:layout_marginRight="8dp"
-            android:textColor="@color/purple_200"
-            android:text="Add fire fighter"
-            app:layout_constraintBottom_toBottomOf="@+id/floating_action_button_fire_fighter"
-            app:layout_constraintEnd_toStartOf="@+id/floating_action_button_fire_fighter"
-            app:layout_constraintTop_toTopOf="@+id/floating_action_button_fire_fighter"
-            />
         <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:id="@+id/floating_action_button_fire_station"
+            android:id="@+id/floating_action_button_unit"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             style="@style/CustomExtendedFloatingAction"
@@ -77,23 +65,11 @@
             app:layout_constraintBottom_toTopOf="@+id/floating_action_button_fire_fighter"
             android:tooltipText="Fire station"
             tools:targetApi="o"
-            android:src="@drawable/ic_fire_station"
+            android:src="@drawable/ic_baseline_groups_24"
             app:rippleColor="@color/light_400"
             app:backgroundTint="@color/light_500"
             app:elevation="1dp"
             app:fabSize="normal"
-            />
-        <com.google.android.material.textview.MaterialTextView
-            android:id="@+id/add_fire_station_action_text"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="8dp"
-            android:layout_marginRight="8dp"
-            android:textColor="@color/purple_200"
-            android:text="Add fire station"
-            app:layout_constraintBottom_toBottomOf="@+id/floating_action_button_fire_station"
-            app:layout_constraintEnd_toStartOf="@+id/floating_action_button_fire_station"
-            app:layout_constraintTop_toTopOf="@+id/floating_action_button_fire_station"
             />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

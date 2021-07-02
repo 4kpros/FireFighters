@@ -8,8 +8,63 @@ public class UserModel {
     String lastName;
     String picture;
 
-    public UserModel() {
+    float latestLatitude;
+    float latestLongitude;
+    boolean isWorking;
+    boolean isFireFighter;
+    boolean isChief;
+    String unit;
 
+    public boolean isChief() {
+        return isChief;
+    }
+
+    public void setChief(boolean chief) {
+        isChief = chief;
+    }
+
+    public String getUnit() {
+        return unit;
+    }
+
+    public void setUnit(String unit) {
+        this.unit = unit;
+    }
+
+    public boolean isWorking() {
+        return isWorking;
+    }
+
+    public void setWorking(boolean working) {
+        isWorking = working;
+    }
+
+    public float getLatestLatitude() {
+        return latestLatitude;
+    }
+
+    public void setLatestLatitude(float latestLatitude) {
+        this.latestLatitude = latestLatitude;
+    }
+
+    public float getLatestLongitude() {
+        return latestLongitude;
+    }
+
+    public void setLatestLongitude(float latestLongitude) {
+        this.latestLongitude = latestLongitude;
+    }
+
+    public UserModel() {
+        isFireFighter = false;
+    }
+
+    public boolean isFireFighter() {
+        return isFireFighter;
+    }
+
+    public void setFireFighter(boolean fireFighter) {
+        isFireFighter = fireFighter;
     }
 
     public String getMail() {

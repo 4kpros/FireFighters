@@ -18,7 +18,7 @@ public class EmergencyHolder extends RecyclerView.ViewHolder {
 
     CardView cardHydrant;
     TextView streetDistance;
-    TextView streetName;
+    TextView emergencyName;
     TextView degree;
     TextView status;
     TextView date;
@@ -64,7 +64,7 @@ public class EmergencyHolder extends RecyclerView.ViewHolder {
     private void initViews(View view) {
         cardHydrant = itemView.findViewById(R.id.card_hydrant);
         streetDistance = itemView.findViewById(R.id.street_distance);
-        streetName = itemView.findViewById(R.id.street_name);
+        emergencyName = itemView.findViewById(R.id.emergency_name);
         degree = itemView.findViewById(R.id.text_fire_degree);
         date = itemView.findViewById(R.id.text_hydrant_date);
         status = itemView.findViewById(R.id.text_hydrant_status);

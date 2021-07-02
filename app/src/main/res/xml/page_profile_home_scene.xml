@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<MotionScene 
+<MotionScene
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:motion="http://schemas.android.com/apk/res-auto">
 
@@ -83,7 +83,8 @@
             android:gravity="start"
             motion:layout_constraintLeft_toRightOf="@+id/constraint_profile_image"
             motion:layout_constraintRight_toLeftOf="@+id/relative_profile_title"
-            motion:layout_constraintTop_toBottomOf="@+id/text_profile_user_name"
+            motion:layout_constraintTop_toTopOf="@+id/constraint_profile_image"
+            motion:layout_constraintBottom_toBottomOf="@+id/constraint_profile_image"
             />
         <Constraint
             android:id="@+id/button_edit_profile"

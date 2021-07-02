@@ -341,7 +341,7 @@ public class HomeFragment extends Fragment {
                                 emergencyModel.setSenderMail(FirebaseManager.getInstance().getCurrentAuthUser().getEmail());
                             emergencyModel.setLongitude(locationResult.getLocations().get(locationResult.getLocations().size() - 1).getLongitude());
                             emergencyModel.setLatitude(locationResult.getLocations().get(locationResult.getLocations().size() - 1).getLatitude());
-                            emergencyViewModel.saveEmergency(emergencyModel, activity).observe(requireActivity(), new Observer<Integer>() {
+                            emergencyViewModel.saveEmergency(emergencyModel).observe(requireActivity(), new Observer<Integer>() {
                                 @Override
                                 public void onChanged(Integer integer) {
                                     if (integer >= 1){

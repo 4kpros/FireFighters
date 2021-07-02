@@ -2,27 +2,33 @@ package com.example.firefighters.ui.profile;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
+import android.app.Dialog;
+import android.app.MediaRouteButton;
 import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
+import android.widget.ArrayAdapter;
+import android.widget.CompoundButton;
 import android.widget.LinearLayout;
+import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.firefighters.R;
-import com.example.firefighters.adapters.MyEmergencyAdapter;
-import com.example.firefighters.adapters.MyFireStationAdapter;
-import com.example.firefighters.adapters.MyWaterPointAdapter;
+import com.example.firefighters.adapters.EmergencyPointAdapter;
+import com.example.firefighters.adapters.FirefighterAdapter;
+import com.example.firefighters.adapters.WaterPointAdapter;
 import com.example.firefighters.models.EmergencyModel;
-import com.example.firefighters.models.FireStationModel;
-import com.example.firefighters.models.FireTruckModel;
+import com.example.firefighters.models.UnitModel;
+import com.example.firefighters.models.UserModel;
 import com.example.firefighters.models.WaterPointModel;
 import com.example.firefighters.tools.ConstantsValues;
 import com.example.firefighters.tools.FirebaseManager;
 import com.example.firefighters.viewmodels.EmergencyViewModel;
-import com.example.firefighters.viewmodels.FireStationViewModel;
-import com.example.firefighters.viewmodels.FireTruckViewModel;
+import com.example.firefighters.viewmodels.UnitViewModel;
 import com.example.firefighters.viewmodels.UserViewModel;
 import com.example.firefighters.viewmodels.WaterPointViewModel;
 import com.google.android.material.button.MaterialButton;
@@ -31,25 +37,29 @@ import com.google.android.material.checkbox.MaterialCheckBox;
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.progressindicator.CircularProgressIndicator;
+import com.google.android.material.switchmaterial.SwitchMaterial;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textview.MaterialTextView;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.widget.SwitchCompat;
 import androidx.cardview.widget.CardView;
 import androidx.constraintlayout.motion.widget.MotionLayout;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 
@@ -62,13 +72,10 @@ public class ProfileFragment extends Fragment {
     //Fab buttons
     ExtendedFloatingActionButton floatingButtonAdd;
     FloatingActionButton floatingButtonAddFireFighter;
-    FloatingActionButton floatingButtonAddFireStation;
-    MaterialTextView textAddFireStation;
-    MaterialTextView textAddFireFighter;
+    FloatingActionButton floatingButtonAddUnit;
     private Context context;
     //Boolean
     private boolean isMyPointsPanel;
-    private boolean isWorkingOnPanel;
     private boolean isAllFabVisible;
     //Text views
     MaterialTextView textProfileMail;
@@ -86,52 +93,56 @@ public class ProfileFragment extends Fragment {
     private MaterialButton signOutButton;
     private MaterialButton goToSignInButton;
     private MaterialButton goToSignUpButton;
-    private MaterialButton workingOnButton;
-    private MaterialButton myPointsButton;
+    private MaterialButton pointsButton;
     private MaterialButton forgotPasswordButton;
-    private CircularProgressIndicator circularProgressIndicator;
+    private CircularProgressIndicator circularProgressIndicatorConnexion;
+    private CircularProgressIndicator circularProgressIndicatorCreation;
+    private CircularProgressIndicator circularProgressPoints;
     //Card views
-    private CardView workingOnCard;
     private MaterialButtonToggleGroup toggleButton;
     private MaterialButton emergencyPointButton;
     private MaterialButton waterPointButton;
-    private MaterialButton fireStationPointButton;
+    private MaterialButton firefighterPointButton;
     //Recyclers views
-    //Recyclers views
-    private RecyclerView recyclerViewMyEmergencies;
-    private RecyclerView recyclerViewMyWaterPoints;
-    private RecyclerView recyclerViewMyFireStation;
+    private RecyclerView recyclerViewPoints;
 
     private UserViewModel userViewModel;
     private EmergencyViewModel emergencyViewModel;
     private WaterPointViewModel waterPointViewModel;
-    private FireStationViewModel fireStationViewModel;
-    private LinearLayout linearWorkingOn;
+    private UnitViewModel unitViewModel;
+
     private ConstraintLayout constraintFloatingAction;
-    private LinearLayout linearMyPointExpand
-            ;
-    private MyEmergencyAdapter myEmergencyAdapter;
-    private MyFireStationAdapter myFireStationAdapter;
-    private MyWaterPointAdapter myWaterPointAdapter;
+    private LinearLayout linearMyPointExpand;
 
     private final int loadQte = 10;
+
     ArrayList<EmergencyModel> emergencies;
     ArrayList<WaterPointModel> waterPoints;
-    ArrayList<FireStationModel> fireStations;
+    ArrayList<UserModel> fireFighters;
+
+    private UserModel currentUser = new UserModel();
+    private EmergencyPointAdapter emergencyPointAdapter;
+    private FirefighterAdapter firefighterAdapter;
+    private WaterPointAdapter waterPointAdapter;
+
+    DocumentSnapshot lastDocumentFireFighter;
+    DocumentSnapshot lastDocumentEmergency;
+    DocumentSnapshot lastDocumentWaterPoint;
+    private int limitCount = 10;
+    private LinearLayoutManager layoutManagerEmergencies;
+    private LinearLayoutManager layoutManagerWaterPoints;
+    private LinearLayoutManager layoutManagerFirefighters;
+    private LinearLayout linearWorkingOn;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_profile, container, false);
         context = getContext();
         initViews(view);
+        setupRecyclersViews();
         initViewModel();
         setViewStates();
-        ObserveLiveData();
         return view;
-    }
-
-    private void ObserveLiveData() {
-        //
     }
 
     @Override
@@ -144,6 +155,15 @@ public class ProfileFragment extends Fragment {
     private void initViewModel() {
         userViewModel = new ViewModelProvider(requireActivity()).get(UserViewModel.class);
         userViewModel.init();
+
+        emergencyViewModel = new ViewModelProvider(requireActivity()).get(EmergencyViewModel.class);
+        emergencyViewModel.init();
+
+        waterPointViewModel = new ViewModelProvider(requireActivity()).get(WaterPointViewModel.class);
+        waterPointViewModel.init();
+
+        unitViewModel = new ViewModelProvider(requireActivity()).get(UnitViewModel.class);
+        unitViewModel.init();
     }
 
     private void checkInteractions(View root) {
@@ -165,28 +185,33 @@ public class ProfileFragment extends Fragment {
                 signOut();
             }
         });
-        workingOnButton.setOnClickListener(new View.OnClickListener() {
+        pointsButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                getWorkingOnPanel(v);
-            }
-        });
-        myPointsButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                getMyPointsPanel(v);
+                getPointsPanel();
             }
         });
         toggleButton.addOnButtonCheckedListener(new MaterialButtonToggleGroup.OnButtonCheckedListener() {
             @Override
             public void onButtonChecked(MaterialButtonToggleGroup group, int checkedId, boolean isChecked) {
-                int tempId = group.getCheckedButtonId();
-                if (tempId == emergencyPointButton.getId()) {
+                if (checkedId == emergencyPointButton.getId()) {
+                    emergencies.clear();
+                    lastDocumentEmergency = null;
+                    showLoadingPoints();
                     loadEmergencyRecycler();
-                } else if (tempId == waterPointButton.getId()) {
+                    loadMoreEmergencies();
+                } else if (checkedId == waterPointButton.getId()) {
+                    waterPoints.clear();
+                    lastDocumentWaterPoint = null;
+                    showLoadingPoints();
                     loadWaterRecycler();
-                } else if (tempId == fireStationPointButton.getId()) {
-                    loadFireStationRecycler();
+                    loadMoreWaterPoints();
+                } else if (checkedId == firefighterPointButton.getId()) {
+                    fireFighters.clear();
+                    lastDocumentFireFighter = null;
+                    showLoadingPoints();
+                    loadFirefighterRecycler();
+                    loadMoreFirefighters();
                 }
             }
         });
@@ -204,165 +229,178 @@ public class ProfileFragment extends Fragment {
         floatingButtonAddFireFighter.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                showDialogAddFireFighter(v);
+                hideAllFab();
+                unitViewModel.getUnitsQuery().observe(requireActivity(), new Observer<QuerySnapshot>() {
+                    @Override
+                    public void onChanged(QuerySnapshot queryDocumentSnapshots) {
+                        if (queryDocumentSnapshots.size() > 0){
+                            showAddFirefighterDialog(queryDocumentSnapshots.getDocuments());
+                        }else{
+                            Toast.makeText(context, "No unit found !", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
             }
         });
-        floatingButtonAddFireStation.setOnClickListener(new View.OnClickListener() {
+        floatingButtonAddUnit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                showDialogAddFireStationPoint(v);
+                hideAllFab();
+                showAddUnitDialog();
             }
         });
     }
 
-    private void showDialogAddFireFighter(View v) {
-        hideAllFab();
-        Toast.makeText(context, "new Fire fighter", Toast.LENGTH_SHORT).show();
+    private void showLoadingPoints() {
+        circularProgressPoints.show();
+        circularProgressPoints.setVisibility(View.VISIBLE);
     }
 
-    private void showDialogAddFireStationPoint(View v) {
-        hideAllFab();
-        Toast.makeText(context, "Fire station", Toast.LENGTH_SHORT).show();
+    private void hideLoadingPoints() {
+        circularProgressPoints.hide();
+        circularProgressPoints.setVisibility(View.GONE);
     }
 
     private void setupRecyclersViews() {
         emergencies = new ArrayList<>();
         waterPoints = new ArrayList<>();
-        fireStations = new ArrayList<>();
-        recyclerViewMyFireStation.addOnScrollListener(new RecyclerView.OnScrollListener() {
-            @Override
-            public void onScrolled(@NonNull @NotNull RecyclerView recyclerView, int dx, int dy) {
-                super.onScrolled(recyclerView, dx, dy);
-                if (!recyclerView.canScrollVertically(1)){
-                    loadMoreFireStations();
-                }
-            }
-        });
-        recyclerViewMyEmergencies.addOnScrollListener(new RecyclerView.OnScrollListener() {
-            @Override
-            public void onScrolled(@NonNull @NotNull RecyclerView recyclerView, int dx, int dy) {
-                super.onScrolled(recyclerView, dx, dy);
-                if (!recyclerView.canScrollVertically(1)){
-                    loadMoreEmergencies();
-                }
-            }
-        });
-        recyclerViewMyWaterPoints.addOnScrollListener(new RecyclerView.OnScrollListener() {
-            @Override
-            public void onScrolled(@NonNull @NotNull RecyclerView recyclerView, int dx, int dy) {
-                super.onScrolled(recyclerView, dx, dy);
-                if (!recyclerView.canScrollVertically(1)){
-                    loadMoreWaterPoints();
-                }
-            }
-        });
-        GridLayoutManager layoutManager1 = new GridLayoutManager(requireContext(), 1, RecyclerView.VERTICAL, false);
-        recyclerViewMyEmergencies.setLayoutManager(layoutManager1);
-        recyclerViewMyEmergencies.setAdapter(myEmergencyAdapter);
+        fireFighters = new ArrayList<>();
 
-        GridLayoutManager layoutManager2 = new GridLayoutManager(requireContext(), 1, RecyclerView.VERTICAL, false);
-        recyclerViewMyWaterPoints.setLayoutManager(layoutManager2);
-        recyclerViewMyWaterPoints.setAdapter(myWaterPointAdapter);
+        //Setup recycler view for emergencies
+        emergencies = new ArrayList<>();
+        layoutManagerEmergencies = new LinearLayoutManager(context, RecyclerView.VERTICAL, false);
+        emergencyPointAdapter = new EmergencyPointAdapter(context, emergencies);
 
-        GridLayoutManager layoutManager3 = new GridLayoutManager(requireContext(), 1, RecyclerView.VERTICAL, false);
-        recyclerViewMyFireStation.setLayoutManager(layoutManager3);
-        recyclerViewMyFireStation.setAdapter(myFireStationAdapter);
-        reloadMoreEmergencies();
-        reloadMoreWaterPoints();
-        reloadMoreFireStations();
+        //Setup recycler view for firefighters
+        fireFighters = new ArrayList<>();
+        layoutManagerFirefighters = new LinearLayoutManager(context, RecyclerView.VERTICAL, false);
+        firefighterAdapter = new FirefighterAdapter(requireContext(), fireFighters);
+
+        //Setup recycler view for waters points
+        waterPoints = new ArrayList<>();
+        layoutManagerWaterPoints = new LinearLayoutManager(context, RecyclerView.VERTICAL, false);
+        waterPointAdapter = new WaterPointAdapter(context, waterPoints);
+//
+//        recyclerViewMyFirefighter.addOnScrollListener(new RecyclerView.OnScrollListener() {
+//            @Override
+//            public void onScrolled(@NonNull @NotNull RecyclerView recyclerView, int dx, int dy) {
+//                super.onScrolled(recyclerView, dx, dy);
+//                if (!recyclerView.canScrollVertically(1)){
+//                    loadMoreFirefighters();
+//                }
+//            }
+//        });
+//        recyclerViewMyEmergencies.addOnScrollListener(new RecyclerView.OnScrollListener() {
+//            @Override
+//            public void onScrolled(@NonNull @NotNull RecyclerView recyclerView, int dx, int dy) {
+//                super.onScrolled(recyclerView, dx, dy);
+//                if (!recyclerView.canScrollVertically(1)){
+//                    loadMoreEmergencies();
+//                }
+//            }
+//        });
+//        recyclerViewMyWaterPoints.addOnScrollListener(new RecyclerView.OnScrollListener() {
+//            @Override
+//            public void onScrolled(@NonNull @NotNull RecyclerView recyclerView, int dx, int dy) {
+//                super.onScrolled(recyclerView, dx, dy);
+//                if (!recyclerView.canScrollVertically(1)){
+//                    loadMoreWaterPoints();
+//                }
+//            }
+//        });
     }
 
     private void loadMoreEmergencies() {
-        emergencyViewModel.getEmergenciesQuery(requireActivity()).observe(requireActivity(), new Observer<QuerySnapshot>() {
+        emergencyViewModel.getEmergenciesQuery(lastDocumentEmergency, null, null, limitCount).observe(requireActivity(), new Observer<QuerySnapshot>() {
             @Override
             public void onChanged(QuerySnapshot queryDocumentSnapshots) {
+                hideLoadingPoints();
+                int startPositionUpdate = 0;
+                if (emergencies != null && emergencies.size() > 0)
+                    startPositionUpdate = emergencies.size();
                 for (DocumentSnapshot document:queryDocumentSnapshots) {
                     emergencies.add(document.toObject(EmergencyModel.class));
                 }
-                myEmergencyAdapter.notifyItemRangeInserted(myEmergencyAdapter.getItemCount(), emergencies.size());
+                if (emergencies.size() > 0)
+                    lastDocumentEmergency = queryDocumentSnapshots.getDocuments().get(0);
+                    //Update now the view
+                int endPositionUpdate = 0;
+                if (emergencies.size() > 0)
+                    endPositionUpdate = emergencies.size()-1;
+                if (emergencyPointAdapter != null)
+                    emergencyPointAdapter.notifyItemRangeInserted(startPositionUpdate, endPositionUpdate);
+                if (getActivity() != null)
+                    emergencyViewModel.getEmergenciesQuery(lastDocumentEmergency, null, null, limitCount).removeObservers(requireActivity());
             }
         });
     }
 
-    private void reloadMoreEmergencies() {
-        emergencies.clear();
-        emergencyViewModel.getEmergenciesQuery(requireActivity()).observe(requireActivity(), new Observer<QuerySnapshot>() {
+    private void loadMoreFirefighters() {
+        userViewModel.loadFireFighters(lastDocumentFireFighter, limitCount).observe(requireActivity(), new Observer<QuerySnapshot>() {
             @Override
             public void onChanged(QuerySnapshot queryDocumentSnapshots) {
+                hideLoadingPoints();
+                int startPositionUpdate = 0;
+                if (fireFighters != null && fireFighters.size() > 0)
+                    startPositionUpdate = fireFighters.size();
                 for (DocumentSnapshot document:queryDocumentSnapshots) {
-                    emergencies.add(document.toObject(EmergencyModel.class));
+                    fireFighters.add(document.toObject(UserModel.class));
                 }
-                myFireStationAdapter.notifyItemRangeInserted(myFireStationAdapter.getItemCount(), fireStations.size());
-            }
-        });
-    }
+                if (fireFighters.size() > 0)
+                    lastDocumentFireFighter = queryDocumentSnapshots.getDocuments().get(0);
 
-    private void loadMoreFireStations() {
-        fireStationViewModel.getFireStationsQuery(requireActivity()).observe(requireActivity(), new Observer<QuerySnapshot>() {
-            @Override
-            public void onChanged(QuerySnapshot queryDocumentSnapshots) {
-                for (DocumentSnapshot document:queryDocumentSnapshots) {
-                    fireStations.add(document.toObject(FireStationModel.class));
-                }
-                myEmergencyAdapter.notifyDataSetChanged();
-            }
-        });
-    }
-
-    private void reloadMoreFireStations() {
-        fireStations.clear();
-        fireStationViewModel.getFireStationsQuery(requireActivity()).observe(requireActivity(), new Observer<QuerySnapshot>() {
-            @Override
-            public void onChanged(QuerySnapshot queryDocumentSnapshots) {
-                for (DocumentSnapshot document:queryDocumentSnapshots) {
-                    fireStations.add(document.toObject(FireStationModel.class));
-                }
-                myWaterPointAdapter.notifyDataSetChanged();
+                //Update now the view
+                int endPositionUpdate = 0;
+                if (fireFighters != null && fireFighters.size() > 0)
+                    endPositionUpdate = fireFighters.size()-1;
+                if (firefighterAdapter != null)
+                    firefighterAdapter.notifyItemRangeInserted(startPositionUpdate, endPositionUpdate);
+                if (getActivity() != null)
+                    userViewModel.loadFireFighters(lastDocumentFireFighter, limitCount).removeObservers(requireActivity());
             }
         });
     }
 
     private void loadMoreWaterPoints() {
-        waterPointViewModel.getWaterSourcesQuery(requireActivity()).observe(requireActivity(), new Observer<QuerySnapshot>() {
+        waterPointViewModel.getWaterPointsQuery(lastDocumentWaterPoint, limitCount).observe(requireActivity(), new Observer<QuerySnapshot>() {
             @Override
             public void onChanged(QuerySnapshot queryDocumentSnapshots) {
+                hideLoadingPoints();
+                int startPositionUpdate = 0;
+                if (waterPoints != null && waterPoints.size() > 0)
+                    startPositionUpdate = waterPoints.size();
                 for (DocumentSnapshot document:queryDocumentSnapshots) {
                     waterPoints.add(document.toObject(WaterPointModel.class));
                 }
-                myFireStationAdapter.notifyItemRangeInserted(myFireStationAdapter.getItemCount(), fireStations.size());
+                if (waterPoints.size() > 0)
+                    lastDocumentWaterPoint = queryDocumentSnapshots.getDocuments().get(0);
+
+                //Update now the view
+                int endPositionUpdate = 0;
+                if (waterPoints != null && waterPoints.size() > 0)
+                    endPositionUpdate = waterPoints.size()-1;
+                if (waterPointAdapter != null)
+                    waterPointAdapter.notifyItemRangeInserted(startPositionUpdate, endPositionUpdate);
+                if (getActivity() != null)
+                    waterPointViewModel.getWaterPointsQuery(lastDocumentWaterPoint, limitCount).removeObservers(requireActivity());
             }
         });
-    }
-
-    private void reloadMoreWaterPoints() {
-        waterPoints.clear();
-        waterPointViewModel.getWaterSourcesQuery(requireActivity()).observe(requireActivity(), new Observer<QuerySnapshot>() {
-            @Override
-            public void onChanged(QuerySnapshot queryDocumentSnapshots) {
-                for (DocumentSnapshot document:queryDocumentSnapshots) {
-                    waterPoints.add(document.toObject(WaterPointModel.class));
-                }
-                myWaterPointAdapter.notifyItemRangeInserted(myWaterPointAdapter.getItemCount(), waterPoints.size());
-            }
-        });
-    }
-
-    private void loadWaterRecycler() {
-        recyclerViewMyEmergencies.setVisibility(View.GONE);
-        recyclerViewMyWaterPoints.setVisibility(View.VISIBLE);
-        recyclerViewMyFireStation.setVisibility(View.GONE);
     }
 
     private void loadEmergencyRecycler() {
-        recyclerViewMyEmergencies.setVisibility(View.VISIBLE);
-        recyclerViewMyWaterPoints.setVisibility(View.GONE);
-        recyclerViewMyFireStation.setVisibility(View.GONE);
+        recyclerViewPoints.removeAllViews();
+        recyclerViewPoints.setLayoutManager(layoutManagerEmergencies);
+        recyclerViewPoints.setAdapter(emergencyPointAdapter);
     }
 
-    private void loadFireStationRecycler() {
-        recyclerViewMyEmergencies.setVisibility(View.GONE);
-        recyclerViewMyWaterPoints.setVisibility(View.GONE);
-        recyclerViewMyFireStation.setVisibility(View.VISIBLE);
+    private void loadFirefighterRecycler() {
+        recyclerViewPoints.setLayoutManager(layoutManagerFirefighters);
+        recyclerViewPoints.setAdapter(firefighterAdapter);
+    }
+
+    private void loadWaterRecycler() {
+        recyclerViewPoints.setLayoutManager(layoutManagerWaterPoints);
+        recyclerViewPoints.setAdapter(waterPointAdapter);
     }
 
     private void tryToSignUp() {
@@ -370,16 +408,18 @@ public class ProfileFragment extends Fragment {
         String userName = Objects.requireNonNull(userNameSignUp.getText()).toString();
         String userMail = Objects.requireNonNull(mailSignUp.getText()).toString();
         String userPassword = Objects.requireNonNull(passwordSignUp2.getText()).toString();
-        userViewModel.createNewUser(requireActivity(), userName, userMail, userPassword).observe(requireActivity(), new Observer<Integer>() {
+        userViewModel.createNewUser(userName, userMail, userPassword, false).observe(requireActivity(), new Observer<Integer>() {
             @Override
             public void onChanged(Integer integer) {
                 if (integer >= 1){
-                    setViewStates();
                     Toast.makeText(context, "Registered !", Toast.LENGTH_SHORT).show();
+                    loadUser(userMail);
                 }else{
                     hideLoading();
                     Toast.makeText(context, "Error sign up !", Toast.LENGTH_SHORT).show();
                 }
+                if (getActivity() != null)
+                    userViewModel.createNewUser(userName, userMail, userPassword, false).removeObservers(requireActivity());
             }
         });
     }
@@ -388,16 +428,34 @@ public class ProfileFragment extends Fragment {
         showLoading();
         String userMail = Objects.requireNonNull(mailSignIn.getText()).toString();
         String userPassword = Objects.requireNonNull(passwordSignIn.getText()).toString();
-        userViewModel.signInUser(requireActivity(), userMail, userPassword).observe(requireActivity(), new Observer<Integer>() {
+        userViewModel.signInUser(userMail, userPassword).observe(requireActivity(), new Observer<Integer>() {
             @Override
             public void onChanged(Integer integer) {
                 if (integer >= 1){
-                    setViewStates();
-                    Toast.makeText(context, "Logged !", Toast.LENGTH_SHORT).show();
+                    loadUser(userMail);
                 }else{
                     hideLoading();
-                    Toast.makeText(context, "Error logging !", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(context, "Error sign in !", Toast.LENGTH_SHORT).show();
                 }
+                if (getActivity() != null)
+                    userViewModel.signInUser(userMail, userPassword).removeObservers(requireActivity());
+            }
+        });
+    }
+
+    private void loadUser(String myMail) {
+        userViewModel.loadUserModel(myMail).observe(requireActivity(), new Observer<UserModel>() {
+            @Override
+            public void onChanged(UserModel userModel) {
+                hideLoading();
+                setViewStates();
+                if (FirebaseManager.getInstance().getCurrentAuthUser() == null || (currentUser == null && FirebaseManager.getInstance().getCurrentAuthUser() == null)){
+                    Toast.makeText(context, "Error sign in !", Toast.LENGTH_SHORT).show();
+                }else{
+                    Toast.makeText(context, "Logged !", Toast.LENGTH_SHORT).show();
+                }
+                if (getActivity() != null)
+                    userViewModel.loadUserModel(myMail).removeObservers(requireActivity());
             }
         });
     }
@@ -406,52 +464,52 @@ public class ProfileFragment extends Fragment {
         userViewModel.logOut().observe(requireActivity(), new Observer<Integer>() {
             @Override
             public void onChanged(Integer integer) {
-                if (integer == 1){
+                hideLoading();
+                if (integer >= 1){
                     setViewStates();
+                    Toast.makeText(context, "Disconnected !", Toast.LENGTH_SHORT).show();
                 }
             }
         });
     }
 
     private void setViewStates() {
+        hideLoadingPoints();
+
         //Set the correct page if the user is auth
-        if (FirebaseManager.getInstance().getCurrentAuthUser() == null){
+        if (FirebaseManager.getInstance().getCurrentAuthUser() == null || (currentUser == null && FirebaseManager.getInstance().getCurrentAuthUser() == null)){
             //Set the connexion page
+            userViewModel.logOut();
             goToSignInPage();
         }else{
-            userViewModel.loadTypeUser().observe(requireActivity(), new Observer<String>() {
-                @Override
-                public void onChanged(String s) {
-                    if (s.equals(ConstantsValues.NORMAL_USER)){
-                        //Go to normal user page
-                        goToProfileHomePageDefault();
-                    }else if(s.equals(ConstantsValues.FIRE_FIGHTER_USER)){
-                        //Go to fire fighter page
-                        goToProfileHomePageFireFighter();
-                    }else if(s.equals(ConstantsValues.ADMIN_USER)){
-                        //Go to admin page
-                        goToProfileHomePageAdmin();
-                    }else{
-                        Toast.makeText(context, "null", Toast.LENGTH_SHORT).show();
-                    }
+            if (FirebaseManager.getInstance().getCurrentAuthUser() != null && FirebaseManager.getInstance().getCurrentAuthUser().getEmail() != null){
+                if(FirebaseManager.getInstance().getCurrentAuthUser().getEmail().equals(ConstantsValues.ADMIN_EMAIL)){
+                    //Go to admin page
+                    goToProfileHomePageAdmin();
+                }else{
+                    userViewModel.loadUserModel(FirebaseManager.getInstance().getCurrentAuthUser().getEmail()).observe(requireActivity(), new Observer<UserModel>() {
+                        @Override
+                        public void onChanged(UserModel userModel) {
+                            if(userModel != null){
+                                if (userModel.isFireFighter()){
+                                    //Go to firefighter page
+                                    goToProfileHomePageFireFighter(userModel.isChief());
+                                }else{
+                                    //Go to basic user page
+                                    goToProfileHomePageDefault();
+                                }
+                            }else {
+                                //Go to basic user page
+                                goToProfileHomePageDefault();
+                            }
+                            if (getActivity() != null)
+                                userViewModel.loadUserModel(FirebaseManager.getInstance().getCurrentAuthUser().getEmail()).removeObservers(requireActivity());
+                        }
+                    });
                 }
-            });
+            }
         }
 
-        int tempId = toggleButton.getCheckedButtonId();
-        if (tempId == emergencyPointButton.getId()) {
-            loadEmergencyRecycler();
-        } else if (tempId == waterPointButton.getId()) {
-            loadWaterRecycler();
-        } else if (tempId == fireStationPointButton.getId()) {
-            loadFireStationRecycler();
-        }
-
-        if (isWorkingOnPanel) {
-            workingOnCard.setVisibility(View.VISIBLE);
-        } else {
-            workingOnCard.setVisibility(View.GONE);
-        }
         if (isMyPointsPanel) {
             linearMyPointExpand.setVisibility(View.VISIBLE);
         } else {
@@ -460,52 +518,52 @@ public class ProfileFragment extends Fragment {
 
         //Set for action floating buttons
         if (isAllFabVisible) {
-            textAddFireStation.setVisibility(View.VISIBLE);
-            textAddFireFighter.setVisibility(View.VISIBLE);
             floatingButtonAddFireFighter.setVisibility(View.VISIBLE);
-            floatingButtonAddFireStation.setVisibility(View.VISIBLE);
+            floatingButtonAddUnit.setVisibility(View.VISIBLE);
             floatingButtonAdd.extend();
         } else {
-            textAddFireStation.setVisibility(View.GONE);
-            textAddFireFighter.setVisibility(View.GONE);
             floatingButtonAddFireFighter.setVisibility(View.GONE);
-            floatingButtonAddFireStation.setVisibility(View.GONE);
+            floatingButtonAddUnit.setVisibility(View.GONE);
             floatingButtonAdd.shrink();
         }
     }
 
     private void goToProfileHomePageAdmin() {
         if(FirebaseManager.getInstance().getCurrentAuthUser().getDisplayName() == null){
-            textProfileName.setText("<<Unknown name>>");
+            textProfileName.setText("");
         }else {
             textProfileName.setText(FirebaseManager.getInstance().getCurrentAuthUser().getDisplayName());
         }
         textProfileMail.setText(FirebaseManager.getInstance().getCurrentAuthUser().getEmail());
         pageProfileHome.setVisibility(View.VISIBLE);
         pageProfileConnexion.setVisibility(View.GONE);
-        linearWorkingOn.setVisibility(View.VISIBLE);
+        linearWorkingOn.setVisibility(View.GONE);
         constraintFloatingAction.setVisibility(View.VISIBLE);
     }
-    private void goToProfileHomePageFireFighter() {
+    private void goToProfileHomePageFireFighter(boolean chief) {
+        ConstantsValues.setIsFirefighter(true);
+        ConstantsValues.setIsChief(chief);
         if(FirebaseManager.getInstance().getCurrentAuthUser().getDisplayName() == null){
-            textProfileName.setText("<<Unknown name>>");
+            textProfileName.setText("");
         }else {
             textProfileName.setText(FirebaseManager.getInstance().getCurrentAuthUser().getDisplayName());
         }
+        firefighterPointButton.setVisibility(View.GONE);
         textProfileMail.setText(FirebaseManager.getInstance().getCurrentAuthUser().getEmail());
         pageProfileHome.setVisibility(View.VISIBLE);
         pageProfileConnexion.setVisibility(View.GONE);
         linearWorkingOn.setVisibility(View.VISIBLE);
         constraintFloatingAction.setVisibility(View.VISIBLE);
         floatingButtonAddFireFighter.setVisibility(View.GONE);
-        textAddFireFighter.setVisibility(View.GONE);
+        floatingButtonAddUnit.setVisibility(View.GONE);
     }
     private void goToProfileHomePageDefault() {
         if(FirebaseManager.getInstance().getCurrentAuthUser().getDisplayName() == null){
-            textProfileName.setText("<<Unknown name>>");
+            textProfileName.setText("");
         }else {
             textProfileName.setText(FirebaseManager.getInstance().getCurrentAuthUser().getDisplayName());
         }
+        firefighterPointButton.setVisibility(View.GONE);
         textProfileMail.setText(FirebaseManager.getInstance().getCurrentAuthUser().getEmail());
         pageProfileHome.setVisibility(View.VISIBLE);
         pageProfileConnexion.setVisibility(View.GONE);
@@ -514,8 +572,8 @@ public class ProfileFragment extends Fragment {
     }
 
     private void goToSignInPage() {
-        textProfileName.setText("<<Unknown name>>");
-        textProfileMail.setText("<<Unknown mail>>");
+        textProfileName.setText("");
+        textProfileMail.setText("");
         pageProfileHome.setVisibility(View.GONE);
         pageProfileConnexion.setVisibility(View.VISIBLE);
         linearWorkingOn.setVisibility(View.GONE);
@@ -523,55 +581,26 @@ public class ProfileFragment extends Fragment {
     }
 
     private void hideAllFab() {
-        textAddFireStation.setVisibility(View.GONE);
-        textAddFireFighter.setVisibility(View.GONE);
         floatingButtonAddFireFighter.hide();
-        floatingButtonAddFireStation.hide();
+        floatingButtonAddUnit.hide();
         isAllFabVisible = false;
         floatingButtonAdd.shrink();
     }
 
     private void showAllFab() {
-        textAddFireStation.setVisibility(View.VISIBLE);
-        textAddFireFighter.setVisibility(View.VISIBLE);
         floatingButtonAddFireFighter.show();
-        floatingButtonAddFireStation.show();
+        floatingButtonAddUnit.show();
         isAllFabVisible = true;
         floatingButtonAdd.extend();
     }
 
-    private void getWorkingOnPanel(View v) {
-        if (isWorkingOnPanel) {
-            isWorkingOnPanel = false;
-            //Now hide working on panel
-            workingOnCard.setVisibility(View.GONE);
-            workingOnCard.setAlpha(1);
-            workingOnCard.setVisibility(View.VISIBLE);
-            workingOnCard.animate()
-                    .alpha(0)
-                    .setDuration(100)
-                    .setListener(new AnimatorListenerAdapter() {
-                        @Override
-                        public void onAnimationEnd(Animator animation) {
-                            super.onAnimationEnd(animation);
-                        }
-                    });
-        } else {
-            isWorkingOnPanel = true;
-            //Now show working on panel
-            workingOnCard.setVisibility(View.VISIBLE);
-            workingOnCard.setAlpha(0);
-            workingOnCard.animate()
-                    .alpha(1)
-                    .setDuration(100)
-                    .setListener(null);
-        }
-    }
-
-    private void getMyPointsPanel(View v) {
+    private void getPointsPanel() {
+        hideLoadingPoints();
         if (isMyPointsPanel) {
             isMyPointsPanel = false;
             //Now hide my points panel
+            pointsButton.setIcon(requireActivity().getResources().getDrawable(R.drawable.ic_baseline_keyboard_arrow_down_24));
+            recyclerViewPoints.setVisibility(View.GONE);
             linearMyPointExpand.animate()
                     .alpha(0)
                     .setDuration(100)
@@ -585,9 +614,149 @@ public class ProfileFragment extends Fragment {
         } else {
             isMyPointsPanel = true;
             //Now show my points panel
+            pointsButton.setIcon(requireActivity().getResources().getDrawable(R.drawable.ic_baseline_keyboard_arrow_up_24));
             linearMyPointExpand.setAlpha(1);
             linearMyPointExpand.setVisibility(View.VISIBLE);
+            recyclerViewPoints.setVisibility(View.VISIBLE);
         }
+    }
+
+    private void showAddFirefighterDialog(List<DocumentSnapshot> documents) {
+        hideAllFab();
+        Dialog dialog = new Dialog(context);
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialog.setContentView(R.layout.dialog_new_firefighter);
+        dialog.setCanceledOnTouchOutside(true);
+        dialog.getWindow().setBackgroundDrawable(getResources().getDrawable(R.color.transparent));
+        dialog.findViewById(R.id.button_close_dialog).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog.dismiss();
+            }
+        });
+        Spinner spinnerUnit = dialog.findViewById(R.id.firefighter_unit);
+        //Setup adapter
+        ArrayList<String> spinnerArray = new ArrayList<>();
+        for (DocumentSnapshot document:documents) {
+            if(document.toObject(UnitModel.class) != null){
+                String tempUnitName = document.toObject(UnitModel.class).getUnitName();
+                if (tempUnitName != null)
+                    spinnerArray.add(tempUnitName);
+            }
+        }
+        // Array of choices
+        ArrayAdapter<String> spinnerArrayAdapter = new ArrayAdapter<String>(
+                requireContext(),
+                android.R.layout.simple_spinner_item,
+                spinnerArray
+        ); //selected item will look like a spinner set from XML
+        spinnerArrayAdapter.setDropDownViewResource(android.R.layout
+                .simple_spinner_dropdown_item);
+        spinnerUnit.setAdapter(spinnerArrayAdapter);
+
+        UserModel firefighter = new UserModel();
+
+        SwitchMaterial switchChief = dialog.findViewById(R.id.firefighter_chief);
+        switchChief.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked){
+                    firefighter.setChief(true);
+                }
+            }
+        });
+        dialog.findViewById(R.id.button_save_firefighter).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                TextInputEditText textMail = dialog.findViewById(R.id.text_input_mail);
+                //Temp values
+                String tempMail = "";
+                String tempUnit = "";
+                //
+                tempMail = String.valueOf(textMail.getText());
+                tempUnit = spinnerUnit.getSelectedItem().toString();
+                firefighter.setMail(tempMail);
+                firefighter.setFireFighter(true);
+                firefighter.setUnit(tempUnit);
+                if (tempMail.isEmpty()){
+                    Toast.makeText(context, "Please enter valid mail name !", Toast.LENGTH_SHORT).show();
+                }else{
+                    userViewModel.loadUserModel(tempMail).observe(requireActivity(), new Observer<UserModel>() {
+                        @Override
+                        public void onChanged(UserModel userModel) {
+                            if (userModel == null){
+                                dialog.dismiss();
+                                userViewModel.saveFireFighter(firefighter).observe(requireActivity(), new Observer<Integer>() {
+                                    @Override
+                                    public void onChanged(Integer integer) {
+                                        if (integer >= 1){
+                                            Toast.makeText(context, "firefighter saved !", Toast.LENGTH_SHORT).show();
+                                        }else {
+                                            Toast.makeText(context, "Error saving firefighter !", Toast.LENGTH_SHORT).show();
+                                        }
+                                    }
+                                });
+                            }else {
+                                Toast.makeText(context, "This firefighter already registered !", Toast.LENGTH_SHORT).show();
+                            }
+                        }
+                    });
+                }
+            }
+        });
+        dialog.show();
+    }
+
+    private void showAddUnitDialog() {
+        hideAllFab();
+        Dialog dialog = new Dialog(context);
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialog.setContentView(R.layout.dialog_new_unit);
+        dialog.setCanceledOnTouchOutside(true);
+        dialog.getWindow().setBackgroundDrawable(getResources().getDrawable(R.color.transparent));
+        dialog.findViewById(R.id.button_close_dialog).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog.dismiss();
+            }
+        });
+        dialog.findViewById(R.id.button_save_unit).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                TextInputEditText textInputEditText = dialog.findViewById(R.id.text_input_unit_name);
+                String tempUnitName = "";
+                tempUnitName = String.valueOf(textInputEditText.getText());
+                if (tempUnitName.isEmpty()){
+                    Toast.makeText(context, "Please enter valid unit name !", Toast.LENGTH_SHORT).show();
+                }else{
+                    String finalTempUnitName = tempUnitName;
+                    unitViewModel.getUnitModel(tempUnitName).observe(requireActivity(), new Observer<UnitModel>() {
+                        @Override
+                        public void onChanged(UnitModel unitModel) {
+                            dialog.dismiss();
+                            if (unitModel == null){
+                                UnitModel unitModelSave = new UnitModel();
+                                unitModelSave.setUnitName(finalTempUnitName);
+                                unitViewModel.saveUnit(unitModelSave).observe(requireActivity(), new Observer<Integer>() {
+                                    @Override
+                                    public void onChanged(Integer integer) {
+                                        if (integer >= 1){
+                                            Toast.makeText(context, "Unit saved !", Toast.LENGTH_SHORT).show();
+                                        }else {
+                                            Toast.makeText(context, "Error saving ! " +integer, Toast.LENGTH_SHORT).show();
+                                        }
+                                    }
+                                });
+                            }else{
+                                dialog.dismiss();
+                                Toast.makeText(context, "This unit already registered !", Toast.LENGTH_SHORT).show();
+                            }
+                        }
+                    });
+                }
+            }
+        });
+        dialog.show();
     }
 
     private void initViews(View root) {
@@ -609,67 +778,69 @@ public class ProfileFragment extends Fragment {
         signOutButton = root.findViewById(R.id.button_log_out);
         goToSignInButton = root.findViewById(R.id.button_go_to_sign_in);
         goToSignUpButton = root.findViewById(R.id.button_go_to_sign_up);
-        workingOnButton = root.findViewById(R.id.button_working_on);
-        myPointsButton = root.findViewById(R.id.button_my_points);
+        pointsButton = root.findViewById(R.id.button_points);
         forgotPasswordButton = root.findViewById(R.id.button_forgot_password);
 
         checkBoxRemember = root.findViewById(R.id.checkbox_remember_me);
-        circularProgressIndicator = root.findViewById(R.id.progress_circular_connexion);
+        circularProgressIndicatorConnexion = root.findViewById(R.id.progress_circular_connexion);
+        circularProgressIndicatorCreation = root.findViewById(R.id.progress_circular_create);
+        circularProgressPoints = root.findViewById(R.id.progress_points);
 
-        //Card views
-        workingOnCard = root.findViewById(R.id.card_working_on);
 
         //Motions layouts
         pageProfileConnexion = root.findViewById(R.id.motion_layout_profile);
         pageProfileHome = root.findViewById(R.id.coordinatorLayout);
 
         //Recyclers
-        recyclerViewMyEmergencies = root.findViewById(R.id.recycler_my_emergencies);
-        recyclerViewMyWaterPoints = root.findViewById(R.id.recycler_my_water_points);
-        recyclerViewMyFireStation = root.findViewById(R.id.recycler_my_fire_station);
+        recyclerViewPoints = root.findViewById(R.id.recycler_points);
 
         //Toggle Groups
         toggleButton = root.findViewById(R.id.toggle_button);
-        emergencyPointButton = root.findViewById(R.id.button_emergency_points);
-        waterPointButton = root.findViewById(R.id.button_water_points);
-        fireStationPointButton = root.findViewById(R.id.button_station_points);
+        emergencyPointButton = root.findViewById(R.id.button_manage_emergency_points);
+        waterPointButton = root.findViewById(R.id.button_manage_water_points);
+        firefighterPointButton = root.findViewById(R.id.button_manage_firefighter_points);
 
         //Floating buttons
         floatingButtonAdd = root.findViewById(R.id.floating_action_button_add);
         floatingButtonAddFireFighter = root.findViewById(R.id.floating_action_button_fire_fighter);
-        floatingButtonAddFireStation = root.findViewById(R.id.floating_action_button_fire_station);
-        textAddFireFighter = root.findViewById(R.id.add_fire_fighter_action_text);
-        textAddFireStation = root.findViewById(R.id.add_fire_station_action_text);
+        floatingButtonAddUnit = root.findViewById(R.id.floating_action_button_unit);
 
         //LinearLayouts
-        linearWorkingOn = root.findViewById(R.id.linear_working_on);
-        linearMyPointExpand = root.findViewById(R.id.linear_my_points_expand);
+        linearMyPointExpand = root.findViewById(R.id.linear_manage_points_expand);
         constraintFloatingAction = root.findViewById(R.id.constraint_floating_action_buttons);
+        linearWorkingOn = root.findViewById(R.id.linear_working_on);
     }
 
     private void showLoading() {
-//        checkBoxRemember.setVisibility(View.INVISIBLE);
-//        forgotPasswordButton.setVisibility(View.INVISIBLE);
-//        goToSignUpButton.setVisibility(View.INVISIBLE);
-//        goToSignInButton.setVisibility(View.INVISIBLE);
-//
-        signUpButton.setVisibility(View.INVISIBLE);
-        signInButton.setVisibility(View.INVISIBLE);
+        requireActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                signUpButton.setVisibility(View.GONE);
+                signInButton.setVisibility(View.GONE);
 
-        circularProgressIndicator.show();
-        circularProgressIndicator.setVisibility(View.VISIBLE);
+                circularProgressIndicatorConnexion.show();
+                circularProgressIndicatorConnexion.setVisibility(View.VISIBLE);
+
+                circularProgressIndicatorCreation.show();
+                circularProgressIndicatorCreation.setVisibility(View.VISIBLE);
+            }
+        });
     }
 
     private void hideLoading() {
-//        checkBoxRemember.setVisibility(View.VISIBLE);
-//        forgotPasswordButton.setVisibility(View.VISIBLE);
-//        goToSignUpButton.setVisibility(View.VISIBLE);
-//        goToSignInButton.setVisibility(View.VISIBLE);
-//
-        signUpButton.setVisibility(View.VISIBLE);
-        signInButton.setVisibility(View.VISIBLE);
+        requireActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
 
-        circularProgressIndicator.hide();
-        circularProgressIndicator.setVisibility(View.INVISIBLE);
+                signUpButton.setVisibility(View.VISIBLE);
+                signInButton.setVisibility(View.VISIBLE);
+
+                circularProgressIndicatorConnexion.hide();
+                circularProgressIndicatorConnexion.setVisibility(View.INVISIBLE);
+
+                circularProgressIndicatorCreation.hide();
+                circularProgressIndicatorCreation.setVisibility(View.INVISIBLE);
+            }
+        });
     }
 }

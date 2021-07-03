@@ -27,7 +27,7 @@ import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 
-public class MainActivity extends AppCompatActivity implements HomeFragment.LoadPermissions {
+public class MainActivity extends AppCompatActivity {
 
     private UserViewModel userViewModel;
 
@@ -46,21 +46,35 @@ public class MainActivity extends AppCompatActivity implements HomeFragment.Load
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (requestCode == ConstantsValues.SMS_PERMISSION_CODE) {
             if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                Toast.makeText(this, "Location permissions refused", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Location permissions refused !", Toast.LENGTH_SHORT).show();
             } else {
                 //Work
             }
         }
         if (requestCode == ConstantsValues.CALL_PERMISSION_CODE) {
             if (ContextCompat.checkSelfPermission(this, Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED) {
-                Toast.makeText(this, "Call permissions refused", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Call permissions refused !", Toast.LENGTH_SHORT).show();
             } else {
                 //Work
             }
         }
         if (requestCode == ConstantsValues.SMS_PERMISSION_CODE) {
             if (ContextCompat.checkSelfPermission(this, Manifest.permission.SEND_SMS) != PackageManager.PERMISSION_GRANTED) {
-                Toast.makeText(this, "Sms permissions refused", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Sms permissions refused !", Toast.LENGTH_SHORT).show();
+            } else {
+                //Work
+            }
+        }
+        if (requestCode == ConstantsValues.AUDIO_RECORD_PERMISSION_CODE){
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
+                Toast.makeText(this, "Record audio permissions refused !", Toast.LENGTH_SHORT).show();
+            } else {
+                //Work
+            }
+        }
+        if (requestCode == ConstantsValues.CAMERA_PERMISSION_CODE){
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+                Toast.makeText(this, "Camera permissions refused !", Toast.LENGTH_SHORT).show();
             } else {
                 //Work
             }
@@ -70,32 +84,25 @@ public class MainActivity extends AppCompatActivity implements HomeFragment.Load
     private void loadGeneralInfo(){
         userViewModel = new ViewModelProvider(this).get(UserViewModel.class);
         userViewModel.init();
-        userViewModel.loadUserModel(FirebaseManager.getInstance().getCurrentAuthUser().getEmail()).observe(this, new Observer<UserModel>() {
-            @Override
-            public void onChanged(UserModel userModel) {
-                if(userModel != null){
-                    ConstantsValues.setIsFirefighter(userModel.isFireFighter());
-                    ConstantsValues.setIsChief(userModel.isChief());
+        if (FirebaseManager.getInstance().getCurrentAuthUser() == null){
+            loadViews();
+        }else {
+            userViewModel.loadUserModel(FirebaseManager.getInstance().getCurrentAuthUser().getEmail()).observe(this, new Observer<UserModel>() {
+                @Override
+                public void onChanged(UserModel userModel) {
+                    if (userModel != null) {
+                        ConstantsValues.setIsFirefighter(userModel.isFireFighter());
+                        ConstantsValues.setIsChief(userModel.isChief());
+                    }
+                    loadViews();
                 }
-                loadViews();
-            }
-        });
+            });
+        }
     }
     private void loadViews(){
-
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
         ft.setCustomAnimations(R.anim.anim_scale_in, R.anim.anim_scale_in);
         ft.replace(R.id.main_frame_layout, new MainFragment()).addToBackStack(null);
         ft.commit();
-    }
-
-    @Override
-    public void loadLocationPermissions() {
-
-    }
-
-    @Override
-    public void loadCallPermissions() {
-
     }
 }

@@ -4,7 +4,7 @@
     android:id="@+id/bottom_sheet_container"
     android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="wrap_content"
     android:layout_margin="10dp"
     style="@style/CustomShapeRoundedGradient"
     >
@@ -16,7 +16,7 @@
             android:id="@+id/text_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Help"
+            android:text="Settings"
             style="@style/CustomCleanTextColor"
             android:textSize="16sp"
             app:textAllCaps="true"
@@ -38,14 +38,46 @@
             android:ellipsize="end"
             android:linksClickable="true"
             android:maxLines="1"
-            app:icon="@drawable/ic_baseline_keyboard_arrow_down_24"
+            app:icon="@drawable/ic_round_clear_24"
             android:textColor="@color/purple_200"
             app:iconTint="@color/purple_200"
             app:iconGravity="textEnd"
             android:layout_gravity="end"
             android:gravity="center"
-            android:layout_alignParentStart="true"
-            android:layout_alignParentLeft="true"
+            android:layout_alignParentEnd="true"
             />
     </RelativeLayout>
+    <LinearLayout
+        android:id="@+id/linear_no_permissions"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_margin="10dp"
+        >
+        <com.google.android.material.textview.MaterialTextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Theme : "
+            android:layout_margin="5dp"
+            style="@style/CustomCleanTextColor"
+            android:textSize="16sp"
+            android:layout_gravity="center"
+            android:gravity="center"
+            />
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/button_get_permissions"
+            style="@style/Widget.MaterialComponents.Button.TextButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:autoLink="all"
+            android:ellipsize="end"
+            android:linksClickable="true"
+            android:maxLines="1"
+            android:layout_margin="10dp"
+            android:text="Get permissions"
+            android:textColor="@color/purple_200"
+            android:layout_gravity="center"
+            android:gravity="center"
+            app:rippleColor="@color/light_400" />
+    </LinearLayout>
 </LinearLayout>

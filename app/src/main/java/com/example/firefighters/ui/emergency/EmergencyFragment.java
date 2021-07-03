@@ -42,8 +42,6 @@ import androidx.recyclerview.widget.RecyclerView;
 
 public class EmergencyFragment extends Fragment {
 
-    //Progress indicator
-    CircularProgressIndicator circularProgressIndicator;
     private EmergencyViewModel emergencyViewModel;
     private EmergencyAdapter emergencyAdapter;
     private RecyclerView emergenciesRecyclerView;
@@ -52,7 +50,6 @@ public class EmergencyFragment extends Fragment {
     private ImageView buttonFilter;
     private ImageView buttonOrder;
     //Text views
-    private TextView textEmergenciesListTitle;
     private LinearLayoutManager layoutManager;
     private final int loadQte = 10;
     private ArrayList<EmergencyModel> emergencies;
@@ -75,18 +72,18 @@ public class EmergencyFragment extends Fragment {
         lastFilter = ConstantsValues.FILTER_STATUS;
         lastOrder = Query.Direction.DESCENDING;
         lastDocument = null;
+        emergencies = new ArrayList<>();
+        lastDocument = null;
+        initViews(view);
+        checkInteractions();
+        initRecyclerView(view);
+        loadMoreEmergencies();
         return view;
     }
 
     @Override
     public void onViewCreated(@NonNull @NotNull View view, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        initViews(view);
-        checkInteractions();
-        initRecyclerView(view);
-        emergencies.clear();
-        lastDocument = null;
-        loadMoreEmergencies();
     }
 
     private void checkInteractions() {
@@ -114,11 +111,9 @@ public class EmergencyFragment extends Fragment {
     }
 
     private void loadMoreEmergencies() {
-        showEmergenciesLoadingView();
         emergencyViewModel.getEmergenciesQuery(lastDocument, lastFilter, lastOrder, limitCount).observe(requireActivity(), new Observer<QuerySnapshot>() {
             @Override
             public void onChanged(QuerySnapshot queryDocumentSnapshots) {
-                hideEmergenciesLoadingView();
                 for (DocumentSnapshot document:queryDocumentSnapshots) {
                     emergencies.add(document.toObject(EmergencyModel.class));
                 }
@@ -129,16 +124,6 @@ public class EmergencyFragment extends Fragment {
                     emergencyViewModel.getEmergenciesQuery(lastDocument, lastFilter, lastOrder, limitCount).removeObservers(requireActivity());
             }
         });
-    }
-
-    private void hideEmergenciesLoadingView() {
-        circularProgressIndicator.hide();
-        textEmergenciesListTitle.setVisibility(View.VISIBLE);
-    }
-
-    private void showEmergenciesLoadingView() {
-        circularProgressIndicator.show();
-        textEmergenciesListTitle.setVisibility(View.INVISIBLE);
     }
 
     private void showDetailsDialog(int position) {
@@ -360,12 +345,6 @@ public class EmergencyFragment extends Fragment {
         //Buttons
         buttonFilter = view.findViewById(R.id.button_image_filter);
         buttonOrder = view.findViewById(R.id.button_image_order);
-
-        //Text view
-        textEmergenciesListTitle = view.findViewById(R.id.text_emergency_top_title);
-
-        //Circular progress indicator
-        circularProgressIndicator = view.findViewById(R.id.progress_emergency);
     }
 
     @Override

@@ -2,11 +2,12 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="400dp"
+    android:layout_height="wrap_content"
     android:orientation="vertical"
     android:layout_gravity="center"
     style="@style/CustomShapeRoundedGradient"
-    android:layout_margin="10dp">
+    android:layout_margin="10dp"
+    >
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -15,15 +16,15 @@
             android:id="@+id/text_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Emergency details"
+            android:text="Get best water point"
             style="@style/CustomCleanTextColor"
             android:textSize="16sp"
             app:textAllCaps="true"
             android:textStyle="bold"
             android:maxLines="1"
             android:gravity="start"
-            android:layout_marginLeft="5dp"
-            android:layout_marginRight="5dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
             android:ellipsize="end"
             android:textAllCaps="true"
             android:layout_centerInParent="true"
@@ -55,11 +56,45 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         >
-        <androidx.viewpager2.widget.ViewPager2
-            android:id="@+id/view_pager_image_video_view"
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="250dp"
-            android:orientation="horizontal"
-            />
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            >
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/button_water_default"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                style="@style/Widget.MaterialComponents.Button.TextButton"
+                app:rippleColor="@color/light_300"
+                android:text="Default algorithm"
+                android:layout_margin="10dp"
+                android:autoLink="all"
+                android:ellipsize="end"
+                android:linksClickable="true"
+                android:maxLines="1"
+                android:layout_gravity="center"
+                android:gravity="center"
+                android:textColor="@color/purple_200"
+                app:iconTint="@color/purple_200"
+                />
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/button_water_ahp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                style="@style/Widget.MaterialComponents.Button.TextButton"
+                app:rippleColor="@color/light_300"
+                android:text="with AHP"
+                android:layout_margin="10dp"
+                android:autoLink="all"
+                android:ellipsize="end"
+                android:linksClickable="true"
+                android:maxLines="1"
+                android:layout_gravity="center"
+                android:gravity="center"
+                android:textColor="@color/purple_200"
+                app:iconTint="@color/purple_200"
+                />
+        </LinearLayout>
     </androidx.core.widget.NestedScrollView>
 </LinearLayout>

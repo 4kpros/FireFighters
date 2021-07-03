@@ -2,13 +2,16 @@ package com.example.firefighters.tools;
 
 public abstract class ConstantsValues {
 
+    //Application tag
+    public static final String APPLICATION_TAG = "Firefighters";
+
     //Emergency states
     public static final String WORKING = "Status working";
     public static final String NOT_WORKING = "Status not working";
     public static final String FINISHED = "Status finished";
 
     //Filter
-    public static final String FILTER_NAME = "streetName";
+    public static final String FILTER_NAME = "id";
     public static final String FILTER_DEGREE = "gravity";
     public static final String FILTER_STATUS = "status";
 
@@ -17,8 +20,8 @@ public abstract class ConstantsValues {
     public static final int LOCATION_PERMISSION_CODE = 2;
     public static final int SMS_PERMISSION_CODE = 3;
     public static final int BLUETOOTH_PERMISSION_CODE = 3;
-    public static final int STORAGE_READ_PERMISSION_CODE = 4;
-    public static final int STORAGE_WRITE_PERMISSION_CODE = 5;
+    public static final int CAMERA_PERMISSION_CODE = 6;
+    public static final int AUDIO_RECORD_PERMISSION_CODE = 7;
 
     //Gravities
     public static final String GRAVITY_NORMAL = "Normal";

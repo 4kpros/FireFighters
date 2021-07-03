@@ -33,6 +33,20 @@ public class WaterPointRepository {
         return instance;
     }
 
+    public LiveData<QuerySnapshot> getAllWaterPointsQuery() {
+        MutableLiveData<QuerySnapshot> data = new MutableLiveData<>();
+        FirebaseManager.getInstance().getFirebaseFirestoreInstance()
+                .collection(ConstantsValues.WATER_POINTS_COLLECTION)
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull @NotNull Task<QuerySnapshot> task) {
+                        data.setValue(task.getResult());
+                    }
+                });
+        return data;
+    }
+
     public LiveData<QuerySnapshot> getWaterPointsQuery(DocumentSnapshot lastDocument, int limitCount) {
         MutableLiveData<QuerySnapshot> data = new MutableLiveData<>();
         if (lastDocument != null){

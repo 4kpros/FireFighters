@@ -22,6 +22,9 @@ public class WaterPointViewModel extends ViewModel {
             return;
         repository = WaterPointRepository.getInstance();
     }
+    public LiveData<QuerySnapshot> getAllWaterPointsQuery() {
+        return repository.getAllWaterPointsQuery();
+    }
     public LiveData<QuerySnapshot> getWaterPointsQuery(DocumentSnapshot lastDocument, int limitCount) {
         return repository.getWaterPointsQuery(lastDocument, limitCount);
     }

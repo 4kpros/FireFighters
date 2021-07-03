@@ -158,17 +158,6 @@
         app:layout_constraintRight_toRightOf="@+id/text_emergency_top_title"
         app:layout_constraintTop_toTopOf="parent"
         />
-    <com.google.android.material.progressindicator.CircularProgressIndicator
-        android:id="@+id/progress_emergency"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintLeft_toLeftOf="@+id/relative_emergency_title"
-        app:layout_constraintRight_toRightOf="@+id/relative_emergency_title"
-        app:layout_constraintTop_toTopOf="@+id/relative_emergency_title"
-        app:layout_constraintBottom_toBottomOf="@+id/relative_emergency_title"
-        android:indeterminate="true"
-        app:trackColor="@color/white"
-        />
     <TextView
         android:id="@+id/text_emergency_top_title"
         android:layout_width="wrap_content"

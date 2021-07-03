@@ -4,18 +4,28 @@ import android.Manifest;
 import android.animation.FloatEvaluator;
 import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
+import android.app.Dialog;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.content.Context;
+import android.content.ContextWrapper;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.media.MediaRecorder;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
+import android.os.Environment;
+import android.os.Handler;
 import android.os.Looper;
+import android.provider.MediaStore;
+import android.support.v4.media.session.MediaControllerCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.view.animation.AccelerateDecelerateInterpolator;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -24,30 +34,52 @@ import android.widget.Toast;
 
 import com.example.firefighters.R;
 import com.example.firefighters.models.EmergencyModel;
+import com.example.firefighters.models.MessageModel;
 import com.example.firefighters.tools.ConstantsValues;
 import com.example.firefighters.tools.FirebaseManager;
 import com.example.firefighters.tools.PermissionsManager;
 import com.example.firefighters.ui.mapview.MapViewFragment;
 import com.example.firefighters.viewmodels.EmergencyViewModel;
+import com.example.firefighters.viewmodels.MessageViewModel;
 import com.google.android.gms.location.LocationAvailability;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.button.MaterialButton;
+import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textview.MaterialTextView;
+import com.google.firebase.storage.OnProgressListener;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.StorageTask;
+import com.google.firebase.storage.UploadTask;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.util.Objects;
 import java.util.Set;
+import java.util.UUID;
 
+import androidx.activity.result.ActivityResult;
+import androidx.activity.result.ActivityResultCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.core.content.FileProvider;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
@@ -57,6 +89,7 @@ import androidx.lifecycle.ViewModelProvider;
 public class HomeFragment extends Fragment {
     private final int phoneNumber = 000;
     EmergencyViewModel emergencyViewModel;
+    MessageViewModel messageViewModel;
     CountDownTimer countDownTimerCall;
     CountDownTimer countDownTimerSos;
     //Relative layouts
@@ -72,6 +105,96 @@ public class HomeFragment extends Fragment {
     private Context context;
     private AppCompatActivity activity;
     private FragmentManager fragmentManager;
+    private MediaRecorder mediaRecorder;
+    private Handler handlerRecordVoice = new Handler();
+    private boolean canRunThread = true;
+    private ActivityResultLauncher<Intent> imageActivityResult;
+    private ActivityResultLauncher<Intent> videoActivityResult;
+
+    @Override
+    public void onCreate(@Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
+        imageActivityResult = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), new ActivityResultCallback<ActivityResult>() {
+            @Override
+            public void onActivityResult(ActivityResult result) {
+                if (result.getData() != null){
+                    if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.R){
+                        Bitmap tempBitmap = (Bitmap) result.getData().getExtras().get("data");
+                        Toast.makeText(context, tempBitmap+"", Toast.LENGTH_SHORT).show();
+                        String tempPath = saveImageToInternalStorage(tempBitmap);
+                        Toast.makeText(context, tempPath+"", Toast.LENGTH_SHORT).show();
+                    }else{
+                        Toast.makeText(context, "No implementation for Android 11+ !", Toast.LENGTH_SHORT).show();
+                    }
+                }
+            }
+        });
+        videoActivityResult = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), new ActivityResultCallback<ActivityResult>() {
+            @Override
+            public void onActivityResult(ActivityResult result) {
+                if (result.getData() != null){
+                        Toast.makeText(context, result.getData()+"", Toast.LENGTH_LONG).show();
+                        Toast.makeText(context, result.getData()+"", Toast.LENGTH_LONG).show();
+                        Toast.makeText(context, result.getData()+"", Toast.LENGTH_LONG).show();
+                        Toast.makeText(context, result.getData()+"", Toast.LENGTH_LONG).show();
+                        Toast.makeText(context, result.getData()+"", Toast.LENGTH_LONG).show();
+                        Toast.makeText(context, result.getData()+"", Toast.LENGTH_LONG).show();
+                        Toast.makeText(context, result.getData()+"", Toast.LENGTH_LONG).show();
+                        Toast.makeText(context, result.getData()+"", Toast.LENGTH_LONG).show();
+//                    if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.R){
+//                        FileProvider tempUri = (FileProvider) result.getData().getExtras().get("data");
+//                        Toast.makeText(context, tempUri+"", Toast.LENGTH_SHORT).show();
+////                        String tempPath = saveVideoToInternalStorage(tempUri);
+////                        Toast.makeText(context, tempPath+"", Toast.LENGTH_SHORT).show();
+//                    }else{
+//                        Toast.makeText(context, "No implementation for Android 11+ !", Toast.LENGTH_SHORT).show();
+//                    }
+                }
+            }
+        });
+        super.onCreate(savedInstanceState);
+    }
+
+    private String saveImageToInternalStorage(Bitmap bitmapImage) {
+        ContextWrapper cw = new ContextWrapper(activity.getApplicationContext());
+        // path to /data/data/covid_app/app_data/imageDir
+        File directory = cw.getDir("imageDir", Context.MODE_PRIVATE);
+        // Create imageDir
+        File myPath =new File(directory,"/" +ConstantsValues.APPLICATION_TAG+ "/emergencyImage.jpg");
+
+        FileOutputStream fos = null;
+        try {
+            fos = new FileOutputStream(myPath);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+        if (fos != null){
+            // Use the compress method on the BitMap object to write image to the OutputStream
+            bitmapImage.compress(Bitmap.CompressFormat.JPEG, 100, fos);
+        }
+
+        return directory.getAbsolutePath()+"/emergencyImage.jpg";
+    }
+
+    private String saveVideoToInternalStorage(Uri bitmapImage) {
+        ContextWrapper cw = new ContextWrapper(activity.getApplicationContext());
+        // path to /data/data/covid_app/app_data/imageDir
+        File directory = cw.getDir("videoDir", Context.MODE_PRIVATE);
+//        // Create imageDir
+//        File myPath =new File(directory,"/" +ConstantsValues.APPLICATION_TAG+ "/emergencyImage.jpg");
+//
+//        FileOutputStream fos = null;
+//        try {
+//            fos = new FileOutputStream(myPath);
+//        } catch (FileNotFoundException e) {
+//            e.printStackTrace();
+//        }
+//        if (fos != null){
+//            // Use the compress method on the BitMap object to write image to the OutputStream
+//            bitmapImage.compress(Bitmap.CompressFormat.JPEG, 100, fos);
+//        }
+
+        return directory.getAbsolutePath()+"/emergencyImage.jpg";
+    }
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
@@ -100,6 +223,9 @@ public class HomeFragment extends Fragment {
     private void initViewModels(View view) {
         emergencyViewModel = new ViewModelProvider(requireActivity()).get(EmergencyViewModel.class);
         emergencyViewModel.init();
+
+        messageViewModel = new ViewModelProvider(requireActivity()).get(MessageViewModel.class);
+        messageViewModel.init();
     }
 
     private void setAnimations() {
@@ -218,7 +344,7 @@ public class HomeFragment extends Fragment {
 
     private void showBottomSheetDialogHelp(View view) {
         BottomSheetDialog bottomSheet = new BottomSheetDialog(context);
-        bottomSheet.setContentView(R.layout.bottom_sheet_dialog_help);
+        bottomSheet.setContentView(R.layout.bottom_sheet_dialog_settings);
         bottomSheet.setCancelable(true);
         bottomSheet.setCanceledOnTouchOutside(true);
         bottomSheet.getWindow().findViewById(R.id.design_bottom_sheet).setBackgroundResource(android.R.color.transparent);
@@ -235,7 +361,10 @@ public class HomeFragment extends Fragment {
         bottomSheetSos.findViewById(R.id.button_add_media_dialog).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                showBottomSheetFragmentAddMedia(v, bottomSheetSos);
+                bottomSheetSos.dismiss();
+                if (countDownTimerSos != null)
+                    countDownTimerSos.cancel();
+                showBottomSheetDialogAddMedia(v, bottomSheetSos);
             }
         });
         bottomSheetSos.findViewById(R.id.button_cancel_sos).setOnClickListener(new View.OnClickListener() {
@@ -249,8 +378,7 @@ public class HomeFragment extends Fragment {
         bottomSheetSos.findViewById(R.id.button_get_permissions).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (bottomSheetSos != null)
-                    bottomSheetSos.dismiss();
+                bottomSheetSos.dismiss();
                 PermissionsManager.getInstance().requestLocationPermission(activity);
             }
         });
@@ -281,11 +409,231 @@ public class HomeFragment extends Fragment {
         bottomSheet.show();
     }
 
-    private void showBottomSheetFragmentAddMedia(View v, BottomSheetDialog bottomSheetSos) {
-//        if (countDownTimerSos != null)
-//            countDownTimerSos.cancel();
-//        BottomSheetDialogFragment bottomSheetDialogFragment = new BottomSheetDialogFragment();
-//        bottomSheetDialogFragment.sho
+    private void showBottomSheetDialogAddMedia(View v, BottomSheetDialog bottomSheetSos) {
+        Dialog dialog = new Dialog(context);
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialog.setContentView(R.layout.dialog_add_media);
+        dialog.setCanceledOnTouchOutside(true);
+        dialog.getWindow().setBackgroundDrawable(getResources().getDrawable(R.color.transparent));
+        dialog.findViewById(R.id.button_close_dialog).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog.dismiss();
+            }
+        });
+        dialog.findViewById(R.id.button_add_image).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(PermissionsManager.getInstance().isCameraPermissions(requireActivity())){
+                    getImageFromActivityResult();
+                }else {
+                    showDialogGetPermissions("camera", ConstantsValues.CAMERA_PERMISSION_CODE);
+                }
+            }
+        });
+        dialog.findViewById(R.id.button_add_video).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(PermissionsManager.getInstance().isCameraPermissions(requireActivity())){
+                    getVideoFromActivityResult();
+                }else {
+                    showDialogGetPermissions("camera", ConstantsValues.CAMERA_PERMISSION_CODE);
+                }
+            }
+        });
+        dialog.findViewById(R.id.button_add_audio).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(PermissionsManager.getInstance().isAudioRecordingPermissions(requireActivity())){
+                    recordAudio(dialog);
+                }else {
+                    showDialogGetPermissions("audio record", ConstantsValues.AUDIO_RECORD_PERMISSION_CODE);
+                }
+            }
+        });
+        dialog.findViewById(R.id.button_stop_recording_audio).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                stopRecordingVoice(dialog);
+            }
+        });
+        dialog.findViewById(R.id.button_remove_audio).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                clearAudioResource(dialog);
+            }
+        });
+        dialog.findViewById(R.id.button_send_emergency).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                MaterialTextView imgUrl = dialog.findViewById(R.id.text_image_resource);
+                MaterialTextView videoUrl = dialog.findViewById(R.id.text_video_resource);
+                MaterialTextView audioUrl = dialog.findViewById(R.id.text_audio_resource);
+                TextInputEditText message = dialog.findViewById(R.id.text_input_emergency_message);
+                String tempMessage = "";
+                if (message.getText() != null)
+                    tempMessage = message.getText().toString();
+                sendMediaSOS(imgUrl.getText().toString(), videoUrl.getText().toString(), audioUrl.getText().toString(), tempMessage);
+            }
+        });
+        dialog.show();
+    }
+
+    private void showDialogGetPermissions(String title, int permissionCode) { BottomSheetDialog bottomSheet = new BottomSheetDialog(context);
+        bottomSheet.setContentView(R.layout.bottom_sheet_dialog_get_permissions);
+        bottomSheet.setCancelable(false);
+        bottomSheet.setCanceledOnTouchOutside(false);
+        bottomSheet.getWindow().findViewById(R.id.design_bottom_sheet).setBackgroundResource(android.R.color.transparent);
+        MaterialTextView textViewTitle = bottomSheet.findViewById(R.id.permission_title);
+        if (textViewTitle != null){
+            String tempTitle;
+            if (title != null && !title.isEmpty()){
+                tempTitle = "No " + title + " permissions found !";
+            }else {
+                tempTitle = "No permissions found !";
+            }
+            textViewTitle.setText(tempTitle);
+        }
+        bottomSheet.findViewById(R.id.button_cancel_permission).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                bottomSheet.dismiss();
+            }
+        });
+        bottomSheet.findViewById(R.id.button_get_permissions).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                bottomSheet.dismiss();
+                if (permissionCode == ConstantsValues.AUDIO_RECORD_PERMISSION_CODE){
+                    PermissionsManager.getInstance().requestAudioRecordPermission(requireActivity());
+                }else if (permissionCode == ConstantsValues.CAMERA_PERMISSION_CODE){
+                    PermissionsManager.getInstance().requestCameraPermission(requireActivity());
+                }
+            }
+        });
+        bottomSheet.show();
+    }
+
+    private void clearAudioResource(Dialog dialog) {
+        dialog.findViewById(R.id.button_remove_audio).setVisibility(View.GONE);
+        dialog.findViewById(R.id.button_add_audio).setVisibility(View.VISIBLE);
+        MaterialTextView recordingTime = dialog.findViewById(R.id.text_audio_resource);
+        recordingTime.setText("");
+    }
+
+    private void recordAudio(Dialog dialog) {
+        showRecordingView(dialog);
+        MaterialTextView recordingTimeTextView = dialog.findViewById(R.id.text_recording_audio_time);
+        recordingTimeTextView.setText("0");
+
+        //Start recording
+        String tempFileName = "";
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            android.icu.util.Calendar calendar = android.icu.util.Calendar.getInstance();
+            tempFileName += calendar.get(android.icu.util.Calendar.YEAR);
+            tempFileName += calendar.get(android.icu.util.Calendar.MONTH);
+            tempFileName += calendar.get(android.icu.util.Calendar.DAY_OF_MONTH);
+            tempFileName += calendar.get(android.icu.util.Calendar.HOUR);
+            tempFileName += calendar.get(android.icu.util.Calendar.MINUTE);
+            tempFileName += calendar.get(android.icu.util.Calendar.SECOND);
+            tempFileName += calendar.get(android.icu.util.Calendar.MILLISECOND);
+        }else {
+            java.util.Calendar calendar = null;
+            calendar = java.util.Calendar.getInstance();
+            tempFileName += calendar.get(java.util.Calendar.YEAR);
+            tempFileName += calendar.get(java.util.Calendar.MONTH);
+            tempFileName += calendar.get(java.util.Calendar.DAY_OF_MONTH);
+            tempFileName += calendar.get(java.util.Calendar.HOUR);
+            tempFileName += calendar.get(java.util.Calendar.MINUTE);
+            tempFileName += calendar.get(java.util.Calendar.SECOND);
+            tempFileName += calendar.get(java.util.Calendar.MILLISECOND);
+        }
+        tempFileName = tempFileName + ".3pg";
+        String path = getFilePath(tempFileName);
+        if (mediaRecorder != null) {
+            mediaRecorder.stop();
+            mediaRecorder.release();
+        }
+        mediaRecorder = new MediaRecorder();
+        mediaRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
+        mediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
+        mediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AAC);
+        mediaRecorder.setOutputFile(path);
+        try {
+            mediaRecorder.prepare();
+            mediaRecorder.start();
+            Runnable runnableRecordVoice = new Runnable() {
+                @Override
+                public void run() {
+                    if (canRunThread){
+                        float newDuration = Float.parseFloat(recordingTimeTextView.getText().toString());
+                        newDuration += 1;
+                        updateRecordingDuration(recordingTimeTextView, newDuration);
+                        handlerRecordVoice.postDelayed(this, 1000);
+                    }
+                }
+            };
+            //Start
+            handlerRecordVoice.postDelayed(runnableRecordVoice, 1000);
+        } catch (IOException e) {
+            e.printStackTrace();
+            mediaRecorder = null;
+            hideRecordingView(dialog);
+            Toast.makeText(context, "Unknown error "+ e.toString(), Toast.LENGTH_LONG).show();
+        }
+    }
+
+    private String getFilePath(String tempFileName) {
+        ContextWrapper contextWrapper = new ContextWrapper(requireActivity().getApplicationContext());
+        File musicDirectory = contextWrapper.getExternalFilesDir(Environment.DIRECTORY_MUSIC);
+        File file = new File(musicDirectory, tempFileName);
+        return file.getPath();
+    }
+
+    private void updateRecordingDuration(MaterialTextView materialTextView, float newDuration) {
+        String finalTempDuration = ""+newDuration;
+        activity.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                materialTextView.setText(finalTempDuration);
+            }
+        });
+    }
+
+    private void stopRecordingVoice(Dialog dialog) {
+        hideRecordingView(dialog);
+        if (mediaRecorder != null) {
+            mediaRecorder.stop();
+            mediaRecorder.release();
+            Toast.makeText(context, "Audio Registered !", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void showRecordingView(Dialog dialog) {
+        dialog.findViewById(R.id.relative_record_audio).setVisibility(View.GONE);
+        dialog.findViewById(R.id.relative_recording_audio).setVisibility(View.VISIBLE);
+    }
+    private void hideRecordingView(Dialog dialog){
+        dialog.findViewById(R.id.relative_record_audio).setVisibility(View.VISIBLE);
+        dialog.findViewById(R.id.relative_recording_audio).setVisibility(View.GONE);
+
+        MaterialTextView recordingTime = dialog.findViewById(R.id.text_recording_audio_time);
+        recordingTime.setText("0");
+
+        dialog.findViewById(R.id.button_remove_audio).setVisibility(View.VISIBLE);
+        dialog.findViewById(R.id.button_add_audio).setVisibility(View.GONE);
+        dialog.findViewById(R.id.relative_record_audio).setVisibility(View.VISIBLE);
+        dialog.findViewById(R.id.relative_recording_audio).setVisibility(View.GONE);
+    }
+
+    private void getVideoFromActivityResult() {
+        Intent intent = new Intent(MediaStore.ACTION_VIDEO_CAPTURE);;
+        videoActivityResult.launch(intent);
+    }
+
+    private void getImageFromActivityResult() {
+        Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        imageActivityResult.launch(intent);
     }
 
     private void tryToGetSosPermissions(View view, BottomSheetDialog bottomSheet) {
@@ -293,6 +641,7 @@ public class HomeFragment extends Fragment {
         if (PermissionsManager.getInstance().isLocationPermissions(activity)) {
             bottomSheet.findViewById(R.id.linear_no_permissions).setVisibility(View.GONE);
             bottomSheet.findViewById(R.id.linear_waiting).setVisibility(View.VISIBLE);
+            bottomSheet.findViewById(R.id.button_add_media_dialog).setVisibility(View.VISIBLE);
             MaterialTextView text = (MaterialTextView) bottomSheet.findViewById(R.id.text_progression);
             countDownTimerSos = new CountDownTimer(6000, 1000) {
                 public void onTick(long millisUntilFinished) {
@@ -311,15 +660,11 @@ public class HomeFragment extends Fragment {
         } else {
             bottomSheet.findViewById(R.id.linear_no_permissions).setVisibility(View.VISIBLE);
             bottomSheet.findViewById(R.id.linear_waiting).setVisibility(View.GONE);
+            bottomSheet.findViewById(R.id.button_add_media_dialog).setVisibility(View.GONE);
         }
     }
 
     private void sendSOS() {
-        getLocation();
-    }
-
-
-    private void getLocation() {
         if (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
                 && ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             return;
@@ -361,6 +706,106 @@ public class HomeFragment extends Fragment {
                         super.onLocationAvailability(locationAvailability);
                     }
                 }, Looper.getMainLooper());
+    }
+
+    private void sendMediaSOS(String imageUl, String videoUrl, String audioUrl, String message) {
+        if (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
+                && ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            return;
+        }
+        LocationRequest locationRequest = LocationRequest.create();
+        locationRequest.setInterval(10000);
+        locationRequest.setFastestInterval(3000);
+        locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+        LocationServices.getFusedLocationProviderClient(context)
+                .requestLocationUpdates(locationRequest, new LocationCallback() {
+                    @Override
+                    public void onLocationResult(@NotNull LocationResult locationResult) {
+                        super.onLocationResult(locationResult);
+                        LocationServices.getFusedLocationProviderClient(context)
+                                .removeLocationUpdates(this);
+                        if (locationResult.getLocations().size() > 0) {
+                            EmergencyModel emergencyModel = new EmergencyModel();
+                            if (FirebaseManager.getInstance().getCurrentAuthUser() != null)
+                                emergencyModel.setSenderMail(FirebaseManager.getInstance().getCurrentAuthUser().getEmail());
+                            emergencyModel.setLongitude(locationResult.getLocations().get(locationResult.getLocations().size() - 1).getLongitude());
+                            emergencyModel.setLatitude(locationResult.getLocations().get(locationResult.getLocations().size() - 1).getLatitude());
+                            MessageModel messageModel = new MessageModel();
+                            messageModel.setImagesSrc(imageUl);
+                            messageModel.setVideoSrc(videoUrl);
+                            messageModel.setAudioSrc(audioUrl);
+                            messageModel.setMessage(message);
+                            sendMessageMediaEmergency(messageModel, emergencyModel);
+                        } else {
+                            Toast.makeText(context, "SOS not sent !", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+
+                    @Override
+                    public void onLocationAvailability(LocationAvailability locationAvailability) {
+                        super.onLocationAvailability(locationAvailability);
+                    }
+                }, Looper.getMainLooper());
+    }
+
+    private void sendMessageMediaEmergency(MessageModel messageModel, EmergencyModel emergencyModel) {
+        messageViewModel.saveDataToStorage("images/messages/", messageModel.getImagesSrc()).observe(requireActivity(), new Observer<String>() {
+            @Override
+            public void onChanged(String imageUrl) {
+                if (imageUrl != null){
+                    messageModel.setImagesSrc(imageUrl);
+                    messageViewModel.saveDataToStorage("audios/messages/", messageModel.getAudioSrc()).observe(requireActivity(), new Observer<String>() {
+                        @Override
+                        public void onChanged(String audioUrl) {
+                            if (audioUrl != null){
+                                messageModel.setAudioSrc(audioUrl);
+                                messageViewModel.saveDataToStorage("videos/messages/", messageModel.getVideoSrc()).observe(requireActivity(), new Observer<String>() {
+                                    @Override
+                                    public void onChanged(String videoUrl) {
+                                        if (videoUrl != null){
+                                            //Now send message
+                                            messageModel.setVideoSrc(videoUrl);
+                                            sendMessage(messageModel, emergencyModel);
+                                        }else {
+                                            Toast.makeText(context, "Error sending video !", Toast.LENGTH_SHORT).show();
+                                        }
+                                    }
+                                });
+                            }else {
+                                Toast.makeText(context, "Error sending audio !", Toast.LENGTH_SHORT).show();
+                            }
+                        }
+                    });
+                }else{
+                    Toast.makeText(context, "Error sending image !", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+    }
+
+    private void sendMessage(MessageModel messageModel, EmergencyModel emergencyModel){
+        messageViewModel.saveMessage(messageModel).observe(requireActivity(), new Observer<Integer>() {
+            @Override
+            public void onChanged(Integer integer) {
+                if (integer >= 1){
+                    emergencyModel.setId(String.valueOf(integer));
+                    emergencyViewModel.saveEmergency(emergencyModel).observe(requireActivity(), new Observer<Integer>() {
+                        @Override
+                        public void onChanged(Integer integer) {
+                            if (integer >= 1){
+                                Toast.makeText(requireContext(), "Message media sent !", Toast.LENGTH_SHORT).show();
+                            }else {
+                                Toast.makeText(requireContext(), "Message media not send !", Toast.LENGTH_SHORT).show();
+                            }
+                            emergencyViewModel.saveEmergency(emergencyModel).removeObservers(requireActivity());
+                        }
+                    });
+                }else {
+                    Toast.makeText(requireContext(), "Message media not send !", Toast.LENGTH_SHORT).show();
+                }
+                messageViewModel.saveMessage(messageModel).removeObservers(requireActivity());
+            }
+        });
     }
 
     //Show bottom sheet dialog for call
@@ -437,11 +882,5 @@ public class HomeFragment extends Fragment {
         buttonCallNow = view.findViewById(R.id.button_call_now);
         buttonSos = view.findViewById(R.id.button_text_sos);
         buttonShowMap = view.findViewById(R.id.button_show_map);
-    }
-
-    public interface LoadPermissions {
-        void loadLocationPermissions();
-
-        void loadCallPermissions();
     }
 }

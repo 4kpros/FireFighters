@@ -34,6 +34,11 @@ public class PermissionsManager {
                 Manifest.permission.BLUETOOTH) == PackageManager.PERMISSION_GRANTED;
     }
 
+    public boolean isMessagePermissions(Activity activity) {
+        return ContextCompat.checkSelfPermission(activity,
+                Manifest.permission.SEND_SMS) == PackageManager.PERMISSION_GRANTED;
+    }
+
     public boolean isAudioRecordingPermissions(Activity activity) {
         return ContextCompat.checkSelfPermission(activity,
                 Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED &&
@@ -70,6 +75,16 @@ public class PermissionsManager {
                         Manifest.permission.CALL_PHONE
                 },
                 ConstantsValues.CALL_PERMISSION_CODE
+        );
+    }
+
+    public void requestMessagePermission(Activity activity) {
+        ActivityCompat.requestPermissions(
+                activity,
+                new String[]{
+                        Manifest.permission.SEND_SMS
+                },
+                ConstantsValues.SMS_PERMISSION_CODE
         );
     }
 

@@ -81,13 +81,19 @@ public class MessageRepository {
                     .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                         @Override
                         public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                            Task<Uri> downloadUri = taskSnapshot.getStorage().getDownloadUrl();
-                            if (downloadUri.isSuccessful()) {
-                                String dataUrl = downloadUri.getResult().toString();
-                                data.setValue(dataUrl);
-                            } else {
-                                data.setValue(null);
-                            }
+                            taskSnapshot.getStorage()
+                                    .getDownloadUrl()
+                                    .addOnCompleteListener(new OnCompleteListener<Uri>() {
+                                        @Override
+                                        public void onComplete(@NonNull @NotNull Task<Uri> task) {
+                                            if (task.isSuccessful()) {
+                                                String dataUrl = task.getResult().toString();
+                                                data.setValue(dataUrl);
+                                            } else {
+                                                data.setValue(null);
+                                            }
+                                        }
+                                    });
                         }
                     })
                     .addOnFailureListener(new OnFailureListener() {

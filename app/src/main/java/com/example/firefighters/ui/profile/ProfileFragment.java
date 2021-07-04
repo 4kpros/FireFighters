@@ -68,7 +68,7 @@ public class ProfileFragment extends Fragment {
     //Toggle buttons
     MaterialCheckBox checkBoxRemember;
     MotionLayout pageProfileConnexion;
-    MotionLayout pageProfileHome;
+    ConstraintLayout pageProfileHome;
     //Fab buttons
     ExtendedFloatingActionButton floatingButtonAdd;
     FloatingActionButton floatingButtonAddFireFighter;
@@ -133,6 +133,7 @@ public class ProfileFragment extends Fragment {
     private LinearLayoutManager layoutManagerWaterPoints;
     private LinearLayoutManager layoutManagerFirefighters;
     private LinearLayout linearWorkingOn;
+    private LinearLayout linearRecyclerPoints;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -394,11 +395,13 @@ public class ProfileFragment extends Fragment {
     }
 
     private void loadFirefighterRecycler() {
+        recyclerViewPoints.removeAllViews();
         recyclerViewPoints.setLayoutManager(layoutManagerFirefighters);
         recyclerViewPoints.setAdapter(firefighterAdapter);
     }
 
     private void loadWaterRecycler() {
+        recyclerViewPoints.removeAllViews();
         recyclerViewPoints.setLayoutManager(layoutManagerWaterPoints);
         recyclerViewPoints.setAdapter(waterPointAdapter);
     }
@@ -493,7 +496,7 @@ public class ProfileFragment extends Fragment {
                             if(userModel != null){
                                 if (userModel.isFireFighter()){
                                     //Go to firefighter page
-                                    goToProfileHomePageFireFighter(userModel.isChief());
+                                    goToProfileHomePageFireFighter(userModel.isChief(), userModel.getUnit());
                                 }else{
                                     //Go to basic user page
                                     goToProfileHomePageDefault();
@@ -540,9 +543,10 @@ public class ProfileFragment extends Fragment {
         linearWorkingOn.setVisibility(View.GONE);
         constraintFloatingAction.setVisibility(View.VISIBLE);
     }
-    private void goToProfileHomePageFireFighter(boolean chief) {
+    private void goToProfileHomePageFireFighter(boolean chief, String unit) {
         ConstantsValues.setIsFirefighter(true);
         ConstantsValues.setIsChief(chief);
+        ConstantsValues.setUnit(unit);
         if(FirebaseManager.getInstance().getCurrentAuthUser().getDisplayName() == null){
             textProfileName.setText("");
         }else {
@@ -600,7 +604,6 @@ public class ProfileFragment extends Fragment {
             isMyPointsPanel = false;
             //Now hide my points panel
             pointsButton.setIcon(requireActivity().getResources().getDrawable(R.drawable.ic_baseline_keyboard_arrow_down_24));
-            recyclerViewPoints.setVisibility(View.GONE);
             linearMyPointExpand.animate()
                     .alpha(0)
                     .setDuration(100)
@@ -617,7 +620,6 @@ public class ProfileFragment extends Fragment {
             pointsButton.setIcon(requireActivity().getResources().getDrawable(R.drawable.ic_baseline_keyboard_arrow_up_24));
             linearMyPointExpand.setAlpha(1);
             linearMyPointExpand.setVisibility(View.VISIBLE);
-            recyclerViewPoints.setVisibility(View.VISIBLE);
         }
     }
 
@@ -685,18 +687,29 @@ public class ProfileFragment extends Fragment {
                         @Override
                         public void onChanged(UserModel userModel) {
                             if (userModel == null){
-                                dialog.dismiss();
                                 userViewModel.saveFireFighter(firefighter).observe(requireActivity(), new Observer<Integer>() {
                                     @Override
                                     public void onChanged(Integer integer) {
+                                        dialog.dismiss();
                                         if (integer >= 1){
-                                            Toast.makeText(context, "firefighter saved !", Toast.LENGTH_SHORT).show();
+                                            Toast.makeText(context, "Firefighter saved !", Toast.LENGTH_SHORT).show();
                                         }else {
                                             Toast.makeText(context, "Error saving firefighter !", Toast.LENGTH_SHORT).show();
                                         }
                                     }
                                 });
                             }else {
+                                userViewModel.updateFireFighter(firefighter).observe(requireActivity(), new Observer<Integer>() {
+                                    @Override
+                                    public void onChanged(Integer integer) {
+                                        dialog.dismiss();
+                                        if (integer >= 1){
+                                            Toast.makeText(context, "Firefighter added !", Toast.LENGTH_SHORT).show();
+                                        }else {
+                                            Toast.makeText(context, "Error saving firefighter !", Toast.LENGTH_SHORT).show();
+                                        }
+                                    }
+                                });
                                 Toast.makeText(context, "This firefighter already registered !", Toast.LENGTH_SHORT).show();
                             }
                         }
@@ -789,7 +802,7 @@ public class ProfileFragment extends Fragment {
 
         //Motions layouts
         pageProfileConnexion = root.findViewById(R.id.motion_layout_profile);
-        pageProfileHome = root.findViewById(R.id.coordinatorLayout);
+        pageProfileHome = root.findViewById(R.id.container);
 
         //Recyclers
         recyclerViewPoints = root.findViewById(R.id.recycler_points);
@@ -809,6 +822,7 @@ public class ProfileFragment extends Fragment {
         linearMyPointExpand = root.findViewById(R.id.linear_manage_points_expand);
         constraintFloatingAction = root.findViewById(R.id.constraint_floating_action_buttons);
         linearWorkingOn = root.findViewById(R.id.linear_working_on);
+        linearRecyclerPoints = root.findViewById(R.id.linear_recycler_points);
     }
 
     private void showLoading() {

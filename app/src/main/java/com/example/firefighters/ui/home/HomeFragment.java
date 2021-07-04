@@ -22,6 +22,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.provider.MediaStore;
 import android.support.v4.media.session.MediaControllerCompat;
+import android.telephony.SmsManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -100,6 +101,7 @@ public class HomeFragment extends Fragment {
     private ImageView buttonHelp;
     //MaterialButton
     private MaterialButton buttonCallNow;
+    private MaterialButton buttonSmsNow;
     private MaterialButton buttonShowMap;
     //Text View
     private TextView buttonSos;
@@ -238,6 +240,16 @@ public class HomeFragment extends Fragment {
                 showBottomSheetDialogCallNow(v);
             }
         });
+        buttonSmsNow.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(PermissionsManager.getInstance().isMessagePermissions(requireActivity())){
+                    showDialogSendSmsNow(v);
+                }else {
+                    showDialogGetPermissions("sms", ConstantsValues.SMS_PERMISSION_CODE);
+                }
+            }
+        });
         buttonSos.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -250,6 +262,168 @@ public class HomeFragment extends Fragment {
                 showMapView(v);
             }
         });
+    }
+
+    private void showDialogSendSmsNow(View v) {
+        Dialog dialog = new Dialog(context);
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialog.setContentView(R.layout.dialog_send_sms);
+        dialog.setCanceledOnTouchOutside(true);
+        dialog.getWindow().setBackgroundDrawable(getResources().getDrawable(R.color.transparent));
+        dialog.findViewById(R.id.button_close_dialog).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog.dismiss();
+            }
+        });
+        TextInputEditText textInputEditPhoneNumber = dialog.findViewById(R.id.text_input_sms_phone_number);
+        TextInputEditText textInputEditMessage = dialog.findViewById(R.id.text_input_sms_message);
+        dialog.findViewById(R.id.button_send_sms_unit).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String tempNumber = "";
+                String tempMessage = "";
+                if (textInputEditPhoneNumber.getText() != null && textInputEditMessage.getText() != null){
+                    tempNumber = textInputEditPhoneNumber.getText().toString();
+                    tempMessage = textInputEditMessage.getText().toString();
+                }
+                if (!tempNumber.isEmpty() && !tempMessage.isEmpty() ){
+                    dialog.dismiss();
+                    sendSMS(tempNumber, tempMessage);
+                }else {
+                    Toast.makeText(requireContext(), "Please enter valid phone number and message !", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+        dialog.show();
+    }
+
+    private void showDialogCallCustomPhoneNow(View v) {
+        Dialog dialog = new Dialog(context);
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialog.setContentView(R.layout.dialog_call);
+        dialog.setCanceledOnTouchOutside(true);
+        dialog.getWindow().setBackgroundDrawable(getResources().getDrawable(R.color.transparent));
+        dialog.findViewById(R.id.button_close_dialog).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog.dismiss();
+            }
+        });
+        TextInputEditText textInputEditPhoneNumber = dialog.findViewById(R.id.text_input_call_phone_number);
+        dialog.findViewById(R.id.button_call_unit).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String tempNumber = "";
+                if (textInputEditPhoneNumber.getText() != null){
+                    tempNumber = textInputEditPhoneNumber.getText().toString();
+                }
+                if (!tempNumber.isEmpty()){
+                    dialog.dismiss();
+                    callCustomUnit(tempNumber);
+                }else {
+                    Toast.makeText(requireContext(), "Please enter valid phone number !", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+        dialog.show();
+    }
+
+    private void callCustomUnit(String tempNumber) {
+        if (PermissionsManager.getInstance().isCallPermissions(requireActivity())){
+            Intent intent = new Intent(Intent.ACTION_CALL);
+            intent.setData(Uri.parse("tel:"+tempNumber));
+            startActivity(intent);
+        }else {
+            Toast.makeText(context, "No permissions found !", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void sendSMS(String tempNumber, String tempMessage) {
+        if (PermissionsManager.getInstance().isMessagePermissions(requireActivity())){
+            SmsManager smsManager = SmsManager.getDefault();
+            smsManager.sendTextMessage(tempNumber, null, tempMessage, null, null);
+            Toast.makeText(context, "SMS sent without report!", Toast.LENGTH_SHORT).show();
+        }else {
+            Toast.makeText(context, "No permissions found !", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    //Show bottom sheet dialog for call
+    private void showBottomSheetDialogCallNow(View view) {
+        BottomSheetDialog bottomSheet = new BottomSheetDialog(context);
+        bottomSheet.setContentView(R.layout.bottom_sheet_dialog_cal_now);
+        bottomSheet.setCancelable(false);
+        bottomSheet.setCanceledOnTouchOutside(false);
+        bottomSheet.getWindow().findViewById(R.id.design_bottom_sheet).setBackgroundResource(android.R.color.transparent);
+        bottomSheet.findViewById(R.id.button_cancel_call).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                bottomSheet.dismiss();
+                if (countDownTimerCall != null)
+                    countDownTimerCall.cancel();
+            }
+        });
+        bottomSheet.findViewById(R.id.button_get_permissions).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                bottomSheet.dismiss();
+                PermissionsManager.getInstance().requestCallPermission(activity);
+            }
+        });
+        bottomSheet.findViewById(R.id.button_custom_call).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                bottomSheet.dismiss();
+                if(PermissionsManager.getInstance().isCallPermissions(requireActivity())){
+                    if (countDownTimerCall != null)
+                        countDownTimerCall.cancel();
+                    showDialogCallCustomPhoneNow(v);
+                }else {
+                    showDialogGetPermissions("call", ConstantsValues.CALL_PERMISSION_CODE);
+                }
+            }
+        });
+        tryToGetCallPermissions(view, bottomSheet);
+        bottomSheet.show();
+    }
+
+    private void tryToGetCallPermissions(View view, BottomSheetDialog bottomSheet) {
+        int startCount = 5;
+        if (PermissionsManager.getInstance().isCallPermissions(activity)) {
+            bottomSheet.findViewById(R.id.linear_no_permissions).setVisibility(View.GONE);
+            bottomSheet.findViewById(R.id.linear_waiting).setVisibility(View.VISIBLE);
+            MaterialTextView text = (MaterialTextView) bottomSheet.findViewById(R.id.text_progression);
+            countDownTimerCall = new CountDownTimer(6000, 1000) {
+                public void onTick(long millisUntilFinished) {
+                    text.setText("" + millisUntilFinished / 1000);
+                    //here you can have your logic to set text to edittext
+                }
+
+                public void onFinish() {
+                    text.setText("");
+                    callNow();
+                    bottomSheet.dismiss();
+                }
+
+            };
+            countDownTimerCall.start();
+        } else {
+            bottomSheet.findViewById(R.id.linear_no_permissions).setVisibility(View.VISIBLE);
+            bottomSheet.findViewById(R.id.linear_waiting).setVisibility(View.GONE);
+        }
+    }
+
+    private void callNow() {
+        if (ContextCompat.checkSelfPermission(context,
+                Manifest.permission.CALL_PHONE)
+                != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(activity, new String[]{Manifest.permission.CALL_PHONE}, ConstantsValues.CALL_PERMISSION_CODE);
+        } else {
+            Intent intent = new Intent(Intent.ACTION_CALL);
+            intent.setData(Uri.parse("tel:" + phoneNumber));
+            startActivity(intent);
+        }
     }
 
     private void setBluetoothViews(BottomSheetDialog bottomSheet) {
@@ -380,7 +554,6 @@ public class HomeFragment extends Fragment {
         bottomSheet.findViewById(R.id.button_get_permissions).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (bottomSheet != null)
                     bottomSheet.dismiss();
                 PermissionsManager.getInstance().requestLocationPermission(activity);
             }
@@ -492,6 +665,10 @@ public class HomeFragment extends Fragment {
                     PermissionsManager.getInstance().requestAudioRecordPermission(requireActivity());
                 }else if (permissionCode == ConstantsValues.CAMERA_PERMISSION_CODE){
                     PermissionsManager.getInstance().requestCameraPermission(requireActivity());
+                }else  if (permissionCode == ConstantsValues.CALL_PERMISSION_CODE) {
+                    PermissionsManager.getInstance().requestCallPermission(requireActivity());
+                }else  if (permissionCode == ConstantsValues.SMS_PERMISSION_CODE) {
+                    PermissionsManager.getInstance().requestMessagePermission(requireActivity());
                 }
             }
         });
@@ -821,71 +998,6 @@ public class HomeFragment extends Fragment {
         });
     }
 
-    //Show bottom sheet dialog for call
-    private void showBottomSheetDialogCallNow(View view) {
-        BottomSheetDialog bottomSheet = new BottomSheetDialog(context);
-        bottomSheet.setContentView(R.layout.bottom_sheet_dialog_cal_now);
-        bottomSheet.setCancelable(false);
-        bottomSheet.setCanceledOnTouchOutside(false);
-        bottomSheet.getWindow().findViewById(R.id.design_bottom_sheet).setBackgroundResource(android.R.color.transparent);
-        bottomSheet.findViewById(R.id.button_cancel_call).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                bottomSheet.dismiss();
-                if (countDownTimerCall != null)
-                    countDownTimerCall.cancel();
-            }
-        });
-        bottomSheet.findViewById(R.id.button_get_permissions).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (bottomSheet != null)
-                    bottomSheet.dismiss();
-                PermissionsManager.getInstance().requestCallPermission(activity);
-            }
-        });
-        tryToGetCallPermissions(view, bottomSheet);
-        bottomSheet.show();
-    }
-
-    private void tryToGetCallPermissions(View view, BottomSheetDialog bottomSheet) {
-        int startCount = 5;
-        if (PermissionsManager.getInstance().isCallPermissions(activity)) {
-            bottomSheet.findViewById(R.id.linear_no_permissions).setVisibility(View.GONE);
-            bottomSheet.findViewById(R.id.linear_waiting).setVisibility(View.VISIBLE);
-            MaterialTextView text = (MaterialTextView) bottomSheet.findViewById(R.id.text_progression);
-            countDownTimerCall = new CountDownTimer(6000, 1000) {
-                public void onTick(long millisUntilFinished) {
-                    text.setText("" + millisUntilFinished / 1000);
-                    //here you can have your logic to set text to edittext
-                }
-
-                public void onFinish() {
-                    text.setText("");
-                    callNow();
-                    bottomSheet.dismiss();
-                }
-
-            };
-            countDownTimerCall.start();
-        } else {
-            bottomSheet.findViewById(R.id.linear_no_permissions).setVisibility(View.VISIBLE);
-            bottomSheet.findViewById(R.id.linear_waiting).setVisibility(View.GONE);
-        }
-    }
-
-    private void callNow() {
-        if (ContextCompat.checkSelfPermission(context,
-                Manifest.permission.CALL_PHONE)
-                != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(activity, new String[]{Manifest.permission.CALL_PHONE}, ConstantsValues.CALL_PERMISSION_CODE);
-        } else {
-            Intent intent = new Intent(Intent.ACTION_CALL);
-            intent.setData(Uri.parse("tel:" + phoneNumber));
-            startActivity(intent);
-        }
-    }
-
     private void initViews(View view) {
         sosBackground = view.findViewById(R.id.relative_sos_background);
 
@@ -893,6 +1005,7 @@ public class HomeFragment extends Fragment {
         buttonSettings = view.findViewById(R.id.button_image_settings);
         buttonHelp = view.findViewById(R.id.button_image_help);
         buttonCallNow = view.findViewById(R.id.button_call_now);
+        buttonSmsNow = view.findViewById(R.id.button_sms_now);
         buttonSos = view.findViewById(R.id.button_text_sos);
         buttonShowMap = view.findViewById(R.id.button_show_map);
     }

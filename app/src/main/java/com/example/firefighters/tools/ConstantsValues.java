@@ -54,6 +54,15 @@ public abstract class ConstantsValues {
 
     public static boolean isFirefighter = false;
     public static boolean isChief = false;
+    public static String unit = "";
+
+    public static String getUnit() {
+        return unit;
+    }
+
+    public static void setUnit(String unit) {
+        ConstantsValues.unit = unit;
+    }
 
     public static boolean isIsChief() {
         return isChief;

@@ -25,6 +25,9 @@ public class UserViewModel extends ViewModel {
         repository = UserRepository.getInstance();
     }
 
+    public LiveData<QuerySnapshot> loadAllFireFightersWorkingUnitQuery(String unit){
+        return repository.loadAllFireFightersWorkingUnitQuery(unit);
+    }
     public LiveData<QuerySnapshot> loadFireFighters(DocumentSnapshot lastDocument, int limitCount){
         return repository.loadFireFightersQuery(lastDocument, limitCount);
     }
@@ -33,6 +36,9 @@ public class UserViewModel extends ViewModel {
     }
     public LiveData<Integer> saveFireFighter(UserModel firefighterModel) {
         return repository.saveFireFighter(firefighterModel);
+    }
+    public LiveData<Integer> updateFireFighter(UserModel firefighterModel) {
+        return repository.updateFireFighter(firefighterModel);
     }
     public LiveData<Integer> deleteFireFighter(UserModel firefighterModel) {
         return repository.deleteFireFighter(firefighterModel);

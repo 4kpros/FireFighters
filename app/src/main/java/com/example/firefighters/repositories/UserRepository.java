@@ -117,7 +117,6 @@ public class UserRepository {
         return data;
     }
 
-    //Sign in with mail and password
     public LiveData<UserModel> loadUserModel(String userMail) {
         MutableLiveData<UserModel> data = new MutableLiveData<>();
         UserModel user = null;
@@ -144,6 +143,22 @@ public class UserRepository {
                         }
                     });
         }
+        return data;
+    }
+
+
+    public LiveData<QuerySnapshot> loadAllFireFightersWorkingUnitQuery(String unit) {
+        MutableLiveData<QuerySnapshot> data = new MutableLiveData<>();
+        FirebaseManager.getInstance().getFirebaseFirestoreInstance()
+                .collection(ConstantsValues.USERS_COLLECTION)
+                .whereEqualTo("unit", unit)
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull @NotNull Task<QuerySnapshot> task) {
+                        data.setValue(task.getResult());
+                    }
+                });
         return data;
     }
 
@@ -224,6 +239,25 @@ public class UserRepository {
                 .addOnCompleteListener(new OnCompleteListener<DocumentReference>() {
                     @Override
                     public void onComplete(@NonNull @NotNull Task<DocumentReference> task) {
+                        if (task.isSuccessful()){
+                            data.setValue(1);
+                        }else{
+                            data.setValue(-1);
+                        }
+                    }
+                });
+        return data;
+    }
+
+    public LiveData<Integer> updateFireFighter(UserModel firefighterModel) {
+        MutableLiveData<Integer> data = new MutableLiveData<>();
+        FirebaseManager.getInstance().getFirebaseFirestoreInstance()
+                .collection(ConstantsValues.EMERGENCIES_COLLECTION)
+                .whereEqualTo("mail", firefighterModel.getMail())
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull @NotNull Task<QuerySnapshot> task) {
                         if (task.isSuccessful()){
                             data.setValue(1);
                         }else{

@@ -57,6 +57,8 @@ public class EmergencyFragment extends Fragment {
 
     private EmergencyViewModel emergencyViewModel;
     private MessageViewModel messageViewModel;
+    private UserViewModel userViewModel;
+
     private EmergencyAdapter emergencyAdapter;
     private RecyclerView emergenciesRecyclerView;
     private Context context;
@@ -212,7 +214,6 @@ public class EmergencyFragment extends Fragment {
                 public void onChanged(MessageModel messageModel) {
                     if (messageModel != null){
                         message.setText(messageModel.getMessage());
-                        Toast.makeText(context, messageModel.getImagesSrc()+"", Toast.LENGTH_SHORT).show();
                         imagePlace.setImageURI(messageModel.getImagesSrc());
                         if (messageModel.getAudioSrc() != null && !messageModel.getAudioSrc().isEmpty()){
                             showEmergencyAudio(relativeLayoutPlayView, relativeLayoutNoAudioView);
@@ -279,7 +280,6 @@ public class EmergencyFragment extends Fragment {
                     mediaPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
                         @Override
                         public void onPrepared(MediaPlayer mp) {
-                            canRunThread = false;
                             mediaPlayer.start();
                             mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
                                 @Override
@@ -378,13 +378,13 @@ public class EmergencyFragment extends Fragment {
         bottomSheet.findViewById(R.id.button_work_on).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                setEmergencyWorkOn(bottomSheet, position);
+                setEmergencyStatus(bottomSheet, position, ConstantsValues.WORKING);
             }
         });
         bottomSheet.findViewById(R.id.button_finish_emergency).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                setEmergencyFinished(bottomSheet, position);
+                setEmergencyStatus(bottomSheet, position, ConstantsValues.FINISHED);
             }
         });
         bottomSheet.findViewById(R.id.button_details_emergency).setOnClickListener(new View.OnClickListener() {
@@ -397,28 +397,13 @@ public class EmergencyFragment extends Fragment {
         bottomSheet.show();
     }
 
-    private void setEmergencyFinished(BottomSheetDialog bottomSheet, int position) {
+    private void setEmergencyStatus(BottomSheetDialog bottomSheet, int position, String status) {
         bottomSheet.dismiss();
         EmergencyModel em = emergencies.get(position);
-        em.setStatus(ConstantsValues.FINISHED);
-        emergencyViewModel.updateEmergency(em).observe(requireActivity(), new Observer<Integer>() {
-            @Override
-            public void onChanged(Integer integer) {
-                if (integer >= 1){
-                    emergencies.set(position, em);
-                    emergencyAdapter.notifyItemChanged(position);
-                    Toast.makeText(context, "Updated !", Toast.LENGTH_SHORT).show();
-                }else{
-                    Toast.makeText(context, "Error  update !", Toast.LENGTH_SHORT).show();
-                }
-            }
-        });
-    }
-
-    private void setEmergencyWorkOn(BottomSheetDialog bottomSheet, int position) {
-        bottomSheet.dismiss();
-        EmergencyModel em = emergencies.get(position);
-        em.setStatus(ConstantsValues.WORKING);
+        em.setStatus(status);
+        if (status.equals(ConstantsValues.WORKING) || status.equals(ConstantsValues.FINISHED)){
+            em.setCurrentUnit(ConstantsValues.getUnit());
+        }
         emergencyViewModel.updateEmergency(em).observe(requireActivity(), new Observer<Integer>() {
             @Override
             public void onChanged(Integer integer) {
@@ -540,6 +525,9 @@ public class EmergencyFragment extends Fragment {
 
         messageViewModel = new ViewModelProvider(requireActivity()).get(MessageViewModel.class);
         messageViewModel.init();
+
+        userViewModel = new ViewModelProvider(requireActivity()).get(UserViewModel.class);
+        userViewModel.init();
     }
 
     private void initViews(View view) {

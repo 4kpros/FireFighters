@@ -77,16 +77,23 @@ public class MessageRepository {
             final String randomKey = UUID.randomUUID().toString();
             StorageReference storageReference = FirebaseManager.getInstance().getFirebaseStorageInstance().getReference().child(parent + randomKey);
             Uri imageUri = Uri.fromFile(new File(path));
-            StorageTask<UploadTask.TaskSnapshot> uploadTask = storageReference.putFile(imageUri)
-                    .addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
+            storageReference.putFile(imageUri)
+                    .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                         @Override
-                        public void onComplete(@NonNull @NotNull Task<UploadTask.TaskSnapshot> task) {
-                            if (task.isSuccessful()) {
-                                String dataUrl = Objects.requireNonNull(task.getResult()).toString();
+                        public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                            Task<Uri> downloadUri = taskSnapshot.getStorage().getDownloadUrl();
+                            if (downloadUri.isSuccessful()) {
+                                String dataUrl = downloadUri.getResult().toString();
                                 data.setValue(dataUrl);
                             } else {
                                 data.setValue(null);
                             }
+                        }
+                    })
+                    .addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull @NotNull Exception e) {
+                            data.setValue(null);
                         }
                     });
         }else {
@@ -110,9 +117,9 @@ public class MessageRepository {
                             if (task.getResult().size() > 0) {
                                 EmergencyModel em = task.getResult().getDocuments().get(0).toObject(EmergencyModel.class);
                                 if (em != null)
-                                    lastId = Long.parseLong(em.getId());
+                                    lastId = em.getId();
                             }
-                            messageModel.setId(lastId+1+"");
+                            messageModel.setId(lastId+1);
                             long finalLastId = lastId+1;
                             FirebaseManager.getInstance().getFirebaseFirestoreInstance()
                                     .collection(ConstantsValues.MESSAGE_COLLECTION)

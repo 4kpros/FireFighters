@@ -101,9 +101,9 @@ public class WaterPointRepository {
                             if (task.getResult().size() > 0) {
                                 WaterPointModel wp = task.getResult().getDocuments().get(0).toObject(WaterPointModel.class);
                                 if (wp != null)
-                                    lastId = Long.parseLong(wp.getId());
+                                    lastId = wp.getId();
                             }
-                            waterPointModel.setId(lastId+1+"");
+                            waterPointModel.setId(lastId+1);
                             FirebaseManager.getInstance().getFirebaseFirestoreInstance()
                                     .collection(ConstantsValues.WATER_POINTS_COLLECTION)
                                     .add(waterPointModel)

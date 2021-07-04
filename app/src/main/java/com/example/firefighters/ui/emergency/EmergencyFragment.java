@@ -2,26 +2,38 @@ package com.example.firefighters.ui.emergency;
 
 import android.app.Dialog;
 import android.content.Context;
+import android.media.AudioAttributes;
+import android.media.AudioManager;
+import android.media.MediaPlayer;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
+import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
+import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.firefighters.R;
 import com.example.firefighters.adapters.EmergencyAdapter;
 import com.example.firefighters.models.EmergencyModel;
+import com.example.firefighters.models.MessageModel;
 import com.example.firefighters.models.UserModel;
 import com.example.firefighters.tools.ConstantsValues;
 import com.example.firefighters.viewmodels.EmergencyViewModel;
+import com.example.firefighters.viewmodels.MessageViewModel;
 import com.example.firefighters.viewmodels.UserViewModel;
+import com.facebook.drawee.view.SimpleDraweeView;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.progressindicator.CircularProgressIndicator;
+import com.google.android.material.textview.MaterialTextView;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
@@ -29,6 +41,7 @@ import com.google.firebase.firestore.QuerySnapshot;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Objects;
 
@@ -43,6 +56,7 @@ import androidx.recyclerview.widget.RecyclerView;
 public class EmergencyFragment extends Fragment {
 
     private EmergencyViewModel emergencyViewModel;
+    private MessageViewModel messageViewModel;
     private EmergencyAdapter emergencyAdapter;
     private RecyclerView emergenciesRecyclerView;
     private Context context;
@@ -58,6 +72,11 @@ public class EmergencyFragment extends Fragment {
     private Query.Direction lastOrder = Query.Direction.DESCENDING;
     DocumentSnapshot lastDocument;
     private int limitCount = 10;
+
+    MediaPlayer mediaPlayer = new MediaPlayer();
+    private Handler handlePlayingVoice = new Handler();
+    private boolean isPlaying;
+    private boolean canRunThread;
 
     @Override
     public void onCreate(@Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
@@ -111,9 +130,11 @@ public class EmergencyFragment extends Fragment {
     }
 
     private void loadMoreEmergencies() {
+        showLoadingEmergenciesView();
         emergencyViewModel.getEmergenciesQuery(lastDocument, lastFilter, lastOrder, limitCount).observe(requireActivity(), new Observer<QuerySnapshot>() {
             @Override
             public void onChanged(QuerySnapshot queryDocumentSnapshots) {
+                hideLoadingEmergencies();
                 for (DocumentSnapshot document:queryDocumentSnapshots) {
                     emergencies.add(document.toObject(EmergencyModel.class));
                 }
@@ -124,6 +145,14 @@ public class EmergencyFragment extends Fragment {
                     emergencyViewModel.getEmergenciesQuery(lastDocument, lastFilter, lastOrder, limitCount).removeObservers(requireActivity());
             }
         });
+    }
+
+    private void showLoadingEmergenciesView() {
+        //
+    }
+
+    private void hideLoadingEmergencies() {
+        //
     }
 
     private void showDetailsDialog(int position) {
@@ -138,7 +167,178 @@ public class EmergencyFragment extends Fragment {
                 dialog.dismiss();
             }
         });
+        MaterialTextView id = dialog.findViewById(R.id.text_emergency_id);
+        MaterialTextView status = dialog.findViewById(R.id.text_emergency_status);
+        MaterialTextView gravity = dialog.findViewById(R.id.text_emergency_gravity);
+        MaterialTextView assignedUnit = dialog.findViewById(R.id.text_emergency_unit);
+        MaterialTextView latitude = dialog.findViewById(R.id.text_emergency_latitude);
+        MaterialTextView longitude = dialog.findViewById(R.id.text_emergency_longitude);
+        MaterialTextView sender = dialog.findViewById(R.id.text_emergency_sender_mail);
+        String tempId = "",
+                tempStatus = "",
+                tempGravity = "",
+                tempAssignedUnit = "<< None >>",
+                tempLatitude = "",
+                tempLongitude = "",
+                tempSender = "<< Unknown >>";
+
+        tempId = "EM" +emergencies.get(position).getId();
+        tempStatus = emergencies.get(position).getStatus();
+        tempGravity = emergencies.get(position).getGravity();
+        tempLatitude = emergencies.get(position).getLatitude()+"";
+        tempLongitude = emergencies.get(position).getLongitude()+"";
+        if (emergencies.get(position).getCurrentUnit() != null && !emergencies.get(position).getCurrentUnit().isEmpty())
+            tempAssignedUnit = emergencies.get(position).getCurrentUnit();
+        if (emergencies.get(position).getSenderMail() != null && !emergencies.get(position).getSenderMail().isEmpty())
+            tempSender = emergencies.get(position).getSenderMail();
+
+        id.setText(tempId);
+        status.setText(tempStatus);
+        gravity.setText(tempGravity);
+        assignedUnit.setText(tempAssignedUnit);
+        latitude.setText(tempLatitude);
+        longitude.setText(tempLongitude);
+        sender.setText(tempSender);
+
+        if(emergencies.get(position).getMessageId() > 0){
+            RelativeLayout relativeLayoutPlayView = dialog.findViewById(R.id.relative_play_audio_view);
+            RelativeLayout relativeLayoutNoAudioView = dialog.findViewById(R.id.relative_no_audio_view);
+            SeekBar seekBar = dialog.findViewById(R.id.seek_bar_audio_progress);
+            ImageView buttonPlayStopAudio = dialog.findViewById(R.id.button_emergency_play_pause_audio);
+            SimpleDraweeView imagePlace = dialog.findViewById(R.id.image_emergency_message);
+            MaterialTextView message = dialog.findViewById(R.id.text_emergency_message);
+            messageViewModel.loadMessageModel(emergencies.get(position).getMessageId()).observe(requireActivity(), new Observer<MessageModel>() {
+                @Override
+                public void onChanged(MessageModel messageModel) {
+                    if (messageModel != null){
+                        message.setText(messageModel.getMessage());
+                        Toast.makeText(context, messageModel.getImagesSrc()+"", Toast.LENGTH_SHORT).show();
+                        imagePlace.setImageURI(messageModel.getImagesSrc());
+                        if (messageModel.getAudioSrc() != null && !messageModel.getAudioSrc().isEmpty()){
+                            showEmergencyAudio(relativeLayoutPlayView, relativeLayoutNoAudioView);
+                            prepareEmergencyAudio(messageModel.getAudioSrc(), buttonPlayStopAudio, seekBar, buttonPlayStopAudio);
+                        }else {
+                            hideEmergencyAudio(relativeLayoutPlayView, relativeLayoutNoAudioView);
+                        }
+                    }
+                }
+            });
+        }
         dialog.show();
+    }
+
+    private void hideEmergencyAudio(RelativeLayout relativeLayoutPlayView, RelativeLayout relativeLayoutNoAudioView) {
+        relativeLayoutPlayView.setVisibility(View.GONE);
+        relativeLayoutNoAudioView.setVisibility(View.VISIBLE);
+    }
+
+    private void showEmergencyAudio(RelativeLayout relativeLayoutPlayView, RelativeLayout relativeLayoutNoAudioView) {
+        relativeLayoutPlayView.setVisibility(View.VISIBLE);
+        relativeLayoutNoAudioView.setVisibility(View.GONE);
+    }
+
+    private void prepareEmergencyAudio(String audioSrc, ImageView buttonPlayAudio, SeekBar seekBar, ImageView buttonPlayStopAudio) {
+        buttonPlayAudio.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (!isPlaying){
+                    playAudio(audioSrc, seekBar, buttonPlayStopAudio);
+                }else{
+                    stopPlay();
+                    setPlayingView(false, buttonPlayStopAudio);
+                }
+            }
+        });
+    }
+
+    private void playAudio(String audioSrc, SeekBar seekBar, ImageView buttonPlayStopAudio) {
+        resetProgress(seekBar);
+        stopPlay();
+        setPlayingView(true, buttonPlayStopAudio);
+        mediaPlayer = new MediaPlayer();
+        if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            mediaPlayer.setAudioAttributes(new AudioAttributes.Builder()
+                    .setUsage(AudioAttributes.USAGE_MEDIA)
+                    .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
+                    .build());
+        } else {
+            mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
+        }
+        try {
+            mediaPlayer.setDataSource(audioSrc);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        isPlaying = true;
+        canRunThread = true;
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                if (canRunThread){
+                    mediaPlayer.prepareAsync();
+                    mediaPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+                        @Override
+                        public void onPrepared(MediaPlayer mp) {
+                            canRunThread = false;
+                            mediaPlayer.start();
+                            mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+                                @Override
+                                public void onCompletion(MediaPlayer mp) {
+                                    stopPlay();
+                                    setPlayingView(false, buttonPlayStopAudio);
+                                    resetProgress(seekBar);
+                                }
+                            });
+                            Runnable runnablePlayVoice = new Runnable() {
+                                @Override
+                                public void run() {
+                                    int temMediaPlayerProgress = mediaPlayer.getCurrentPosition();
+                                    int progress = temMediaPlayerProgress / 100;
+                                    setProgress(seekBar, progress);
+                                    handlePlayingVoice.postDelayed(this, 100);
+                                }
+                            };
+                            //Start
+                            handlePlayingVoice.postDelayed(runnablePlayVoice, 100);
+                        }
+                    });
+                }
+            }
+        }).start();
+    }
+
+    private void stopPlay() {
+        canRunThread = false;
+        if (mediaPlayer != null){
+            mediaPlayer.stop();
+            mediaPlayer.release();
+        }
+        isPlaying = false;
+        mediaPlayer = null;
+    }
+
+    private void setPlayingView(boolean play, ImageView buttonPlayStopAudio){
+        if(play){
+            buttonPlayStopAudio.setImageDrawable(getResources().getDrawable(R.drawable.ic_round_play_arrow_24));
+        }else{
+            buttonPlayStopAudio.setImageDrawable(getResources().getDrawable(R.drawable.ic_round_stop_24));
+        }
+    }
+
+    private void setProgress(SeekBar seekBar, int progress){
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            seekBar.setProgress(progress, true);
+        }else {
+            seekBar.setProgress(progress);
+        }
+    }
+
+    private void resetProgress(SeekBar seekBar){
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            seekBar.setProgress(0, true);
+        }else {
+            seekBar.setProgress(0);
+        }
     }
 
     private void showStreetMap(View view, int position) {
@@ -337,6 +537,9 @@ public class EmergencyFragment extends Fragment {
     private void initViewModel() {
         emergencyViewModel = new ViewModelProvider(requireActivity()).get(EmergencyViewModel.class);
         emergencyViewModel.init();
+
+        messageViewModel = new ViewModelProvider(requireActivity()).get(MessageViewModel.class);
+        messageViewModel.init();
     }
 
     private void initViews(View view) {
@@ -350,40 +553,48 @@ public class EmergencyFragment extends Fragment {
     @Override
     public void onStart() {
         super.onStart();
+        canRunThread = false;
     }
 
     @Override
     public void onResume() {
         super.onResume();
+        canRunThread = false;
     }
 
     @Override
     public void onPause() {
         super.onPause();
+        canRunThread = false;
     }
 
     @Override
     public void onStop() {
         super.onStop();
+        canRunThread = false;
     }
 
     @Override
     public void onLowMemory() {
         super.onLowMemory();
+        canRunThread = false;
     }
 
     @Override
     public void onDestroyView() {
         super.onDestroyView();
+        canRunThread = false;
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
+        canRunThread = false;
     }
 
     @Override
     public void onDetach() {
         super.onDetach();
+        canRunThread = false;
     }
 }

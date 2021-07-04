@@ -3,7 +3,7 @@ package com.example.firefighters.models;
 import java.util.Calendar;
 
 public class WaterPointModel {
-    private String id;
+    private long id;
 
     private String senderMail;   //Foreign key user sender
 
@@ -29,11 +29,11 @@ public class WaterPointModel {
         sendUtc = utc;
     }
 
-    public String getId() {
+    public long getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(long id) {
         this.id = id;
     }
 

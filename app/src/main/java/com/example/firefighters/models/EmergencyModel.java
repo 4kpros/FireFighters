@@ -5,10 +5,10 @@ import com.example.firefighters.tools.ConstantsValues;
 import java.util.Calendar;
 
 public class EmergencyModel {
-    private String id;
+    private long id;
 
     private String senderMail; //Foreign key user sender
-    private String messageId;  //Foreign key message
+    private int messageId;  //Foreign key message
 
     private int sendUtc;
     private double longitude;
@@ -44,11 +44,11 @@ public class EmergencyModel {
         sendUtc = utc;
     }
 
-    public String getId() {
+    public long getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(long id) {
         this.id = id;
     }
 
@@ -60,11 +60,11 @@ public class EmergencyModel {
         this.senderMail = senderMail;
     }
 
-    public String getMessageId() {
+    public int getMessageId() {
         return messageId;
     }
 
-    public void setMessageId(String messageId) {
+    public void setMessageId(int messageId) {
         this.messageId = messageId;
     }
 

@@ -1,7 +1,7 @@
 package com.example.firefighters.models;
 
 public class MessageModel {
-    private String id;
+    private long id;
 
     private String message;
     private String imagesSrc;
@@ -11,11 +11,11 @@ public class MessageModel {
     public MessageModel() {
     }
 
-    public String getId() {
+    public long getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(long id) {
         this.id = id;
     }
 

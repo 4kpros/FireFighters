@@ -28,6 +28,9 @@ public class EmergencyViewModel extends ViewModel {
         return repository.getEmergenciesQuerySnapshot(lastFilter, lastOrder);
     }
 
+    public LiveData<EmergencyModel> getEmergencyWorkingOn(String  currentUnit) {
+        return repository.getEmergencyWorkingOn(currentUnit);
+    }
     public LiveData<Integer> saveEmergency(EmergencyModel emergencyModel) {
         return repository.saveEmergency(emergencyModel);
     }

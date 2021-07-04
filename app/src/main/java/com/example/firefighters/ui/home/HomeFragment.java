@@ -52,6 +52,7 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.button.MaterialButton;
+import com.google.android.material.progressindicator.CircularProgressIndicator;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textview.MaterialTextView;
 import com.google.firebase.storage.OnProgressListener;
@@ -107,9 +108,15 @@ public class HomeFragment extends Fragment {
     private FragmentManager fragmentManager;
     private MediaRecorder mediaRecorder;
     private Handler handlerRecordVoice = new Handler();
+    private Runnable runnableRecordVoice;
     private boolean canRunThread = true;
     private ActivityResultLauncher<Intent> imageActivityResult;
     private ActivityResultLauncher<Intent> videoActivityResult;
+
+    private MaterialTextView textImageResource;
+    private String audioPath = "";
+    private CircularProgressIndicator circularProgressLoadingMedia;
+    private MaterialButton buttonMediaSendEmergency;
 
     @Override
     public void onCreate(@Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
@@ -119,9 +126,9 @@ public class HomeFragment extends Fragment {
                 if (result.getData() != null){
                     if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.R){
                         Bitmap tempBitmap = (Bitmap) result.getData().getExtras().get("data");
-                        Toast.makeText(context, tempBitmap+"", Toast.LENGTH_SHORT).show();
-                        String tempPath = saveImageToInternalStorage(tempBitmap);
-                        Toast.makeText(context, tempPath+"", Toast.LENGTH_SHORT).show();
+                        String tempImagePath = saveImageToInternalStorage(tempBitmap);
+                        textImageResource.setText(tempImagePath);
+                        Toast.makeText(context, "Image received !", Toast.LENGTH_SHORT).show();
                     }else{
                         Toast.makeText(context, "No implementation for Android 11+ !", Toast.LENGTH_SHORT).show();
                     }
@@ -133,21 +140,6 @@ public class HomeFragment extends Fragment {
             public void onActivityResult(ActivityResult result) {
                 if (result.getData() != null){
                         Toast.makeText(context, result.getData()+"", Toast.LENGTH_LONG).show();
-                        Toast.makeText(context, result.getData()+"", Toast.LENGTH_LONG).show();
-                        Toast.makeText(context, result.getData()+"", Toast.LENGTH_LONG).show();
-                        Toast.makeText(context, result.getData()+"", Toast.LENGTH_LONG).show();
-                        Toast.makeText(context, result.getData()+"", Toast.LENGTH_LONG).show();
-                        Toast.makeText(context, result.getData()+"", Toast.LENGTH_LONG).show();
-                        Toast.makeText(context, result.getData()+"", Toast.LENGTH_LONG).show();
-                        Toast.makeText(context, result.getData()+"", Toast.LENGTH_LONG).show();
-//                    if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.R){
-//                        FileProvider tempUri = (FileProvider) result.getData().getExtras().get("data");
-//                        Toast.makeText(context, tempUri+"", Toast.LENGTH_SHORT).show();
-////                        String tempPath = saveVideoToInternalStorage(tempUri);
-////                        Toast.makeText(context, tempPath+"", Toast.LENGTH_SHORT).show();
-//                    }else{
-//                        Toast.makeText(context, "No implementation for Android 11+ !", Toast.LENGTH_SHORT).show();
-//                    }
                 }
             }
         });
@@ -159,7 +151,7 @@ public class HomeFragment extends Fragment {
         // path to /data/data/covid_app/app_data/imageDir
         File directory = cw.getDir("imageDir", Context.MODE_PRIVATE);
         // Create imageDir
-        File myPath =new File(directory,"/" +ConstantsValues.APPLICATION_TAG+ "/emergencyImage.jpg");
+        File myPath =new File(directory,"emergencyimage.jpg");
 
         FileOutputStream fos = null;
         try {
@@ -172,28 +164,15 @@ public class HomeFragment extends Fragment {
             bitmapImage.compress(Bitmap.CompressFormat.JPEG, 100, fos);
         }
 
-        return directory.getAbsolutePath()+"/emergencyImage.jpg";
+        return directory.getAbsolutePath()+"/emergencyimage.jpg";
     }
 
     private String saveVideoToInternalStorage(Uri bitmapImage) {
         ContextWrapper cw = new ContextWrapper(activity.getApplicationContext());
         // path to /data/data/covid_app/app_data/imageDir
         File directory = cw.getDir("videoDir", Context.MODE_PRIVATE);
-//        // Create imageDir
-//        File myPath =new File(directory,"/" +ConstantsValues.APPLICATION_TAG+ "/emergencyImage.jpg");
-//
-//        FileOutputStream fos = null;
-//        try {
-//            fos = new FileOutputStream(myPath);
-//        } catch (FileNotFoundException e) {
-//            e.printStackTrace();
-//        }
-//        if (fos != null){
-//            // Use the compress method on the BitMap object to write image to the OutputStream
-//            bitmapImage.compress(Bitmap.CompressFormat.JPEG, 100, fos);
-//        }
 
-        return directory.getAbsolutePath()+"/emergencyImage.jpg";
+        return directory.getAbsolutePath()+"/emergencyvideo.mp4";
     }
 
     @Override
@@ -415,6 +394,8 @@ public class HomeFragment extends Fragment {
         dialog.setContentView(R.layout.dialog_add_media);
         dialog.setCanceledOnTouchOutside(true);
         dialog.getWindow().setBackgroundDrawable(getResources().getDrawable(R.color.transparent));
+        textImageResource = dialog.findViewById(R.id.text_image_resource);
+        textImageResource.setText("");
         dialog.findViewById(R.id.button_close_dialog).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -454,7 +435,7 @@ public class HomeFragment extends Fragment {
         dialog.findViewById(R.id.button_stop_recording_audio).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                stopRecordingVoice(dialog);
+                stopRecordingVoiceAndSave(dialog);
             }
         });
         dialog.findViewById(R.id.button_remove_audio).setOnClickListener(new View.OnClickListener() {
@@ -463,17 +444,20 @@ public class HomeFragment extends Fragment {
                 clearAudioResource(dialog);
             }
         });
+        //Button send emergency
+        buttonMediaSendEmergency = dialog.findViewById(R.id.button_send_emergency);
+        //Circular progress indicator
+        circularProgressLoadingMedia = dialog.findViewById(R.id.progress_indicator_add_media);
         dialog.findViewById(R.id.button_send_emergency).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                MaterialTextView imgUrl = dialog.findViewById(R.id.text_image_resource);
                 MaterialTextView videoUrl = dialog.findViewById(R.id.text_video_resource);
                 MaterialTextView audioUrl = dialog.findViewById(R.id.text_audio_resource);
                 TextInputEditText message = dialog.findViewById(R.id.text_input_emergency_message);
                 String tempMessage = "";
                 if (message.getText() != null)
                     tempMessage = message.getText().toString();
-                sendMediaSOS(imgUrl.getText().toString(), videoUrl.getText().toString(), audioUrl.getText().toString(), tempMessage);
+                sendMediaSOS(dialog, textImageResource.getText().toString(), videoUrl.getText().toString(), audioUrl.getText().toString(), tempMessage);
             }
         });
         dialog.show();
@@ -549,7 +533,8 @@ public class HomeFragment extends Fragment {
             tempFileName += calendar.get(java.util.Calendar.MILLISECOND);
         }
         tempFileName = tempFileName + ".3pg";
-        String path = getFilePath(tempFileName);
+        audioPath = "";
+        audioPath = getFilePath(tempFileName);
         if (mediaRecorder != null) {
             mediaRecorder.stop();
             mediaRecorder.release();
@@ -558,11 +543,11 @@ public class HomeFragment extends Fragment {
         mediaRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
         mediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
         mediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AAC);
-        mediaRecorder.setOutputFile(path);
+        mediaRecorder.setOutputFile(audioPath);
         try {
             mediaRecorder.prepare();
             mediaRecorder.start();
-            Runnable runnableRecordVoice = new Runnable() {
+            runnableRecordVoice = new Runnable() {
                 @Override
                 public void run() {
                     if (canRunThread){
@@ -600,13 +585,17 @@ public class HomeFragment extends Fragment {
         });
     }
 
-    private void stopRecordingVoice(Dialog dialog) {
+    private void stopRecordingVoiceAndSave(Dialog dialog) {
         hideRecordingView(dialog);
         if (mediaRecorder != null) {
             mediaRecorder.stop();
             mediaRecorder.release();
-            Toast.makeText(context, "Audio Registered !", Toast.LENGTH_SHORT).show();
+            mediaRecorder = null;
+            handlerRecordVoice.removeCallbacks(runnableRecordVoice);
+            Toast.makeText(context, "Voice Registered !", Toast.LENGTH_SHORT).show();
         }
+        MaterialTextView textAudioResource = dialog.findViewById(R.id.text_audio_resource);
+        textAudioResource.setText(audioPath);
     }
 
     private void showRecordingView(Dialog dialog) {
@@ -708,9 +697,11 @@ public class HomeFragment extends Fragment {
                 }, Looper.getMainLooper());
     }
 
-    private void sendMediaSOS(String imageUl, String videoUrl, String audioUrl, String message) {
+    private void sendMediaSOS(Dialog dialog, String imageUl, String videoUrl, String audioUrl, String message) {
+        showLoadingMediaAdding();
         if (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
                 && ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            hideLoadingMediaAdding();
             return;
         }
         LocationRequest locationRequest = LocationRequest.create();
@@ -735,8 +726,9 @@ public class HomeFragment extends Fragment {
                             messageModel.setVideoSrc(videoUrl);
                             messageModel.setAudioSrc(audioUrl);
                             messageModel.setMessage(message);
-                            sendMessageMediaEmergency(messageModel, emergencyModel);
+                            sendMessageMediaEmergency(dialog, messageModel, emergencyModel);
                         } else {
+                            hideLoadingMediaAdding();
                             Toast.makeText(context, "SOS not sent !", Toast.LENGTH_SHORT).show();
                         }
                     }
@@ -748,7 +740,24 @@ public class HomeFragment extends Fragment {
                 }, Looper.getMainLooper());
     }
 
-    private void sendMessageMediaEmergency(MessageModel messageModel, EmergencyModel emergencyModel) {
+
+    private void showLoadingMediaAdding() {
+        if (circularProgressLoadingMedia != null && buttonMediaSendEmergency != null) {
+            circularProgressLoadingMedia.show();
+            circularProgressLoadingMedia.setVisibility(View.VISIBLE);
+            buttonMediaSendEmergency.setVisibility(View.GONE);
+        }
+    }
+
+    private void hideLoadingMediaAdding() {
+        if (circularProgressLoadingMedia != null && buttonMediaSendEmergency != null){
+            circularProgressLoadingMedia.hide();
+            circularProgressLoadingMedia.setVisibility(View.GONE);
+            buttonMediaSendEmergency.setVisibility(View.VISIBLE);
+        }
+    }
+
+    private void sendMessageMediaEmergency(Dialog dialog, MessageModel messageModel, EmergencyModel emergencyModel) {
         messageViewModel.saveDataToStorage("images/messages/", messageModel.getImagesSrc()).observe(requireActivity(), new Observer<String>() {
             @Override
             public void onChanged(String imageUrl) {
@@ -765,45 +774,49 @@ public class HomeFragment extends Fragment {
                                         if (videoUrl != null){
                                             //Now send message
                                             messageModel.setVideoSrc(videoUrl);
-                                            sendMessage(messageModel, emergencyModel);
+                                            sendMessage(dialog, messageModel, emergencyModel);
                                         }else {
+                                            hideLoadingMediaAdding();
                                             Toast.makeText(context, "Error sending video !", Toast.LENGTH_SHORT).show();
                                         }
                                     }
                                 });
                             }else {
+                                hideLoadingMediaAdding();
                                 Toast.makeText(context, "Error sending audio !", Toast.LENGTH_SHORT).show();
                             }
                         }
                     });
                 }else{
+                    hideLoadingMediaAdding();
                     Toast.makeText(context, "Error sending image !", Toast.LENGTH_SHORT).show();
                 }
             }
         });
     }
 
-    private void sendMessage(MessageModel messageModel, EmergencyModel emergencyModel){
+    private void sendMessage(Dialog dialog, MessageModel messageModel, EmergencyModel emergencyModel){
         messageViewModel.saveMessage(messageModel).observe(requireActivity(), new Observer<Integer>() {
             @Override
             public void onChanged(Integer integer) {
                 if (integer >= 1){
-                    emergencyModel.setId(String.valueOf(integer));
+                    emergencyModel.setMessageId(integer);
                     emergencyViewModel.saveEmergency(emergencyModel).observe(requireActivity(), new Observer<Integer>() {
                         @Override
                         public void onChanged(Integer integer) {
+                            hideLoadingMediaAdding();
                             if (integer >= 1){
+                                dialog.dismiss();
                                 Toast.makeText(requireContext(), "Message media sent !", Toast.LENGTH_SHORT).show();
                             }else {
                                 Toast.makeText(requireContext(), "Message media not send !", Toast.LENGTH_SHORT).show();
                             }
-                            emergencyViewModel.saveEmergency(emergencyModel).removeObservers(requireActivity());
                         }
                     });
                 }else {
+                    hideLoadingMediaAdding();
                     Toast.makeText(requireContext(), "Message media not send !", Toast.LENGTH_SHORT).show();
                 }
-                messageViewModel.saveMessage(messageModel).removeObservers(requireActivity());
             }
         });
     }
@@ -882,5 +895,11 @@ public class HomeFragment extends Fragment {
         buttonCallNow = view.findViewById(R.id.button_call_now);
         buttonSos = view.findViewById(R.id.button_text_sos);
         buttonShowMap = view.findViewById(R.id.button_show_map);
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        handlerRecordVoice.removeCallbacks(runnableRecordVoice);
     }
 }

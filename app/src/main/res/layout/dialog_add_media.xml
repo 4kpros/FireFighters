@@ -116,6 +116,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="10dp"
                 android:layout_marginRight="10dp"
+                android:visibility="gone"
                 >
                 <com.google.android.material.textview.MaterialTextView
                     android:id="@+id/text_video"
@@ -200,51 +201,55 @@
                     android:ellipsize="end"
                     android:layout_centerVertical="true"
                     android:layout_toEndOf="@+id/text_audio"
-                    android:layout_toStartOf="@+id/button_add_audio"
+                    android:layout_toStartOf="@+id/relative_buttons_add_audio"
                     />
-                <ImageView
-                    android:id="@+id/button_add_audio"
+                <RelativeLayout
+                    android:id="@+id/relative_buttons_add_audio"
                     android:layout_width="40dp"
                     android:layout_height="40dp"
-                    app:layout_constraintLeft_toLeftOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
+                    android:layout_alignParentEnd="true"
+                    android:layout_centerVertical="true"
                     android:layout_marginLeft="10dp"
                     android:layout_marginRight="10dp"
                     android:layout_marginTop="5dp"
                     android:layout_marginBottom="5dp"
-                    android:background="@drawable/ripple_circle"
-                    android:scaleType="centerCrop"
-                    android:src="@drawable/ic_baseline_mic_24"
-                    android:padding="5dp"
-                    android:clickable="true"
-                    android:focusable="true"
-                    android:layout_alignParentEnd="true"
-                    android:layout_gravity="center"
-                    android:layout_centerVertical="true"
-                    app:tint="@color/purple_200"
-                    />
-                <ImageView
-                    android:id="@+id/button_remove_audio"
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
-                    app:layout_constraintLeft_toLeftOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
-                    android:layout_marginLeft="10dp"
-                    android:layout_marginRight="10dp"
-                    android:layout_marginTop="5dp"
-                    android:layout_marginBottom="5dp"
-                    android:background="@drawable/ripple_circle"
-                    android:scaleType="centerCrop"
-                    android:src="@drawable/ic_round_clear_24"
-                    android:padding="5dp"
-                    android:clickable="true"
-                    android:focusable="true"
-                    android:layout_alignParentEnd="true"
-                    android:layout_gravity="center"
-                    android:layout_centerVertical="true"
-                    app:tint="@color/purple_200"
-                    android:visibility="gone"
-                    />
+                    >
+                    <ImageView
+                        android:id="@+id/button_add_audio"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        app:layout_constraintLeft_toLeftOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        android:background="@drawable/ripple_circle"
+                        android:scaleType="centerCrop"
+                        android:src="@drawable/ic_baseline_mic_24"
+                        android:padding="5dp"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:layout_alignParentEnd="true"
+                        android:layout_gravity="center"
+                        android:layout_centerVertical="true"
+                        app:tint="@color/purple_200"
+                        />
+                    <ImageView
+                        android:id="@+id/button_remove_audio"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        app:layout_constraintLeft_toLeftOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        android:background="@drawable/ripple_circle"
+                        android:scaleType="centerCrop"
+                        android:src="@drawable/ic_round_clear_24"
+                        android:padding="5dp"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:layout_alignParentEnd="true"
+                        android:layout_gravity="center"
+                        android:layout_centerVertical="true"
+                        app:tint="@color/purple_200"
+                        android:visibility="gone"
+                        />
+                </RelativeLayout>
             </RelativeLayout>
             <RelativeLayout
                 android:id="@+id/relative_recording_audio"
@@ -339,6 +344,16 @@
                 app:layout_constraintRight_toRightOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/linear_remember_forgot"
                 android:layout_gravity="center"
+                />
+            <com.google.android.material.progressindicator.CircularProgressIndicator
+                android:id="@+id/progress_indicator_add_media"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_margin="10dp"
+                android:indeterminate="true"
+                app:indicatorColor="@color/purple_200"
+                android:visibility="gone"
                 />
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>

@@ -293,7 +293,7 @@ public class MapViewFragment extends Fragment {
                     SymbolOptions symbolOptions = createEmergencySymbolOptions(
                             emergencyModel.getLatitude(),
                             emergencyModel.getLongitude(),
-                            Long.parseLong(emergencyModel.getId()),
+                            emergencyModel.getId(),
                             emergencyModel.getStatus());
                     allSymbolOptions.add(symbolOptions);
                 }
@@ -349,7 +349,7 @@ public class MapViewFragment extends Fragment {
                     SymbolOptions symbolOptions = createWaterPointSymbolOptions(
                             waterPointModel.getLatitude(),
                             waterPointModel.getLongitude(),
-                            Long.parseLong(waterPointModel.getId()));
+                            waterPointModel.getId());
                     allSymbolOptions.add(symbolOptions);
                 }
                 symbolsWaterPoints = symbolManager.create(allSymbolOptions);

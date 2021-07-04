@@ -6,6 +6,7 @@ import android.widget.Toast;
 
 import com.example.firefighters.models.EmergencyModel;
 import com.example.firefighters.models.EmergencyModel;
+import com.example.firefighters.models.UnitModel;
 import com.example.firefighters.tools.ConstantsValues;
 import com.example.firefighters.tools.FirebaseManager;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -103,6 +104,35 @@ public class EmergencyRepository {
                 });
         return data;
     }
+
+    public LiveData<EmergencyModel> getEmergencyWorkingOn(String currentUnit) {
+        MutableLiveData<EmergencyModel> data = new MutableLiveData<>();
+        if (currentUnit == null || currentUnit.isEmpty()) {
+            data.setValue(null);
+        } else {
+            FirebaseManager.getInstance().getFirebaseFirestoreInstance()
+                    .collection(ConstantsValues.EMERGENCIES_COLLECTION)
+                    .whereEqualTo("currentUnit", currentUnit)
+                    .get()
+                    .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                        @Override
+                        public void onComplete(@NonNull @NotNull Task<QuerySnapshot> task) {
+                            if (task.isSuccessful()) {
+                                if (task.getResult().size() > 0) {
+                                    EmergencyModel emergencyModel = task.getResult().getDocuments().get(0).toObject(EmergencyModel.class);
+                                    data.setValue(emergencyModel);
+                                } else {
+                                    data.setValue(null);
+                                }
+                            } else {
+                                data.setValue(null);
+                            }
+                        }
+                    });
+        }
+        return data;
+    }
+
     public LiveData<Integer> saveEmergency(EmergencyModel emergencyModel) {
         MutableLiveData<Integer> data = new MutableLiveData<>();
         FirebaseManager.getInstance().getFirebaseFirestoreInstance()
@@ -118,9 +148,9 @@ public class EmergencyRepository {
                             if (task.getResult().size() > 0) {
                                 EmergencyModel em = task.getResult().getDocuments().get(0).toObject(EmergencyModel.class);
                                 if (em != null)
-                                    lastId = Long.parseLong(em.getId());
+                                    lastId = em.getId();
                             }
-                            emergencyModel.setId(lastId+1+"");
+                            emergencyModel.setId(lastId+1);
                             long finalLastId = lastId+1;
                             FirebaseManager.getInstance().getFirebaseFirestoreInstance()
                                     .collection(ConstantsValues.EMERGENCIES_COLLECTION)

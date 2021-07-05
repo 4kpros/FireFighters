@@ -3,29 +3,20 @@ package com.example.firefighters.ui.mapview;
 import android.Manifest;
 import android.app.Dialog;
 import android.content.pm.PackageManager;
-import android.graphics.Bitmap;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Looper;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.ImageView;
 import android.widget.Toast;
-import android.widget.ToggleButton;
 
 import com.example.firefighters.R;
 import com.example.firefighters.models.EmergencyModel;
-import com.example.firefighters.models.UserModel;
 import com.example.firefighters.models.WaterPointModel;
 import com.example.firefighters.tools.ConstantsValues;
 import com.example.firefighters.viewmodels.EmergencyViewModel;
-import com.example.firefighters.viewmodels.UserViewModel;
 import com.example.firefighters.viewmodels.WaterPointViewModel;
 import com.google.android.gms.location.LocationAvailability;
 import com.google.android.gms.location.LocationCallback;
@@ -37,11 +28,8 @@ import com.google.android.material.button.MaterialButtonToggleGroup;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
-import com.mapbox.api.directions.v5.models.DirectionsResponse;
-import com.mapbox.api.directions.v5.models.DirectionsRoute;
 import com.mapbox.geojson.Point;
 import com.mapbox.mapboxsdk.Mapbox;
-import com.mapbox.mapboxsdk.annotations.MarkerOptions;
 import com.mapbox.mapboxsdk.camera.CameraPosition;
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
 import com.mapbox.mapboxsdk.geometry.LatLng;
@@ -59,32 +47,22 @@ import com.mapbox.mapboxsdk.plugins.annotation.Symbol;
 import com.mapbox.mapboxsdk.plugins.annotation.SymbolManager;
 import com.mapbox.mapboxsdk.plugins.annotation.SymbolOptions;
 import com.mapbox.mapboxsdk.utils.ColorUtils;
-import com.mapbox.navigation.ui.route.NavigationMapRoute;
 
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import androidx.annotation.DrawableRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 
-import static com.mapbox.mapboxsdk.style.layers.Property.ICON_ANCHOR_BOTTOM;
 import static com.mapbox.mapboxsdk.style.layers.Property.ICON_ANCHOR_BOTTOM_LEFT;
-import static com.mapbox.mapboxsdk.style.layers.Property.TEXT_ANCHOR_BOTTOM;
-import static com.mapbox.mapboxsdk.style.layers.Property.TEXT_ANCHOR_LEFT;
-import static com.mapbox.mapboxsdk.style.layers.Property.TEXT_ANCHOR_RIGHT;
 import static com.mapbox.mapboxsdk.style.layers.Property.TEXT_ANCHOR_TOP;
 import static com.mapbox.mapboxsdk.style.layers.Property.TEXT_JUSTIFY_AUTO;
-import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.textVariableAnchor;
 
 public class MapViewFragment extends Fragment {
 
@@ -264,12 +242,11 @@ public class MapViewFragment extends Fragment {
     private void getEventsListener() {
         symbolManager.addClickListener(new OnSymbolClickListener() {
             @Override
-            public boolean onAnnotationClick(Symbol symbol) {
+            public void onAnnotationClick(Symbol symbol) {
                 zoomCameraToPosition(mapboxMap, symbol.getLatLng().getLatitude(), symbol.getLatLng().getLongitude());
                 latitudeDest = symbol.getLatLng().getLatitude();
                 longitudeDest = symbol.getLatLng().getLongitude();
                 showDetailsEmergencyPoint(symbol);
-                return false;
             }
         });
     }

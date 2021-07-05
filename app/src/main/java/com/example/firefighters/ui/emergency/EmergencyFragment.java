@@ -280,22 +280,29 @@ public class EmergencyFragment extends Fragment {
                     mediaPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
                         @Override
                         public void onPrepared(MediaPlayer mp) {
+                            Toast.makeText(context, mediaPlayer.getDuration()*1000 +"", Toast.LENGTH_SHORT).show();
                             mediaPlayer.start();
+                            long duration = mediaPlayer.getDuration();
+                            seekBar.setMax((int)(duration/100));
                             mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
                                 @Override
                                 public void onCompletion(MediaPlayer mp) {
-                                    stopPlay();
                                     setPlayingView(false, buttonPlayStopAudio);
                                     resetProgress(seekBar);
+                                    stopPlay();
                                 }
                             });
                             Runnable runnablePlayVoice = new Runnable() {
                                 @Override
                                 public void run() {
-                                    int temMediaPlayerProgress = mediaPlayer.getCurrentPosition();
-                                    int progress = temMediaPlayerProgress / 100;
-                                    setProgress(seekBar, progress);
-                                    handlePlayingVoice.postDelayed(this, 100);
+                                    if (mediaPlayer != null){
+                                        int temMediaPlayerProgress = mediaPlayer.getCurrentPosition();
+                                        int progress = temMediaPlayerProgress / 100;
+                                        setProgress(seekBar, progress);
+                                        handlePlayingVoice.postDelayed(this, 100);
+                                    }else {
+                                        resetProgress(seekBar);
+                                    }
                                 }
                             };
                             //Start
@@ -319,9 +326,9 @@ public class EmergencyFragment extends Fragment {
 
     private void setPlayingView(boolean play, ImageView buttonPlayStopAudio){
         if(play){
-            buttonPlayStopAudio.setImageDrawable(getResources().getDrawable(R.drawable.ic_round_play_arrow_24));
-        }else{
             buttonPlayStopAudio.setImageDrawable(getResources().getDrawable(R.drawable.ic_round_stop_24));
+        }else{
+            buttonPlayStopAudio.setImageDrawable(getResources().getDrawable(R.drawable.ic_round_play_arrow_24));
         }
     }
 

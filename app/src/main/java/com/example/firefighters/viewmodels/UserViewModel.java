@@ -3,16 +3,11 @@ package com.example.firefighters.viewmodels;
 import android.app.Activity;
 
 import com.example.firefighters.models.UserModel;
-import com.example.firefighters.models.WaterPointModel;
 import com.example.firefighters.repositories.UserRepository;
 import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
-import java.util.ArrayList;
-
 import androidx.lifecycle.LiveData;
-import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
 public class UserViewModel extends ViewModel {

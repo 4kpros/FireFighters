@@ -57,27 +57,18 @@
         <com.google.android.material.textview.MaterialTextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Theme : "
+            android:text="Theme dark : "
             android:layout_margin="5dp"
             style="@style/CustomCleanTextColor"
             android:textSize="16sp"
             android:layout_gravity="center"
             android:gravity="center"
             />
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/button_get_permissions"
-            style="@style/Widget.MaterialComponents.Button.TextButton"
+        <com.google.android.material.switchmaterial.SwitchMaterial
+            android:id="@+id/switch_theme"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:autoLink="all"
-            android:ellipsize="end"
-            android:linksClickable="true"
-            android:maxLines="1"
-            android:layout_margin="10dp"
-            android:text="Get permissions"
-            android:textColor="@color/purple_200"
             android:layout_gravity="center"
-            android:gravity="center"
-            app:rippleColor="@color/light_400" />
+            />
     </LinearLayout>
 </LinearLayout>

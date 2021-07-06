@@ -1,9 +1,5 @@
 package com.example.firefighters.repositories;
 
-import android.app.Activity;
-import android.widget.Toast;
-
-import com.example.firefighters.models.WaterPointModel;
 import com.example.firefighters.models.WaterPointModel;
 import com.example.firefighters.tools.ConstantsValues;
 import com.example.firefighters.tools.FirebaseManager;
@@ -91,6 +87,7 @@ public class WaterPointRepository {
         MutableLiveData<Integer> data = new MutableLiveData<>();
         FirebaseManager.getInstance().getFirebaseFirestoreInstance()
                 .collection(ConstantsValues.WATER_POINTS_COLLECTION)
+                .orderBy("id", Query.Direction.DESCENDING)
                 .limit(1)
                 .get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
@@ -193,4 +190,27 @@ public class WaterPointRepository {
         return data;
     }
 
+    public LiveData<WaterPointModel> getWaterPointModel(int id) {
+        MutableLiveData<WaterPointModel> data = new MutableLiveData<>();
+        FirebaseManager.getInstance().getFirebaseFirestoreInstance()
+                .collection(ConstantsValues.WATER_POINTS_COLLECTION)
+                .whereEqualTo("id", id)
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull @NotNull Task<QuerySnapshot> task) {
+                        if (task.isSuccessful()) {
+                            if (task.getResult().size() > 0) {
+                                WaterPointModel waterPointModel = task.getResult().getDocuments().get(0).toObject(WaterPointModel.class);
+                                data.setValue(waterPointModel);
+                            } else {
+                                data.setValue(null);
+                            }
+                        } else {
+                            data.setValue(null);
+                        }
+                    }
+                });
+        return data;
+    }
 }

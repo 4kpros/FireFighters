@@ -1,29 +1,18 @@
 package com.example.firefighters.repositories;
 
-import android.app.Activity;
-import android.os.Handler;
-import android.widget.Toast;
-
 import com.example.firefighters.models.EmergencyModel;
-import com.example.firefighters.models.EmergencyModel;
-import com.example.firefighters.models.UnitModel;
 import com.example.firefighters.tools.ConstantsValues;
 import com.example.firefighters.tools.FirebaseManager;
 import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.Query;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import org.jetbrains.annotations.NotNull;
-
-import java.util.ArrayList;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -91,42 +80,49 @@ public class EmergencyRepository {
                 });
         return data;
     }
-    public LiveData<QuerySnapshot> getMyWorkingEmergency(String unitWork) {
-        MutableLiveData<QuerySnapshot> data = new MutableLiveData<>();
-        FirebaseManager.getInstance().getFirebaseFirestoreInstance()
-                .collection(ConstantsValues.EMERGENCIES_COLLECTION)
-                .whereEqualTo("", unitWork)
-                .addSnapshotListener(new EventListener<QuerySnapshot>() {
-                    @Override
-                    public void onEvent(@Nullable @org.jetbrains.annotations.Nullable QuerySnapshot value, @Nullable @org.jetbrains.annotations.Nullable FirebaseFirestoreException error) {
-                        data.setValue(value);
-                    }
-                });
-        return data;
-    }
 
-    public LiveData<EmergencyModel> getEmergencyWorkingOn(String currentUnit) {
+    public LiveData<EmergencyModel> getEmergencyWorkingOnModel(String currentUnit) {
         MutableLiveData<EmergencyModel> data = new MutableLiveData<>();
         if (currentUnit == null || currentUnit.isEmpty()) {
             data.setValue(null);
         } else {
             FirebaseManager.getInstance().getFirebaseFirestoreInstance()
                     .collection(ConstantsValues.EMERGENCIES_COLLECTION)
+                    .whereEqualTo("status", ConstantsValues.WORKING)
                     .whereEqualTo("currentUnit", currentUnit)
                     .get()
                     .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                         @Override
                         public void onComplete(@NonNull @NotNull Task<QuerySnapshot> task) {
-                            if (task.isSuccessful()) {
-                                if (task.getResult().size() > 0) {
+                            if (task.isSuccessful()){
+                                if (task.getResult().getDocuments().size() > 0){
                                     EmergencyModel emergencyModel = task.getResult().getDocuments().get(0).toObject(EmergencyModel.class);
                                     data.setValue(emergencyModel);
-                                } else {
+                                }else{
                                     data.setValue(null);
                                 }
-                            } else {
+                            }else{
                                 data.setValue(null);
                             }
+                        }
+                    });
+        }
+        return data;
+    }
+
+    public LiveData<QuerySnapshot> getEmergencyWorkingOn(String currentUnit) {
+        MutableLiveData<QuerySnapshot> data = new MutableLiveData<>();
+        if (currentUnit == null || currentUnit.isEmpty()) {
+            data.setValue(null);
+        } else {
+            FirebaseManager.getInstance().getFirebaseFirestoreInstance()
+                    .collection(ConstantsValues.EMERGENCIES_COLLECTION)
+                    .whereEqualTo("currentUnit", currentUnit)
+                    .whereEqualTo("status", ConstantsValues.WORKING)
+                    .addSnapshotListener(new EventListener<QuerySnapshot>() {
+                        @Override
+                        public void onEvent(@Nullable @org.jetbrains.annotations.Nullable QuerySnapshot value, @Nullable @org.jetbrains.annotations.Nullable FirebaseFirestoreException error) {
+                            data.setValue(value);
                         }
                     });
         }
@@ -221,7 +217,8 @@ public class EmergencyRepository {
                                                 "longitude", emergencyModel.getLongitude(),
                                                 "latitude", emergencyModel.getLatitude(),
                                                 "gravity", emergencyModel.getGravity(),
-                                                "status", emergencyModel.getStatus()
+                                                "status", emergencyModel.getStatus(),
+                                                "currentUnit", emergencyModel.getCurrentUnit()
                                                 )
                                         .addOnCompleteListener(new OnCompleteListener<Void>() {
                                             @Override

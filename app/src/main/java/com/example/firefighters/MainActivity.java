@@ -1,31 +1,26 @@
 package com.example.firefighters;
 
 import android.Manifest;
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.widget.Toast;
 
 import com.example.firefighters.models.UserModel;
-import com.example.firefighters.repositories.UserRepository;
 import com.example.firefighters.tools.ConstantsValues;
 import com.example.firefighters.tools.FirebaseManager;
-import com.example.firefighters.ui.home.HomeFragment;
 import com.example.firefighters.ui.main.MainFragment;
-import com.example.firefighters.viewmodels.EmergencyViewModel;
 import com.example.firefighters.viewmodels.UserViewModel;
 import com.facebook.drawee.backends.pipeline.Fresco;
-import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatDelegate;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.navigation.NavController;
-import androidx.navigation.Navigation;
-import androidx.navigation.ui.AppBarConfiguration;
-import androidx.navigation.ui.NavigationUI;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -38,6 +33,14 @@ public class MainActivity extends AppCompatActivity {
         Fresco.initialize(this);
         setContentView(R.layout.activity_main);
 
+        //Set theme
+        SharedPreferences sharedPref = getPreferences(Context.MODE_PRIVATE);
+        String theme = sharedPref.getString(getString(R.string.save_theme), "");
+        if (theme.equals("dark")) {
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
+        }else{
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
+        }
         loadGeneralInfo();
     }
 

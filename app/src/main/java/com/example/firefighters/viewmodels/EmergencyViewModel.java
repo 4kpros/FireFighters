@@ -1,7 +1,5 @@
 package com.example.firefighters.viewmodels;
 
-import android.app.Activity;
-
 import com.example.firefighters.models.EmergencyModel;
 import com.example.firefighters.repositories.EmergencyRepository;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -9,7 +7,6 @@ import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import androidx.lifecycle.LiveData;
-import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
 public class EmergencyViewModel extends ViewModel {
@@ -28,7 +25,10 @@ public class EmergencyViewModel extends ViewModel {
         return repository.getEmergenciesQuerySnapshot(lastFilter, lastOrder);
     }
 
-    public LiveData<EmergencyModel> getEmergencyWorkingOn(String  currentUnit) {
+    public LiveData<EmergencyModel> getEmergencyWorkingOnModel(String  currentUnit) {
+        return repository.getEmergencyWorkingOnModel(currentUnit);
+    }
+    public LiveData<QuerySnapshot> getEmergencyWorkingOn(String  currentUnit) {
         return repository.getEmergencyWorkingOn(currentUnit);
     }
     public LiveData<Integer> saveEmergency(EmergencyModel emergencyModel) {

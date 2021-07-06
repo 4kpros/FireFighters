@@ -12,10 +12,14 @@
         android:layout_height="match_parent"
         android:visibility="gone"
         />
-    <include layout="@layout/page_profile_home"
+
+    <include
+        layout="@layout/page_profile_home"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        />
+        tools:layout_editor_absoluteX="0dp"
+        tools:layout_editor_absoluteY="0dp" />
+
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/constraint_floating_action_buttons"
         android:layout_width="wrap_content"

@@ -2,12 +2,10 @@ package com.example.firefighters.repositories;
 
 import android.app.Activity;
 
-import com.example.firefighters.models.EmergencyModel;
 import com.example.firefighters.models.UserModel;
 import com.example.firefighters.tools.ConstantsValues;
 import com.example.firefighters.tools.FirebaseManager;
 import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.firestore.DocumentReference;

@@ -7,15 +7,12 @@ import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.CountDownTimer;
 import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
@@ -27,6 +24,7 @@ import com.example.firefighters.models.EmergencyModel;
 import com.example.firefighters.models.MessageModel;
 import com.example.firefighters.models.UserModel;
 import com.example.firefighters.tools.ConstantsValues;
+import com.example.firefighters.tools.FirebaseManager;
 import com.example.firefighters.viewmodels.EmergencyViewModel;
 import com.example.firefighters.viewmodels.MessageViewModel;
 import com.example.firefighters.viewmodels.UserViewModel;
@@ -36,18 +34,17 @@ import com.google.android.material.progressindicator.CircularProgressIndicator;
 import com.google.android.material.textview.MaterialTextView;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.Query;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Objects;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -59,18 +56,24 @@ public class EmergencyFragment extends Fragment {
     private MessageViewModel messageViewModel;
     private UserViewModel userViewModel;
 
+    CircularProgressIndicator progressIndicator;
+
     private EmergencyAdapter emergencyAdapter;
     private RecyclerView emergenciesRecyclerView;
     private Context context;
+
     //Image views
     private ImageView buttonFilter;
     private ImageView buttonOrder;
     //Text views
+    private TextView textTopTitle;
+    //Linear layouts
     private LinearLayoutManager layoutManager;
+
     private final int loadQte = 10;
     private ArrayList<EmergencyModel> emergencies;
 
-    private String lastFilter = ConstantsValues.FILTER_STATUS;
+    private String lastFilter = ConstantsValues.FILTER_NAME;
     private Query.Direction lastOrder = Query.Direction.DESCENDING;
     DocumentSnapshot lastDocument;
     private int limitCount = 10;
@@ -79,6 +82,7 @@ public class EmergencyFragment extends Fragment {
     private Handler handlePlayingVoice = new Handler();
     private boolean isPlaying;
     private boolean canRunThread;
+    private FragmentActivity activity;
 
     @Override
     public void onCreate(@Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
@@ -90,16 +94,44 @@ public class EmergencyFragment extends Fragment {
                              ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_emergency, container, false);
         context = view.getContext();
-        lastFilter = ConstantsValues.FILTER_STATUS;
+        activity = getActivity();
+        lastFilter = ConstantsValues.FILTER_NAME;
         lastOrder = Query.Direction.DESCENDING;
         lastDocument = null;
         emergencies = new ArrayList<>();
         lastDocument = null;
         initViews(view);
-        checkInteractions();
-        initRecyclerView(view);
-        loadMoreEmergencies();
+        getUserType();
         return view;
+    }
+
+    private void getUserType() {
+        //Set the correct page if the user is auth
+        if (FirebaseManager.getInstance().getCurrentAuthUser() == null){
+            //Set the connexion page
+            userViewModel.logOut();
+        }else{
+            if (FirebaseManager.getInstance().getCurrentAuthUser() != null && FirebaseManager.getInstance().getCurrentAuthUser().getEmail() != null){
+                userViewModel.loadUserModel(FirebaseManager.getInstance().getCurrentAuthUser().getEmail()).observe(requireActivity(), new Observer<UserModel>() {
+                    @Override
+                    public void onChanged(UserModel userModel) {
+                        if(userModel != null){
+                            if (userModel.isFireFighter()){
+                                //Go to firefighter page
+                                ConstantsValues.setIsFirefighter(true);
+                                ConstantsValues.setIsChief(userModel.isChief());
+                                ConstantsValues.setUnit(userModel.getUnit());
+                            }
+                            checkInteractions();
+                            initRecyclerView();
+                            loadMoreEmergencies();
+                        }
+                        if (getActivity() != null)
+                            userViewModel.loadUserModel(FirebaseManager.getInstance().getCurrentAuthUser().getEmail()).removeObservers(requireActivity());
+                    }
+                });
+            }
+        }
     }
 
     @Override
@@ -124,7 +156,7 @@ public class EmergencyFragment extends Fragment {
             @Override
             public void onScrolled(@NonNull @NotNull RecyclerView recyclerView, int dx, int dy) {
                 super.onScrolled(recyclerView, dx, dy);
-                if (!recyclerView.canScrollVertically(1)){
+                if (recyclerView.canScrollVertically(1)){
                     loadMoreEmergencies();
                 }
             }
@@ -136,25 +168,27 @@ public class EmergencyFragment extends Fragment {
         emergencyViewModel.getEmergenciesQuery(lastDocument, lastFilter, lastOrder, limitCount).observe(requireActivity(), new Observer<QuerySnapshot>() {
             @Override
             public void onChanged(QuerySnapshot queryDocumentSnapshots) {
-                hideLoadingEmergencies();
                 for (DocumentSnapshot document:queryDocumentSnapshots) {
                     emergencies.add(document.toObject(EmergencyModel.class));
                 }
                 emergencyAdapter.notifyItemRangeInserted(emergencyAdapter.getItemCount(), emergencies.size());
+                hideLoadingEmergencies();
                 if (queryDocumentSnapshots.size() > 0 && queryDocumentSnapshots.getDocuments().size() > 0)
                     lastDocument = queryDocumentSnapshots.getDocuments().get(queryDocumentSnapshots.size()-1);
-                if (getActivity() != null)
-                    emergencyViewModel.getEmergenciesQuery(lastDocument, lastFilter, lastOrder, limitCount).removeObservers(requireActivity());
             }
         });
     }
 
     private void showLoadingEmergenciesView() {
-        //
+        progressIndicator.show();
+        progressIndicator.setVisibility(View.VISIBLE);
+        textTopTitle.setVisibility(View.INVISIBLE);
     }
 
     private void hideLoadingEmergencies() {
-        //
+        progressIndicator.hide();
+        progressIndicator.setVisibility(View.GONE);
+        textTopTitle.setVisibility(View.VISIBLE);
     }
 
     private void showDetailsDialog(int position) {
@@ -348,11 +382,11 @@ public class EmergencyFragment extends Fragment {
         }
     }
 
-    private void showStreetMap(View view, int position) {
+    private void showStreetMap(int position) {
         //
     }
 
-    private void showBottomSheetDialogEmergencyMore(View view, int position) {
+    private void showBottomSheetDialogEmergencyMore(int position) {
         BottomSheetDialog bottomSheet = new BottomSheetDialog(context);
         bottomSheet.setContentView(R.layout.bottom_sheet_layout_emergency_more);
         bottomSheet.setCancelable(true);
@@ -408,21 +442,34 @@ public class EmergencyFragment extends Fragment {
         bottomSheet.dismiss();
         EmergencyModel em = emergencies.get(position);
         em.setStatus(status);
-        if (status.equals(ConstantsValues.WORKING) || status.equals(ConstantsValues.FINISHED)){
-            em.setCurrentUnit(ConstantsValues.getUnit());
-        }
-        emergencyViewModel.updateEmergency(em).observe(requireActivity(), new Observer<Integer>() {
-            @Override
-            public void onChanged(Integer integer) {
-                if (integer >= 1){
-                    emergencies.set(position, em);
-                    emergencyAdapter.notifyItemChanged(position);
-                    Toast.makeText(context, "Updated !", Toast.LENGTH_SHORT).show();
-                }else{
-                    Toast.makeText(context, "Error  update !", Toast.LENGTH_SHORT).show();
+        String tempUnit = ConstantsValues.getUnit();
+        em.setCurrentUnit(tempUnit);
+        if (tempUnit != null && !tempUnit.isEmpty()){
+            emergencyViewModel.getEmergencyWorkingOnModel(tempUnit).observe(activity, new Observer<EmergencyModel>() {
+                @Override
+                public void onChanged(EmergencyModel emergencyModel) {
+                    if (emergencyModel != null){
+                        Toast.makeText(context, "You cannot work on 2 places !", Toast.LENGTH_SHORT).show();
+                    }else {
+                        emergencyViewModel.updateEmergency(em).observe(requireActivity(), new Observer<Integer>() {
+                            @Override
+                            public void onChanged(Integer integer) {
+                                if (integer >= 1){
+                                    emergencies.set(position, em);
+                                    emergencyAdapter.notifyItemChanged(position);
+                                    Toast.makeText(context, "Updated !", Toast.LENGTH_SHORT).show();
+                                }else{
+                                    Toast.makeText(context, "Error  update !", Toast.LENGTH_SHORT).show();
+                                }
+                            }
+                        });
+                    }
                 }
-            }
-        });
+            });
+
+        }else {
+            Toast.makeText(context, "You are not allowed !", Toast.LENGTH_SHORT).show();
+        }
     }
 
     private void showBottomSheetDialogFilter(View view) {
@@ -464,6 +511,7 @@ public class EmergencyFragment extends Fragment {
     private void filterResultsBy(String filterName) {
         lastFilter = filterName;
         emergencies.clear();
+        emergencyAdapter.notifyDataSetChanged();
         lastDocument = null;
         loadMoreEmergencies();
     }
@@ -504,17 +552,17 @@ public class EmergencyFragment extends Fragment {
         loadMoreEmergencies();
     }
 
-    private void initRecyclerView(View view) {
+    private void initRecyclerView() {
         emergencies = new ArrayList<>();
         layoutManager = new LinearLayoutManager(context, RecyclerView.VERTICAL, false);
         emergencyAdapter = new EmergencyAdapter(context, emergencies, new EmergencyAdapter.OnItemClickListener() {
             @Override
             public void onItemMoreClick(int position) {
-                showBottomSheetDialogEmergencyMore(view, position);
+                showBottomSheetDialogEmergencyMore(position);
             }
             @Override
             public void onItemStreetClick(int position) {
-                showStreetMap(view, position);
+                showStreetMap(position);
             }
 
             @Override
@@ -539,10 +587,13 @@ public class EmergencyFragment extends Fragment {
 
     private void initViews(View view) {
         emergenciesRecyclerView = view.findViewById(R.id.recycler_emergencies);
+        progressIndicator = view.findViewById(R.id.progress_loading_emergencies);
 
         //Buttons
         buttonFilter = view.findViewById(R.id.button_image_filter);
         buttonOrder = view.findViewById(R.id.button_image_order);
+
+        textTopTitle = view.findViewById(R.id.text_emergency_top_title);
     }
 
     @Override

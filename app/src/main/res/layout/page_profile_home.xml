@@ -108,8 +108,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="5dp"
-                android:layout_marginTop="5dp"
                 android:layout_marginEnd="10dp"
+                android:layout_marginTop="5dp"
                 android:layout_marginBottom="10dp"
                 android:autoLink="all"
                 android:ellipsize="end"
@@ -122,13 +122,31 @@
                 app:layout_constraintTop_toTopOf="@+id/constraint_profile_image"
                 app:layout_constraintBottom_toBottomOf="@+id/constraint_profile_image"
                 app:rippleColor="@color/light_300" />
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/button_image_add_water_point"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                style="@style/Widget.MaterialComponents.Button.TextButton"
+                android:text="Water point"
+                android:autoLink="all"
+                android:ellipsize="end"
+                android:linksClickable="true"
+                android:maxLines="1"
+                app:iconGravity="textStart"
+                app:icon="@drawable/ic_round_add_24"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/LinearLayout_profile_background"
+                app:rippleColor="@color/light_300"
+                />
             <LinearLayout
                 android:id="@+id/linear_working_on"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
                 android:orientation="vertical"
-                app:layout_constraintTop_toBottomOf="@+id/button_log_out"
+                app:layout_constraintTop_toBottomOf="@+id/button_image_add_water_point"
+                android:visibility="gone"
                 >
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/button_working_on"
@@ -173,23 +191,33 @@
                             android:layout_height="match_parent"
                             >
                             <com.google.android.material.textview.MaterialTextView
-                                android:id="@+id/working_name"
+                                android:id="@+id/working_emergency_name"
                                 style="@style/CustomCleanTextColor"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_centerHorizontal="true"
                                 android:layout_margin="10dp"
-                                android:text="EM12"
+                                android:text=""
                                 />
                             <com.google.android.material.textview.MaterialTextView
-                                android:id="@+id/working_status"
+                                android:id="@+id/working_emergency_unit"
                                 style="@style/CustomCleanTextColor"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:layout_below="@+id/working_name"
                                 android:layout_centerHorizontal="true"
                                 android:layout_margin="10dp"
-                                android:text="Status : Working"
+                                android:layout_below="@+id/working_emergency_name"
+                                android:text=""
+                                />
+                            <com.google.android.material.textview.MaterialTextView
+                                android:id="@+id/working_emergency_status"
+                                style="@style/CustomCleanTextColor"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_below="@+id/working_emergency_unit"
+                                android:layout_centerHorizontal="true"
+                                android:layout_margin="10dp"
+                                android:text=""
                                 />
                         </RelativeLayout>
                     </androidx.cardview.widget.CardView>
@@ -202,6 +230,7 @@
                 android:layout_marginTop="10dp"
                 android:orientation="vertical"
                 app:layout_constraintTop_toBottomOf="@+id/linear_working_on"
+                android:visibility="gone"
                 >
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/button_points"

@@ -3,7 +3,6 @@ package com.example.firefighters.ui.profile;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.app.Dialog;
-import android.app.MediaRouteButton;
 import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -14,7 +13,6 @@ import android.widget.ArrayAdapter;
 import android.widget.CompoundButton;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.firefighters.R;
@@ -27,6 +25,8 @@ import com.example.firefighters.models.UserModel;
 import com.example.firefighters.models.WaterPointModel;
 import com.example.firefighters.tools.ConstantsValues;
 import com.example.firefighters.tools.FirebaseManager;
+import com.example.firefighters.ui.mapview.MapViewFragment;
+import com.example.firefighters.ui.mapviewwaterpoint.AddWaterPointFragment;
 import com.example.firefighters.viewmodels.EmergencyViewModel;
 import com.example.firefighters.viewmodels.UnitViewModel;
 import com.example.firefighters.viewmodels.UserViewModel;
@@ -41,7 +41,6 @@ import com.google.android.material.switchmaterial.SwitchMaterial;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textview.MaterialTextView;
 import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import org.jetbrains.annotations.NotNull;
@@ -52,11 +51,12 @@ import java.util.Objects;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.widget.SwitchCompat;
-import androidx.cardview.widget.CardView;
 import androidx.constraintlayout.motion.widget.MotionLayout;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -80,6 +80,9 @@ public class ProfileFragment extends Fragment {
     //Text views
     MaterialTextView textProfileMail;
     MaterialTextView textProfileName;
+    MaterialTextView textWorkingUnit;
+    MaterialTextView textWorkingStatus;
+    MaterialTextView textWorkingName;
     //Edit text
     private TextInputEditText mailSignIn;
     private TextInputEditText passwordSignIn;
@@ -95,6 +98,7 @@ public class ProfileFragment extends Fragment {
     private MaterialButton goToSignUpButton;
     private MaterialButton pointsButton;
     private MaterialButton forgotPasswordButton;
+    private MaterialButton buttonAddWaterPoint;
     private CircularProgressIndicator circularProgressIndicatorConnexion;
     private CircularProgressIndicator circularProgressIndicatorCreation;
     private CircularProgressIndicator circularProgressPoints;
@@ -113,6 +117,7 @@ public class ProfileFragment extends Fragment {
 
     private ConstraintLayout constraintFloatingAction;
     private LinearLayout linearMyPointExpand;
+    private LinearLayout linearPoints;
 
     private final int loadQte = 10;
 
@@ -134,11 +139,14 @@ public class ProfileFragment extends Fragment {
     private LinearLayoutManager layoutManagerFirefighters;
     private LinearLayout linearWorkingOn;
     private LinearLayout linearRecyclerPoints;
+    private FragmentManager fragmentManager;
+    private FragmentActivity activity;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_profile, container, false);
         context = getContext();
+        activity = getActivity();
         initViews(view);
         setupRecyclersViews();
         initViewModel();
@@ -151,6 +159,46 @@ public class ProfileFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         checkInteractions(view);
+    }
+
+    private void loadWorkingUnit() {
+        if (ConstantsValues.getUnit() != null && !ConstantsValues.getUnit().isEmpty()) {
+            emergencyViewModel.getEmergencyWorkingOn(ConstantsValues.getUnit()).observe(activity, new Observer<QuerySnapshot>() {
+                @Override
+                public void onChanged(QuerySnapshot queryDocumentSnapshots) {
+                    if (queryDocumentSnapshots != null){
+                        if(queryDocumentSnapshots.getDocuments().size() > 0){
+                            EmergencyModel emergencyModel = queryDocumentSnapshots.getDocuments().get(0).toObject(EmergencyModel.class);
+                            if (emergencyModel != null) {
+                                setCurrentWorkingViews(emergencyModel);
+                            }else {
+                                removeCurrentWorkingViews();
+                            }
+                        }else{
+                            removeCurrentWorkingViews();
+                        }
+                    }else{
+                        removeCurrentWorkingViews();
+                    }
+                }
+            });
+        }else{
+            removeCurrentWorkingViews();
+        }
+    }
+
+    private void setCurrentWorkingViews(EmergencyModel emergencyModel) {
+        String tempName = "Emergency : EM"+emergencyModel.getId();
+        textWorkingName.setText(tempName);
+        String tempUnit = "Unit : "+emergencyModel.getCurrentUnit();
+        textWorkingUnit.setText(tempUnit);
+        String tempStatus = "Status : "+emergencyModel.getStatus();
+        textWorkingStatus.setText(tempStatus);
+    }
+    private void removeCurrentWorkingViews() {
+        textWorkingName.setText("");
+        textWorkingUnit.setText("None !");
+        textWorkingStatus.setText("");
     }
 
     private void initViewModel() {
@@ -190,6 +238,12 @@ public class ProfileFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 getPointsPanel();
+            }
+        });
+        buttonAddWaterPoint.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                goToMapViewAddWaterPoint();
             }
         });
         toggleButton.addOnButtonCheckedListener(new MaterialButtonToggleGroup.OnButtonCheckedListener() {
@@ -252,6 +306,14 @@ public class ProfileFragment extends Fragment {
         });
     }
 
+    private void goToMapViewAddWaterPoint() {
+        fragmentManager = activity.getSupportFragmentManager();
+        FragmentTransaction ft = fragmentManager.beginTransaction();
+        ft.setCustomAnimations(R.anim.anim_tanslate_scale_in, R.anim.anim_tanslate_scale_out);
+        ft.add(R.id.main_frame_layout, new AddWaterPointFragment()).addToBackStack(null);
+        ft.commit();
+    }
+
     private void showLoadingPoints() {
         circularProgressPoints.show();
         circularProgressPoints.setVisibility(View.VISIBLE);
@@ -281,34 +343,6 @@ public class ProfileFragment extends Fragment {
         waterPoints = new ArrayList<>();
         layoutManagerWaterPoints = new LinearLayoutManager(context, RecyclerView.VERTICAL, false);
         waterPointAdapter = new WaterPointAdapter(context, waterPoints);
-//
-//        recyclerViewMyFirefighter.addOnScrollListener(new RecyclerView.OnScrollListener() {
-//            @Override
-//            public void onScrolled(@NonNull @NotNull RecyclerView recyclerView, int dx, int dy) {
-//                super.onScrolled(recyclerView, dx, dy);
-//                if (!recyclerView.canScrollVertically(1)){
-//                    loadMoreFirefighters();
-//                }
-//            }
-//        });
-//        recyclerViewMyEmergencies.addOnScrollListener(new RecyclerView.OnScrollListener() {
-//            @Override
-//            public void onScrolled(@NonNull @NotNull RecyclerView recyclerView, int dx, int dy) {
-//                super.onScrolled(recyclerView, dx, dy);
-//                if (!recyclerView.canScrollVertically(1)){
-//                    loadMoreEmergencies();
-//                }
-//            }
-//        });
-//        recyclerViewMyWaterPoints.addOnScrollListener(new RecyclerView.OnScrollListener() {
-//            @Override
-//            public void onScrolled(@NonNull @NotNull RecyclerView recyclerView, int dx, int dy) {
-//                super.onScrolled(recyclerView, dx, dy);
-//                if (!recyclerView.canScrollVertically(1)){
-//                    loadMoreWaterPoints();
-//                }
-//            }
-//        });
     }
 
     private void loadMoreEmergencies() {
@@ -505,6 +539,7 @@ public class ProfileFragment extends Fragment {
                                 //Go to basic user page
                                 goToProfileHomePageDefault();
                             }
+                            loadWorkingUnit();
                             if (getActivity() != null)
                                 userViewModel.loadUserModel(FirebaseManager.getInstance().getCurrentAuthUser().getEmail()).removeObservers(requireActivity());
                         }
@@ -542,6 +577,7 @@ public class ProfileFragment extends Fragment {
         pageProfileConnexion.setVisibility(View.GONE);
         linearWorkingOn.setVisibility(View.GONE);
         constraintFloatingAction.setVisibility(View.VISIBLE);
+        linearPoints.setVisibility(View.VISIBLE);
     }
     private void goToProfileHomePageFireFighter(boolean chief, String unit) {
         ConstantsValues.setIsFirefighter(true);
@@ -557,9 +593,10 @@ public class ProfileFragment extends Fragment {
         pageProfileHome.setVisibility(View.VISIBLE);
         pageProfileConnexion.setVisibility(View.GONE);
         linearWorkingOn.setVisibility(View.VISIBLE);
-        constraintFloatingAction.setVisibility(View.VISIBLE);
+        constraintFloatingAction.setVisibility(View.GONE);
         floatingButtonAddFireFighter.setVisibility(View.GONE);
         floatingButtonAddUnit.setVisibility(View.GONE);
+        linearPoints.setVisibility(View.VISIBLE);
     }
     private void goToProfileHomePageDefault() {
         if(FirebaseManager.getInstance().getCurrentAuthUser().getDisplayName() == null){
@@ -568,6 +605,7 @@ public class ProfileFragment extends Fragment {
             textProfileName.setText(FirebaseManager.getInstance().getCurrentAuthUser().getDisplayName());
         }
         firefighterPointButton.setVisibility(View.GONE);
+        linearPoints.setVisibility(View.GONE);
         textProfileMail.setText(FirebaseManager.getInstance().getCurrentAuthUser().getEmail());
         pageProfileHome.setVisibility(View.VISIBLE);
         pageProfileConnexion.setVisibility(View.GONE);
@@ -777,6 +815,10 @@ public class ProfileFragment extends Fragment {
         textProfileMail = root.findViewById(R.id.text_profile_mail);
         textProfileName = root.findViewById(R.id.text_profile_user_name);
 
+        textWorkingName = root.findViewById(R.id.working_emergency_name);
+        textWorkingUnit = root.findViewById(R.id.working_emergency_unit);
+        textWorkingStatus = root.findViewById(R.id.working_emergency_status);
+
         //Edit texts
         mailSignIn = root.findViewById(R.id.text_input_sign_in_mail);
         passwordSignIn = root.findViewById(R.id.text_input_sign_in_password);
@@ -792,6 +834,7 @@ public class ProfileFragment extends Fragment {
         goToSignInButton = root.findViewById(R.id.button_go_to_sign_in);
         goToSignUpButton = root.findViewById(R.id.button_go_to_sign_up);
         pointsButton = root.findViewById(R.id.button_points);
+        buttonAddWaterPoint = root.findViewById(R.id.button_image_add_water_point);
         forgotPasswordButton = root.findViewById(R.id.button_forgot_password);
 
         checkBoxRemember = root.findViewById(R.id.checkbox_remember_me);
@@ -820,6 +863,7 @@ public class ProfileFragment extends Fragment {
 
         //LinearLayouts
         linearMyPointExpand = root.findViewById(R.id.linear_manage_points_expand);
+        linearPoints = root.findViewById(R.id.linear_points);
         constraintFloatingAction = root.findViewById(R.id.constraint_floating_action_buttons);
         linearWorkingOn = root.findViewById(R.id.linear_working_on);
         linearRecyclerPoints = root.findViewById(R.id.linear_recycler_points);

@@ -24,7 +24,7 @@
         android:alpha="1"
         />
     <ImageView
-        android:id="@+id/button_image_back"
+        android:id="@+id/button_back_mapview"
         android:layout_width="40dp"
         android:layout_height="40dp"
         app:layout_constraintLeft_toLeftOf="@+id/linear_top_buttons_background"
@@ -38,6 +38,36 @@
         android:clickable="true"
         android:focusable="true"
         />
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintLeft_toRightOf="@+id/button_back_mapview"
+        app:layout_constraintRight_toLeftOf="@+id/button_image_add_water_point"
+        app:layout_constraintTop_toTopOf="@+id/linear_top_buttons_background"
+        app:layout_constraintBottom_toBottomOf="@+id/linear_top_buttons_background"
+        android:gravity="center"
+        android:layout_marginStart="10dp"
+        android:layout_marginEnd="10dp"
+        >
+        <TextView
+            android:id="@+id/text_distance"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text=""
+            android:maxLength="20"
+            android:maxLines="1"
+            android:ellipsize="end"
+            />
+        <TextView
+            android:id="@+id/text_distance_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text=""
+            android:maxLines="1"
+            android:ellipsize="end"
+            />
+    </LinearLayout>
     <ImageView
         android:id="@+id/button_image_add_water_point"
         android:layout_width="40dp"
@@ -79,6 +109,7 @@
         android:gravity="center"
         android:layout_marginLeft="15dp"
         android:layout_marginRight="15dp"
+        android:visibility="gone"
         >
         <com.google.android.material.button.MaterialButton
             android:id="@+id/button_start_navigation"
@@ -90,15 +121,6 @@
             app:icon="@drawable/ic_baseline_navigation_24"
             app:backgroundTint="@color/blue_200"
             app:cornerRadius="5dp" />
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/button_cancel"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="10dp"
-            android:layout_marginRight="10dp"
-            android:text="Cancel"
-            app:backgroundTint="@color/purple_200"
-            app:cornerRadius="5dp"/>
     </LinearLayout>
     <com.google.android.material.button.MaterialButtonToggleGroup
         android:id="@+id/toggle_button"

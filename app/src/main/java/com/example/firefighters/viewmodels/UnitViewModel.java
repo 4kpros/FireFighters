@@ -1,11 +1,7 @@
 package com.example.firefighters.viewmodels;
 
-import com.example.firefighters.models.EmergencyModel;
 import com.example.firefighters.models.UnitModel;
-import com.example.firefighters.repositories.EmergencyRepository;
 import com.example.firefighters.repositories.UnitRepository;
-import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import androidx.lifecycle.LiveData;

@@ -27,7 +27,11 @@
     <!-- BottomTab bar -->
     <style name="CustomTab">
         <item name="android:background">@drawable/custom_tab_light</item>
-    </style>v
+    </style>
+
+    <style name="customInstructionView">
+        <item name="navigationViewLocationLayerStyle">@style/NavigationLocationLayerStyle</item>
+    </style>
 
     <!-- Extended floating action button -->
     <style name="CustomExtendedFloatingAction" parent="@style/Widget.MaterialComponents.ExtendedFloatingActionButton">

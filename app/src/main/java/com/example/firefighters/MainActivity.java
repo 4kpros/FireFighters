@@ -39,6 +39,7 @@ public class MainActivity extends AppCompatActivity {
     private EmergencyViewModel emergencyViewModel;
     private NotificationManagerCompat notificationManagerCompat;
     private String CHANNEL_ID = "FIRE_FIGHTER_CHANNEL_1";
+    private boolean firsTime;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -126,13 +127,17 @@ public class MainActivity extends AppCompatActivity {
         emergencyViewModel.getEmergenciesQuerySnapshot(null, null).observe(this, new Observer<QuerySnapshot>() {
             @Override
             public void onChanged(QuerySnapshot queryDocumentSnapshots) {
-                if (queryDocumentSnapshots != null){
-                    if (queryDocumentSnapshots.getDocumentChanges().size() > 0){
-                        for (DocumentChange document:queryDocumentSnapshots.getDocumentChanges()) {
-                            EmergencyModel emergencyModel = document.getDocument().toObject(EmergencyModel.class);
-                            notifyUser(emergencyModel);
+                if (firsTime){
+                    if (queryDocumentSnapshots != null){
+                        if (queryDocumentSnapshots.getDocumentChanges().size() > 0){
+                            for (DocumentChange document:queryDocumentSnapshots.getDocumentChanges()) {
+                                EmergencyModel emergencyModel = document.getDocument().toObject(EmergencyModel.class);
+                                notifyUser(emergencyModel);
+                            }
                         }
                     }
+                }else {
+                    firsTime = true;
                 }
             }
         });
@@ -142,7 +147,7 @@ public class MainActivity extends AppCompatActivity {
         notificationManagerCompat = NotificationManagerCompat.from(this);
         String tempMessage = "EM "+emergencyModel.getId();
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this)
-                .setContentTitle("Nouveau message de sensibilisation")
+                .setContentTitle("New emergency !")
                 .setContentText(tempMessage)
                 .setSmallIcon(R.drawable.ic_baseline_fireplace_24)
                 .setChannelId(CHANNEL_ID)
@@ -154,7 +159,7 @@ public class MainActivity extends AppCompatActivity {
 
         if (Build.VERSION.SDK_INT > 26) {
             NotificationChannel channel = null;
-            channel = new NotificationChannel(CHANNEL_ID, "covid_app", NotificationManager.IMPORTANCE_LOW);
+            channel = new NotificationChannel(CHANNEL_ID, "Firefighters", NotificationManager.IMPORTANCE_LOW);
             manager.createNotificationChannel(channel);
         }
 

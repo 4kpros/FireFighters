@@ -101,37 +101,10 @@ public class EmergencyFragment extends Fragment {
         emergencies = new ArrayList<>();
         lastDocument = null;
         initViews(view);
-        getUserType();
+        initRecyclerView();
+        checkInteractions();
+        loadMoreEmergencies();
         return view;
-    }
-
-    private void getUserType() {
-        //Set the correct page if the user is auth
-        if (FirebaseManager.getInstance().getCurrentAuthUser() == null){
-            //Set the connexion page
-            userViewModel.logOut();
-        }else{
-            if (FirebaseManager.getInstance().getCurrentAuthUser() != null && FirebaseManager.getInstance().getCurrentAuthUser().getEmail() != null){
-                userViewModel.loadUserModel(FirebaseManager.getInstance().getCurrentAuthUser().getEmail()).observe(requireActivity(), new Observer<UserModel>() {
-                    @Override
-                    public void onChanged(UserModel userModel) {
-                        if(userModel != null){
-                            if (userModel.isFireFighter()){
-                                //Go to firefighter page
-                                ConstantsValues.setIsFirefighter(true);
-                                ConstantsValues.setIsChief(userModel.isChief());
-                                ConstantsValues.setUnit(userModel.getUnit());
-                            }
-                            checkInteractions();
-                            initRecyclerView();
-                            loadMoreEmergencies();
-                        }
-                        if (getActivity() != null)
-                            userViewModel.loadUserModel(FirebaseManager.getInstance().getCurrentAuthUser().getEmail()).removeObservers(requireActivity());
-                    }
-                });
-            }
-        }
     }
 
     @Override

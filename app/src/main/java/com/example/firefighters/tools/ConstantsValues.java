@@ -1,5 +1,7 @@
 package com.example.firefighters.tools;
 
+import com.example.firefighters.viewmodels.EmergencyViewModel;
+
 public abstract class ConstantsValues {
 
     //Application tag

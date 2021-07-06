@@ -24,6 +24,9 @@ public class EmergencyViewModel extends ViewModel {
     public LiveData<QuerySnapshot> getEmergenciesQuerySnapshot(String lastFilter, Query.Direction lastOrder) {
         return repository.getEmergenciesQuerySnapshot(lastFilter, lastOrder);
     }
+    public LiveData<QuerySnapshot> getLastQuerySnapshot(String lastFilter, Query.Direction lastOrder) {
+        return repository.getLastQuerySnapshot(lastFilter, lastOrder);
+    }
 
     public LiveData<EmergencyModel> getEmergencyWorkingOnModel(String  currentUnit) {
         return repository.getEmergencyWorkingOnModel(currentUnit);

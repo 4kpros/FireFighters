@@ -2,12 +2,14 @@ package com.example.firefighters;
 
 import android.Manifest;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.widget.Toast;
 
 import com.example.firefighters.models.UserModel;
+import com.example.firefighters.service.NotificationService;
 import com.example.firefighters.tools.ConstantsValues;
 import com.example.firefighters.tools.FirebaseManager;
 import com.example.firefighters.ui.main.MainFragment;
@@ -96,8 +98,10 @@ public class MainActivity extends AppCompatActivity {
                     if (userModel != null) {
                         ConstantsValues.setIsFirefighter(userModel.isFireFighter());
                         ConstantsValues.setIsChief(userModel.isChief());
+                        ConstantsValues.setUnit(userModel.getUnit());
                     }
                     loadViews();
+                    startService(new Intent(getApplication(), NotificationService.class));
                 }
             });
         }
@@ -108,4 +112,5 @@ public class MainActivity extends AppCompatActivity {
         ft.replace(R.id.main_frame_layout, new MainFragment()).addToBackStack(null);
         ft.commit();
     }
+
 }

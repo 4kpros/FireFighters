@@ -80,6 +80,24 @@ public class EmergencyRepository {
                 });
         return data;
     }
+    public LiveData<QuerySnapshot> getLastQuerySnapshot(String lastFilter, Query.Direction lastOrder) {
+        if (lastFilter == null || lastFilter.isEmpty())
+            lastFilter = ConstantsValues.FILTER_NAME;
+        if (lastOrder == null)
+            lastOrder = Query.Direction.DESCENDING;
+        MutableLiveData<QuerySnapshot> data = new MutableLiveData<>();
+        FirebaseManager.getInstance().getFirebaseFirestoreInstance()
+                .collection(ConstantsValues.EMERGENCIES_COLLECTION)
+                .orderBy(lastFilter, lastOrder)
+                .limit(1)
+                .addSnapshotListener(new EventListener<QuerySnapshot>() {
+                    @Override
+                    public void onEvent(@Nullable @org.jetbrains.annotations.Nullable QuerySnapshot value, @Nullable @org.jetbrains.annotations.Nullable FirebaseFirestoreException error) {
+                        data.setValue(value);
+                    }
+                });
+        return data;
+    }
 
     public LiveData<EmergencyModel> getEmergencyWorkingOnModel(String currentUnit) {
         MutableLiveData<EmergencyModel> data = new MutableLiveData<>();

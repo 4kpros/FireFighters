@@ -9,10 +9,12 @@ Comme fonctionnalites nous avons :
 - reception de l'alerte grace a la notificaton push (pas execute en background mais execute sur l'activite principale qui d'alleurs n'est que la seule activite car nous avons opte pour une meilleure performance en gerant les fragments)
 - Changement de theme (pour le fun)
 
-Technologies et Pratiaues
+Technologies
 - Android Java
 - Firebase
 - Architecture components (MVVM architecture)
 - Mapbox
 
 Captures d'ecran
+
+![Alt Text](https://docs.google.com/uc?export=download&id=1UhJEfYlR0jeM7EEhlOA5Xn4GiEscZNFU)

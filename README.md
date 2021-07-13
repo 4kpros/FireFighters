@@ -1,5 +1,7 @@
 # FireFIghters
 
+CECI EST DANS LE CADRE D'UN PROJET SCOLAIRE.
+
 Cette application permet de gerer en temps reel les cas d'incendis.
 Comme fonctionnalites nous avons :
 - Gestion des comptes utilisateurs

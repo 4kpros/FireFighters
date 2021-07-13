@@ -15,6 +15,17 @@ Technologies
 - Architecture components (MVVM architecture)
 - Mapbox
 
+Comment est ce que ca marche :
+- Nous avons 3 pages au depart (Home, Emergencies, Profil)
+- Dans l'onglet HOME, on a les boutons :
+    . Bluetooth : permet de voir l'appareil sur lequel nous sommes connecte.
+    . Setting : Permet de changer le theme.
+    . Call : Permet de lancer un appel vers un numero de telephone.
+    . SMS : Permet d'envoyer un message vers un numero de telephone.
+    . SOS : Permet d'envoyer une alerte en ayant la possibilite d'ajouter une image, audio et sms.
+    . Map view : Ici on affiche la map avec les points d'eau et d'alertes. Nous pouvons egalement tracer la route entre notre position et le point choisi.
+
+
 Captures d'ecran
 
 ![Alt Text](https://docs.google.com/uc?export=download&id=1UhJEfYlR0jeM7EEhlOA5Xn4GiEscZNFU)

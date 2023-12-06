@@ -1009,6 +1009,10 @@ class HomeFragment : Fragment() {
 
     override fun onDestroy() {
         super.onDestroy()
-        handlerRecordVoice.removeCallbacks((runnableRecordVoice)!!)
+        try {
+            handlerRecordVoice.removeCallbacks((runnableRecordVoice)!!)
+        }catch (error: Throwable) {
+            error.printStackTrace()
+        }
     }
 }

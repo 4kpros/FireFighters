@@ -7,18 +7,18 @@
 
     <fragment
         android:id="@+id/navigation_home"
-        android:name="com.example.firefighters.ui.home.HomeFragment"
+        android:name="com.example.firefighters.ui.fragments.HomeFragment"
         android:label="@string/title_home"
         tools:layout="@layout/fragment_home" />
 
     <fragment
         android:id="@+id/navigation_emergency"
-        android:name="com.example.firefighters.ui.emergency.EmergencyFragment"
+        android:name="com.example.firefighters.ui.fragments.EmergencyFragment"
         android:label="@string/title_emergency"
         tools:layout="@layout/fragment_emergency" />
     <fragment
         android:id="@+id/navigation_profile"
-        android:name="com.example.firefighters.ui.profile.ProfileFragment"
+        android:name="com.example.firefighters.ui.fragments.ProfileFragment"
         android:label="@string/title_profile"
         tools:layout="@layout/fragment_profile" />
 </navigation>

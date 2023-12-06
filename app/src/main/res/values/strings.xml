@@ -8,7 +8,7 @@
     <!-- TODO: Remove or change this placeholder text -->
     <string name="title_emergency">Emergency</string>
 
-    <string name="mapbox_access_token">sk.eyJ1IjoiNGtwcm9zeiIsImEiOiJja3BncXV2YmgyajNyMnpvZ2xqcTRsdnQxIn0.dKNuwojM1l0dRUy4TinnfQ</string>
+    <string name="mapbox_access_token">pk.eyJ1IjoiNGtwcm9zeiIsImEiOiJjbHBycmVnZmYwZDI5MnFuODdmOHR6c2Y4In0.jx8UP5In55fGb3q3JZEqHA</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="save_theme">save_theme</string>

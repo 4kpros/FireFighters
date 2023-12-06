@@ -1,169 +1,179 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:mapbox="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    style="@style/CustomShapeGradient">
-    <com.mapbox.mapboxsdk.maps.MapView
-        android:id="@+id/map_view"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        mapbox:mapbox_cameraZoom="17"
-        />
-    <LinearLayout
-        android:id="@+id/linear_top_buttons_background"
-        android:layout_width="0dp"
-        android:layout_height="56dp"
-        android:orientation="vertical"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        style="@style/CustomShapeRoundedGradient"
-        android:layout_margin="10dp"
-        android:alpha="1"
-        />
-    <ImageView
-        android:id="@+id/button_back_mapview"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
-        app:layout_constraintLeft_toLeftOf="@+id/linear_top_buttons_background"
-        app:layout_constraintTop_toTopOf="@+id/linear_top_buttons_background"
-        app:layout_constraintBottom_toBottomOf="@+id/linear_top_buttons_background"
-        android:layout_margin="10dp"
-        android:background="@drawable/ripple_circle"
-        android:scaleType="centerCrop"
-        android:src="@drawable/ic_baseline_keyboard_arrow_down_24"
-        android:padding="5dp"
-        android:clickable="true"
-        android:focusable="true"
-        />
-    <LinearLayout
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        app:layout_constraintLeft_toRightOf="@+id/button_back_mapview"
-        app:layout_constraintRight_toLeftOf="@+id/button_image_add_water_point"
-        app:layout_constraintTop_toTopOf="@+id/linear_top_buttons_background"
-        app:layout_constraintBottom_toBottomOf="@+id/linear_top_buttons_background"
-        android:gravity="center"
-        android:layout_marginStart="10dp"
-        android:layout_marginEnd="10dp"
-        >
-        <TextView
-            android:id="@+id/text_distance"
-            android:layout_width="wrap_content"
+        style="@style/CustomShapeGradient">
+
+        <com.mapbox.mapboxsdk.maps.MapView
+            android:id="@+id/map_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            mapbox:mapbox_cameraZoom="17" />
+
+        <LinearLayout
+            android:id="@+id/linear_top_buttons_background"
+            android:layout_width="0dp"
+            android:layout_height="56dp"
+            android:orientation="vertical"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            style="@style/CustomShapeRoundedGradient"
+            android:layout_margin="10dp"
+            android:alpha="1" />
+
+        <ImageView
+            android:id="@+id/button_back_mapview"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            app:layout_constraintLeft_toLeftOf="@+id/linear_top_buttons_background"
+            app:layout_constraintTop_toTopOf="@+id/linear_top_buttons_background"
+            app:layout_constraintBottom_toBottomOf="@+id/linear_top_buttons_background"
+            android:layout_margin="10dp"
+            android:background="@drawable/ripple_circle"
+            android:scaleType="centerCrop"
+            android:src="@drawable/baseline_arrow_back_24"
+            android:padding="5dp"
+            android:clickable="true"
+            android:focusable="true" />
+
+        <LinearLayout
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text=""
-            android:maxLength="20"
-            android:maxLines="1"
-            android:ellipsize="end"
-            />
-        <TextView
-            android:id="@+id/text_distance_title"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text=""
-            android:maxLines="1"
-            android:ellipsize="end"
-            />
-    </LinearLayout>
-    <ImageView
-        android:id="@+id/button_image_add_water_point"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
-        app:layout_constraintRight_toRightOf="@+id/linear_top_buttons_background"
-        app:layout_constraintTop_toTopOf="@+id/linear_top_buttons_background"
-        app:layout_constraintBottom_toBottomOf="@+id/linear_top_buttons_background"
-        android:layout_margin="10dp"
-        android:background="@drawable/ripple_circle"
-        android:scaleType="centerCrop"
-        android:src="@drawable/ic_water_drop"
-        android:padding="5dp"
-        android:clickable="true"
-        android:focusable="true"
-        />
-    <LinearLayout
-        android:id="@+id/linear_buttons_background"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:orientation="vertical"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/linear_buttons"
-        style="@style/CustomShapeRoundedGradient"
-        android:layout_marginLeft="10dp"
-        android:layout_marginRight="10dp"
-        android:layout_marginBottom="10dp"
-        android:alpha="1"
-        />
-    <LinearLayout
-        android:id="@+id/linear_buttons"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintBottom_toTopOf="@+id/toggle_button"
-        android:gravity="center"
-        android:layout_marginLeft="15dp"
-        android:layout_marginRight="15dp"
-        android:visibility="gone"
-        >
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/button_start_navigation"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            app:layout_constraintLeft_toRightOf="@+id/button_back_mapview"
+            app:layout_constraintRight_toLeftOf="@+id/button_image_add_water_point"
+            app:layout_constraintTop_toTopOf="@+id/linear_top_buttons_background"
+            app:layout_constraintBottom_toBottomOf="@+id/linear_top_buttons_background"
+            android:gravity="center"
+            android:layout_marginStart="10dp"
+            android:layout_marginEnd="10dp">
+
+            <TextView
+                android:id="@+id/text_distance"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text=""
+                android:maxLength="20"
+                android:maxLines="1"
+                android:ellipsize="end" />
+
+            <TextView
+                android:id="@+id/text_distance_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text=""
+                android:maxLines="1"
+                android:ellipsize="end" />
+        </LinearLayout>
+
+        <ImageView
+            android:id="@+id/button_image_add_water_point"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            app:layout_constraintRight_toRightOf="@+id/linear_top_buttons_background"
+            app:layout_constraintTop_toTopOf="@+id/linear_top_buttons_background"
+            app:layout_constraintBottom_toBottomOf="@+id/linear_top_buttons_background"
+            android:layout_margin="10dp"
+            android:background="@drawable/ripple_circle"
+            android:scaleType="centerCrop"
+            android:src="@drawable/ic_water_drop"
+            android:padding="5dp"
+            android:clickable="true"
+            android:focusable="true" />
+
+        <LinearLayout
+            android:id="@+id/linear_buttons_background"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:orientation="vertical"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/linear_buttons"
+            style="@style/CustomShapeRoundedGradient"
             android:layout_marginLeft="10dp"
             android:layout_marginRight="10dp"
-            android:text="Start"
-            app:icon="@drawable/ic_baseline_navigation_24"
-            app:backgroundTint="@color/blue_200"
-            app:cornerRadius="5dp" />
-    </LinearLayout>
-    <com.google.android.material.button.MaterialButtonToggleGroup
-        android:id="@+id/toggle_button"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:gravity="center"
-        app:selectionRequired="false"
-        app:singleSelection="false"
-        android:layout_marginLeft="15dp"
-        android:layout_marginRight="15dp"
-        android:layout_marginBottom="10dp"
-        app:layout_constraintLeft_toLeftOf="@+id/linear_buttons_background"
-        app:layout_constraintRight_toRightOf="@+id/linear_buttons_background"
-        app:layout_constraintBottom_toBottomOf="@+id/linear_buttons_background">
+            android:layout_marginBottom="10dp"
+            android:alpha="1" />
 
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/button_emergency_points"
-            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+        <LinearLayout
+            android:id="@+id/linear_buttons"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintBottom_toTopOf="@+id/toggle_button"
+            android:gravity="center"
+            android:layout_marginLeft="15dp"
+            android:layout_marginRight="15dp"
+            android:visibility="gone">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/button_start_navigation"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp"
+                android:text="Start"
+                app:icon="@drawable/ic_baseline_navigation_24"
+                app:backgroundTint="@color/blue_200"
+                app:cornerRadius="5dp" />
+        </LinearLayout>
+
+        <com.google.android.material.button.MaterialButtonToggleGroup
+            android:id="@+id/toggle_button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:gravity="center"
+            app:selectionRequired="false"
+            app:singleSelection="false"
+            android:layout_marginLeft="15dp"
+            android:layout_marginRight="15dp"
+            android:layout_marginBottom="10dp"
+            app:layout_constraintLeft_toLeftOf="@+id/linear_buttons_background"
+            app:layout_constraintRight_toRightOf="@+id/linear_buttons_background"
+            app:layout_constraintBottom_toBottomOf="@+id/linear_buttons_background">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/button_emergency_points"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Emergencies" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/button_water_points"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Water points" />
+        </com.google.android.material.button.MaterialButtonToggleGroup>
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/floating_button_my_position"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Emergencies" />
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/button_water_points"
-            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Water points" />
-    </com.google.android.material.button.MaterialButtonToggleGroup>
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/floating_button_my_position"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_margin="10dp"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintBottom_toTopOf="@+id/linear_buttons_background"
-        android:src="@drawable/ic_baseline_my_location_24"
-        style="@style/CustomFlatFloatingAction"
-        app:fabSize="normal"
-        app:rippleColor="@color/light_400"
-        app:backgroundTint="@color/light_500"
-        app:elevation="1dp"
-        android:tooltipText="My point"
-        mapbox:targetApi="o" />
-</androidx.constraintlayout.widget.ConstraintLayout>
+            android:layout_margin="10dp"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintBottom_toTopOf="@+id/linear_buttons_background"
+            android:src="@drawable/ic_baseline_my_location_24"
+            style="@style/CustomFlatFloatingAction"
+            app:fabSize="normal"
+            app:rippleColor="@color/light_400"
+            app:backgroundTint="@color/light_500"
+            app:elevation="1dp"
+            android:tooltipText="My point"
+            mapbox:targetApi="o" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

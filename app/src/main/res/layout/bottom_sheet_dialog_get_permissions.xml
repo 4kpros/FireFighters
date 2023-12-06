@@ -37,7 +37,7 @@
             android:linksClickable="true"
             android:maxLines="1"
             android:layout_margin="10dp"
-            android:text="Get permissions"
+            android:text="Request permissions"
             android:textColor="@color/purple_200"
             android:layout_gravity="center"
             android:gravity="center"

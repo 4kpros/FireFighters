@@ -1,0 +1,244 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:context=".ui.activities.BluetoothActivity">
+
+        <RelativeLayout
+            android:id="@+id/linear_top_buttons_background"
+            android:layout_width="0dp"
+            android:layout_height="56dp"
+            android:orientation="horizontal"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            style="@style/CustomShapeRoundedGradient"
+            android:layout_margin="10dp"
+            android:alpha="1">
+
+            <ImageView
+                android:id="@+id/button_back"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp"
+                android:layout_marginTop="5dp"
+                android:layout_marginBottom="5dp"
+                android:layout_gravity="center_vertical"
+                android:background="@drawable/ripple_circle"
+                android:scaleType="centerCrop"
+                android:src="@drawable/baseline_arrow_back_24"
+                android:padding="5dp"
+                android:clickable="true"
+                android:focusable="true"
+                android:layout_alignParentStart="true"
+                android:layout_centerVertical="true" />
+
+            <ImageView
+                android:id="@+id/button_share_location"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp"
+                android:layout_marginTop="5dp"
+                android:layout_marginBottom="5dp"
+                android:layout_gravity="center_vertical"
+                android:background="@drawable/ripple_circle"
+                android:scaleType="centerCrop"
+                android:src="@drawable/ic_fire"
+                android:padding="5dp"
+                android:clickable="true"
+                android:focusable="true"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true" />
+        </RelativeLayout>
+
+        <LinearLayout
+            android:id="@+id/bottom_sheet_container"
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            style="@style/CustomShapeRoundedGradient"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent">
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:minHeight="60dp">
+
+                <com.google.android.material.textview.MaterialTextView
+                    android:id="@+id/text_title"
+                    style="@style/CustomCleanTextColor"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentStart="true"
+                    android:layout_alignParentEnd="true"
+                    android:layout_centerInParent="true"
+                    android:ellipsize="end"
+                    android:maxLines="1"
+                    android:text="Bluetooth feature"
+                    android:textAlignment="center"
+                    android:textAllCaps="true"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    app:textAllCaps="true" />
+            </RelativeLayout>
+
+            <LinearLayout
+                android:id="@+id/linear_default"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="visible">
+
+                <com.google.android.material.textview.MaterialTextView
+                    android:id="@+id/paired_devices_count"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="0 paired devices found"
+                    style="@style/CustomCleanTextColor"
+                    android:textSize="16sp"
+                    android:layout_gravity="center"
+                    android:gravity="center" />
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/button_scan_paired_devices"
+                        style="@style/Widget.MaterialComponents.Button.TextButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:autoLink="all"
+                        android:ellipsize="end"
+                        android:linksClickable="true"
+                        android:maxLines="1"
+                        android:layout_margin="10dp"
+                        android:text="Scan paired devices"
+                        android:textColor="@color/purple_200"
+                        android:layout_gravity="center"
+                        android:gravity="center"
+                        app:rippleColor="@color/light_400"
+                        android:layout_alignParentStart="true" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/button_scan_devices"
+                        style="@style/Widget.MaterialComponents.Button.TextButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:autoLink="all"
+                        android:ellipsize="end"
+                        android:linksClickable="true"
+                        android:maxLines="1"
+                        android:layout_margin="10dp"
+                        android:text="Search devices"
+                        android:textColor="@color/purple_200"
+                        android:layout_gravity="center"
+                        android:gravity="center"
+                        app:rippleColor="@color/light_400"
+                        android:layout_alignParentEnd="true" />
+                </RelativeLayout>
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/linear_no_permissions"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <com.google.android.material.textview.MaterialTextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Bluetooth permissions required !"
+                    style="@style/CustomCleanTextColor"
+                    android:textSize="16sp"
+                    android:layout_gravity="center"
+                    android:gravity="center" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/button_get_permissions"
+                    style="@style/Widget.MaterialComponents.Button.TextButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:autoLink="all"
+                    android:ellipsize="end"
+                    android:linksClickable="true"
+                    android:maxLines="1"
+                    android:layout_margin="10dp"
+                    android:text="Grant permissions"
+                    android:textColor="@color/purple_200"
+                    android:layout_gravity="center"
+                    android:gravity="center"
+                    app:rippleColor="@color/light_400" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/linear_waiting"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <com.google.android.material.textview.MaterialTextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Searching..."
+                    style="@style/CustomCleanTextColor"
+                    android:textSize="16sp"
+                    android:layout_gravity="center"
+                    android:gravity="center" />
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <com.google.android.material.progressindicator.CircularProgressIndicator
+                        android:id="@+id/progress_indicator_sos"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        app:layout_constraintLeft_toLeftOf="parent"
+                        app:layout_constraintRight_toRightOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        android:layout_margin="10dp"
+                        android:indeterminate="true"
+                        app:indicatorColor="@color/purple_200" />
+
+                    <com.google.android.material.textview.MaterialTextView
+                        android:id="@+id/text_progression"
+                        android:layout_width="0dp"
+                        android:layout_height="0dp"
+                        app:layout_constraintLeft_toLeftOf="@+id/progress_indicator_sos"
+                        app:layout_constraintRight_toRightOf="@+id/progress_indicator_sos"
+                        app:layout_constraintTop_toTopOf="@+id/progress_indicator_sos"
+                        app:layout_constraintBottom_toBottomOf="@+id/progress_indicator_sos"
+                        android:padding="2dp"
+                        android:gravity="center"
+                        style="@style/CustomCleanTextColor"
+                        android:textStyle="bold"
+                        android:text=""
+                        android:maxLength="1"
+                        android:maxLines="1"
+                        android:ellipsize="end"
+
+                        />
+                </androidx.constraintlayout.widget.ConstraintLayout>
+            </LinearLayout>
+        </LinearLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

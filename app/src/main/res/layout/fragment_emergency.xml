@@ -1,210 +1,215 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.motion.widget.MotionLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    app:layoutDescription="@xml/fragment_emergency_scene"
-    style="@style/CustomShapeGradient"
-    >
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recycler_emergencies"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:scrollbars="vertical"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/linear_transparent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        style="@style/ScrollView"
-        android:scrollbarStyle="insideInset"
-        />
-    <LinearLayout
-        android:id="@+id/linear_transparent"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:orientation="vertical"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="@+id/linear_filter"
-        />
-    <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/text_input_layout_search_emergencies"
-        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
-        android:layout_marginBottom="10dp"
-        android:layout_marginLeft="25dp"
-        android:layout_marginRight="25dp"
-        android:hint="Search..."
-        android:maxLines="1"
-        android:paddingLeft="10dp"
-        android:paddingRight="10dp"
-        android:textSize="18sp"
-        android:textStyle="normal"
-        app:boxCornerRadiusBottomEnd="30dp"
-        app:boxCornerRadiusBottomStart="30dp"
-        app:boxCornerRadiusTopStart="30dp"
-        app:boxCornerRadiusTopEnd="30dp"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/relative_title_emergencies"
-        >
-        <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/text_input_sign_search_emergencies"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:inputType="textFilter"
-            android:nextFocusDown="@id/button_search"
-            />
-    </com.google.android.material.textfield.TextInputLayout>
-    <LinearLayout
-        android:id="@+id/linear_filter"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:layout_marginEnd="10dp"
-        android:layout_marginRight="10dp"
-        android:gravity="center"
-        android:orientation="horizontal"
-        app:layout_constraintBottom_toBottomOf="@+id/button_search"
-        app:layout_constraintLeft_toLeftOf="@+id/text_input_layout_search_emergencies"
-        app:layout_constraintRight_toLeftOf="@+id/button_search"
-        app:layout_constraintTop_toTopOf="@+id/button_search"
-        >
-        <TextView
-            android:layout_width="wrap_content"
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+
+    </data>
+
+    <androidx.constraintlayout.motion.widget.MotionLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layoutDescription="@xml/fragment_emergency_scene"
+        style="@style/CustomShapeGradient">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recycler_emergencies"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:scrollbars="vertical"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/linear_transparent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            style="@style/ScrollView"
+            android:scrollbarStyle="insideInset" />
+
+        <LinearLayout
+            android:id="@+id/linear_transparent"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:orientation="vertical"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="@+id/linear_filter" />
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/text_input_layout_search_emergencies"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:ellipsize="end"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="10dp"
+            android:layout_marginLeft="25dp"
+            android:layout_marginRight="25dp"
+            android:hint="Search..."
             android:maxLines="1"
-            android:text="Filter : "
-            android:textColor="@color/purple_200"
-            android:textSize="14sp"
-            />
-        <ImageView
-            android:id="@+id/button_image_filter"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:layout_marginStart="5dp"
-            android:layout_marginLeft="5dp"
-            android:background="@drawable/ripple_circle"
-            android:scaleType="centerCrop"
-            android:src="@drawable/ic_baseline_filter_list_24"
-            app:tint="@color/purple_200"
-            android:padding="5dp"
-            android:clickable="true"
-            android:focusable="true"
-            />
-    </LinearLayout>
-    <LinearLayout
-        android:id="@+id/linear_order"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:layout_marginStart="10dp"
-        android:layout_marginLeft="10dp"
-        android:gravity="center"
-        android:orientation="horizontal"
-        app:layout_constraintBottom_toBottomOf="@+id/button_search"
-        app:layout_constraintLeft_toRightOf="@+id/button_search"
-        app:layout_constraintRight_toRightOf="@+id/text_input_layout_search_emergencies"
-        app:layout_constraintTop_toTopOf="@+id/button_search"
-        >
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:ellipsize="end"
-            android:maxLines="1"
-            android:text="Order : "
-            android:textColor="@color/purple_200"
-            android:textSize="14sp"
-            />
-        <ImageView
-            android:id="@+id/button_image_order"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:layout_marginStart="5dp"
-            android:layout_marginLeft="5dp"
-            android:background="@drawable/ripple_circle"
-            android:scaleType="centerCrop"
-            android:src="@drawable/ic_baseline_arrow_upward_24"
-            app:tint="@color/purple_200"
-            android:padding="5dp"
-            android:clickable="true"
-            android:focusable="true"
-            />
-    </LinearLayout>
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/button_search"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_margin="20dp"
-        android:text="Search"
-        app:cornerRadius="5dp"
-        android:visibility="visible"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/text_input_layout_search_emergencies"
-        />
-    <RelativeLayout
-        android:id="@+id/relative_emergency_title"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        style="@style/CustomShapeSecondaryRoundedBottom"
-        app:layout_constraintBottom_toBottomOf="@+id/relative_title_emergencies"
-        app:layout_constraintLeft_toLeftOf="@+id/relative_title_emergencies"
-        app:layout_constraintRight_toRightOf="@+id/relative_title_emergencies"
-        app:layout_constraintTop_toTopOf="parent"
-        />
-    <RelativeLayout
-        android:id="@+id/relative_title_emergencies"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        >
-        <TextView
-            android:id="@+id/text_emergency_top_title"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp"
+            android:textSize="18sp"
+            android:textStyle="normal"
+            app:boxCornerRadiusBottomEnd="30dp"
+            app:boxCornerRadiusBottomStart="30dp"
+            app:boxCornerRadiusTopStart="30dp"
+            app:boxCornerRadiusTopEnd="30dp"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/relative_title_emergencies">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/text_input_sign_search_emergencies"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:inputType="textFilter"
+                android:nextFocusDown="@id/button_search" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <LinearLayout
+            android:id="@+id/linear_filter"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginEnd="10dp"
+            android:layout_marginRight="10dp"
             android:gravity="center"
-            android:text="     EMERGENCIES     "
-            android:textColor="@color/white"
-            android:textSize="16sp"
-            android:textStyle="bold"
-            android:layout_centerInParent="true"
-            />
-        <com.google.android.material.progressindicator.CircularProgressIndicator
+            android:orientation="horizontal"
+            app:layout_constraintBottom_toBottomOf="@+id/button_search"
+            app:layout_constraintLeft_toLeftOf="@+id/text_input_layout_search_emergencies"
+            app:layout_constraintRight_toLeftOf="@+id/button_search"
+            app:layout_constraintTop_toTopOf="@+id/button_search">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:text="Filter : "
+                android:textColor="@color/purple_200"
+                android:textSize="14sp" />
+
+            <ImageView
+                android:id="@+id/button_image_filter"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_marginStart="5dp"
+                android:layout_marginLeft="5dp"
+                android:background="@drawable/ripple_circle"
+                android:scaleType="centerCrop"
+                android:src="@drawable/ic_baseline_filter_list_24"
+                app:tint="@color/purple_200"
+                android:padding="5dp"
+                android:clickable="true"
+                android:focusable="true" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/linear_order"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginStart="10dp"
+            android:layout_marginLeft="10dp"
+            android:gravity="center"
+            android:orientation="horizontal"
+            app:layout_constraintBottom_toBottomOf="@+id/button_search"
+            app:layout_constraintLeft_toRightOf="@+id/button_search"
+            app:layout_constraintRight_toRightOf="@+id/text_input_layout_search_emergencies"
+            app:layout_constraintTop_toTopOf="@+id/button_search">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:text="Order : "
+                android:textColor="@color/purple_200"
+                android:textSize="14sp" />
+
+            <ImageView
+                android:id="@+id/button_image_order"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_marginStart="5dp"
+                android:layout_marginLeft="5dp"
+                android:background="@drawable/ripple_circle"
+                android:scaleType="centerCrop"
+                android:src="@drawable/ic_baseline_arrow_upward_24"
+                app:tint="@color/purple_200"
+                android:padding="5dp"
+                android:clickable="true"
+                android:focusable="true" />
+        </LinearLayout>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/button_search"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:indicatorColor="@color/white"
-            android:indeterminate="true"
-            android:visibility="invisible"
-            android:layout_centerInParent="true"
-            android:layout_margin="5dp"
-            />
-    </RelativeLayout>
-    <LinearLayout
-        android:id="@+id/linear_progress"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        >
-        <com.google.android.material.progressindicator.CircularProgressIndicator
-            android:id="@+id/progress_loading_emergencies"
+            android:layout_margin="20dp"
+            android:text="Search"
+            app:cornerRadius="5dp"
+            android:visibility="visible"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/text_input_layout_search_emergencies" />
+
+        <RelativeLayout
+            android:id="@+id/relative_emergency_title"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            style="@style/CustomShapeSecondaryRoundedBottom"
+            app:layout_constraintBottom_toBottomOf="@+id/relative_title_emergencies"
+            app:layout_constraintLeft_toLeftOf="@+id/relative_title_emergencies"
+            app:layout_constraintRight_toRightOf="@+id/relative_title_emergencies"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <RelativeLayout
+            android:id="@+id/relative_title_emergencies"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:indicatorColor="@color/white"
-            android:indeterminate="true"
-            android:layout_margin="5dp"
-            android:visibility="gone"
-            />
-    </LinearLayout>
-</androidx.constraintlayout.motion.widget.MotionLayout>
+            android:orientation="horizontal"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <TextView
+                android:id="@+id/text_emergency_top_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="     EMERGENCIES     "
+                android:textColor="@color/white"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:layout_centerInParent="true" />
+
+            <com.google.android.material.progressindicator.CircularProgressIndicator
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:indicatorColor="@color/white"
+                android:indeterminate="true"
+                android:visibility="invisible"
+                android:layout_centerInParent="true"
+                android:layout_margin="5dp" />
+        </RelativeLayout>
+
+        <LinearLayout
+            android:id="@+id/linear_progress"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <com.google.android.material.progressindicator.CircularProgressIndicator
+                android:id="@+id/progress_loading_emergencies"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:indicatorColor="@color/white"
+                android:indeterminate="true"
+                android:layout_margin="5dp"
+                android:visibility="gone" />
+        </LinearLayout>
+    </androidx.constraintlayout.motion.widget.MotionLayout>
+</layout>
